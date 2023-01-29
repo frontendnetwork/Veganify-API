@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" data-color-mode="dark" data-dark-theme="dark">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <title>VeganCheck.me API Overview</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
+    />
+    <style>
+      body {
+        width: 50%;
+      }
+
+      @media only screen and (max-width: 750px) {
+        body {
+          width: 95%;
+        }
+        img {
+          display: none;
+        }
+      }
+    </style>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body class="m-5 mx-auto">
+    <div class="markdown-body">
+      <span class="branch-name">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+          class="octicon octicon-git-branch"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M11.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122V6A2.5 2.5 0 0110 8.5H6a1 1 0 00-1 1v1.128a2.251 2.251 0 11-1.5 0V5.372a2.25 2.25 0 111.5 0v1.836A2.492 2.492 0 016 7h4a1 1 0 001-1v-.628A2.25 2.25 0 019.5 3.25zM4.25 12a.75.75 0 100 1.5.75.75 0 000-1.5zM3.5 3.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0z"
+          ></path>
+        </svg>
+        main
+      </span>
+      <img
+        width="80px"
+        src="https://raw.githubusercontent.com/JokeNetwork/vegancheck.me/main/img/hero_icon.png"
+        align="right"
+        alt="VeganCheck Logo"
+      />
+      <h1>VeganCheck.me API Overview</h1>
+      <p>
+        <span class="Label mr-1 Label--success">Stable</span
+        ><span class="Label mr-1 Label--primary">v0.2.0</span
+        ><span class="Label mr-1 Label--accent">Public version</span>
+      </p>
+      <p>
+        The public version of the API misses the following (essential) files:
+      </p>
+      <ul>
+        <li><code>.env</code></li>
+        <li><code>grades.js</code></li>
+        <li><code>node_modules/</code></li>
+      </ul>
+      <h2>Requirements</h2>
+      <ul>
+        <li>
+          <a href="https://nodejs.org/en/download/">Node.js</a> (Reccomended
+          version: v18.13.0 or higher)
+        </li>
+        <li>
+          <a href="https://docs.npmjs.com/cli/v8/commands/npm-install">npm</a>
+        </li>
+      </ul>
+      <h2>Initialize on the API server</h2>
+      <p>
+        Assuming production use in the JokeNetwork/VeganCheck-API environment:
+      </p>
+      <p><strong>Start the service</strong></p>
+      <pre><code class="lang-bash">[jake@cassiopeia ~]$ supervisorctl start vegancheck-api
+veganapi: started</code></pre>
+      <p><strong>Restart the service (e.g. after update)</strong></p>
+      <pre><code class="lang-bash">[jake@cassiopeia ~]$ supervisorctl restart vegancheck-api
+veganapi: stopped
+veganapi: started</code></pre>
+      <p>
+        <strong
+          >Supervisor file located at
+          <code>etc/services.d/veganapi.ini</code></strong
+        >
+      </p>
+      <pre><code>[program:veganapi]
+directory=/home/jake/vegan-api
+command=npm run start
+autostart=true
+autorestart=true
+environment=NODE_ENV=production
+startsecs=30</code></pre>
+      <h2>OpenAPI specification</h2>
+      <div x-data="{ open: false }">
+        <div class="Box">
+          <div class="Box-row d-flex flex-items-center">
+            <div class="flex-auto">
+              <strong>Newest version in the repo</strong>
+              <div class="text-small color-fg-subtle">
+                The version in the repo gets updated more frequently.
+              </div>
+            </div>
+            <a
+              href="https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml"
+              class="btn btn-primary"
+              >Open in repo</a
+            >
+          </div>
+          <div class="Box-row d-flex flex-items-center">
+            <div class="flex-auto">
+              <strong>Version 29/01/23</strong>
+              <div class="text-small color-fg-subtle">
+                Read the version from 29/01/23 here.
+              </div>
+            </div>
+            <button class="btn" @click="open = ! open">Read here</button>
+          </div>
+        </div>
+
+        <pre
+          class="mt-3"
+          x-show="open"
+          @click.outside="open = false"
+        ><code class="lang-bash">openapi: 3.0.0
+    info:
+      title: VeganCheck API
+      version: '0.2.0'
+      description: API for checking if products and ingredients are vegan
+      contact:
+        name: VeganCheck Team
+        email: info@vegancheck.me
+        url: https://api.vegancheck.me
+    
+    servers:
+      - url: https://api.vegancheck.me
+    
+    paths:
+      /v0/product/{barcode}:
+        get:
+          summary: Gives out the name of a product, if the product is vegan or not, if the product is vegetarian or not, if the product is animal cruelty free, if the product contains palmoil, the nutriscore of the product and the VeganCheck Grade of the product as well where this data comes from.
+          parameters:
+            - in: path
+              name: barcode
+              required: true
+              description: The barcode of the product
+              schema:
+                type: string
+          responses:
+            '200':
+              description: OK
+              content: application/json
+            '400':
+              description: Wrong/bad/missing argument
+            '404':
+              description: Product not found
+            '429':
+              description: Rate limit exceeded
+            '500':
+              description: Server error
+            '504':
+              description: Database server took to long to respond
+    
+      /v0/ingredients/{ingredientslist}:
+        get:
+          summary: Check if ingredients out of a ingredientslist are vegan
+          parameters:
+            - in: path
+              name: ingredientslist
+              required: true
+              description: A comma- and space-separated list of ingredients to check
+              schema:
+                type: string
+          responses:
+            '200':
+              description: OK
+              content: application/json
+            '400':
+              description: Missing required parameter
+            '404':
+              description: Missing required parameter
+            '500':
+              description: Server error
+    
+      /v0/peta/crueltyfree:
+        get:
+          summary: Get a automatically daily-updated list of brands that produce animal cruelty free according to PETA
+          responses:
+            '200':
+              description: OK
+            '400':
+              description: Missing required parameter
+            '500':
+              description: Server error</code></pre>
+      </div>
+
+      <h2>Endpoints</h2>
+      <div class="flash flash-success">
+        <svg
+          class="octicon octicon-shield-check"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M11.9275 3.55567C11.9748 3.54134 12.0252 3.54134 12.0725 3.55567L19.3225 5.75264C19.4292 5.78497 19.5 5.88157 19.5 5.99039V11C19.5 13.4031 18.7773 15.3203 17.5164 16.847C16.246 18.3853 14.3925 19.5706 12.0703 20.4278C12.0253 20.4444 11.9746 20.4444 11.9297 20.4278C9.60747 19.5706 7.75398 18.3853 6.48358 16.847C5.2227 15.3203 4.5 13.4031 4.5 11L4.5 5.9904C4.5 5.88158 4.57082 5.78496 4.6775 5.75264L11.9275 3.55567ZM12.5075 2.12013C12.1766 2.01985 11.8234 2.01985 11.4925 2.12013L4.24249 4.3171C3.50587 4.54032 3 5.21807 3 5.9904L3 11C3 13.7306 3.83104 15.9908 5.32701 17.8022C6.81347 19.6021 8.91996 20.9157 11.4102 21.835C11.7904 21.9753 12.2095 21.9753 12.5897 21.835C15.08 20.9157 17.1865 19.6021 18.673 17.8022C20.169 15.9908 21 13.7306 21 11V5.99039C21 5.21804 20.4941 4.54031 19.7575 4.3171L12.5075 2.12013ZM16.2803 9.78033C16.5732 9.48744 16.5732 9.01256 16.2803 8.71967C15.9874 8.42678 15.5126 8.42678 15.2197 8.71967L11 12.9393L9.28033 11.2197C8.98744 10.9268 8.51256 10.9268 8.21967 11.2197C7.92678 11.5126 7.92678 11.9874 8.21967 12.2803L10.4697 14.5303C10.7626 14.8232 11.2374 14.8232 11.5303 14.5303L16.2803 9.78033Z"
+          ></path>
+        </svg>
+        All endpoints are only accessible via HTTPS.
+      </div>
+      <h3>Available endpoints</h3>
+      <p>The following endpoints are available within the VeganCheck.me API:</p>
+      <ul>
+        <li>
+          <code>https://api.vegancheck.me/v0/grades/backend</code><br /><strong
+            >Warning:</strong
+          >
+          This endpoint is not publicly available in the repo and will not be
+          published.
+        </li>
+        <li>
+          <code
+            >https://api.vegancheck.me/v0/ingredients/{ingredientslist}</code
+          >
+        </li>
+        <li><code>https://api.vegancheck.me/v0/peta/crueltyfree</code></li>
+        <li><code>https://api.vegancheck.me/v0/product/{barcode}</code></li>
+      </ul>
+      <h3>Unavailable endpoints</h3>
+      <p>
+        The following endpoints are currently unavailable within the
+        VeganCheck.me API:
+      </p>
+      <ul>
+        <li>
+          <code style="text-decoration: line-through"
+            >https://api.vegancheck.me/v0/peta/veganapproved</code
+          >
+        </li>
+      </ul>
+      <h2>API documentation</h2>
+      <p>
+        The API documentation can be found at one of the following locations:
+      </p>
+      <ul>
+        <li>
+          <a href="https://jokenetwork.de/vegancheck-api"
+            >VeganCheck.me API at JokeNetwork</a
+          >
+        </li>
+        <li>
+          <a href="https://jokenetwork.de/vegancheck-ingredients-api"
+            >VeganCheck.me Ingredients API at JokeNetwork</a
+          >
+        </li>
+        <li>
+          <a href="https://jokenetwork.de/vegancheck-peta-api"
+            >VeganCheck.me PETA API at JokeNetwork</a
+          >
+        </li>
+      </ul>
+      <footer class="border-top">
+        <p class="color-fg-muted mt-2">
+          &copy; <span id="date"></span>
+          <a href="//vegancheck.me">VeganCheck.me</a> - Licensed under
+          <a
+            href="https://github.com/JokeNetwork/vegancheck.me/blob/main/LICENSE"
+            >MIT</a
+          >
+        </p>
+      </footer>
+    </div>
+    <script>
+      document.getElementById("date").innerHTML = new Date().getFullYear();
+    </script>
+  </body>
+</html>
