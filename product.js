@@ -7,23 +7,30 @@ module.exports = function (app) {
   const bodyParser = require("body-parser");
   require("dotenv").config();
 
-  app.post("/v0/product/:id", (req, res) => {
+  app.post(["/v0/product/:id", "/v0/product/"], (req, res) => {
+    let barcode;
+
     if (!req.params.id) {
+      barcode = req.body.barcode;
+    }
+    else if (!req.body.barcode) {
+      barcode = req.params.id;
+    }
+    if (!req.params.id && !req.body.barcode) {
       res.status(400).json({
         status: "400",
         code: "Bad request",
         message: "Missing argument v0/product/:barcode",
       });
     } 
-    else if (isNaN(req.params.id)) {
-        res.status(400).json({
-            status: "400",
-            code: "Bad request",
-            message: "Wrong argument v0/product/:barcode",
-          });
+    else if (isNaN(barcode)) {
+      res.status(400).json({
+          status: "400",
+          code: "Bad request",
+          message: "Wrong argument v0/product/:barcode",
+        });
     }
     else {
-      const barcode = req.params.id;
       let vegan = "n/a";
       let vegetarian = "n/a";
       let palmoil = "n/a";
