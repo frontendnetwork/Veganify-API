@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: VeganCheck API
+  version: '0.2.0'
+  description: API for checking if products and ingredients are vegan
+  contact:
+    name: VeganCheck Team
+    email: info@vegancheck.me
+    url: https://api.vegancheck.me
+
+servers:
+  - url: https://api.vegancheck.me
+
+paths:
+  /v0/product/{barcode}:
+    get:
+      summary: Gives out the name of a product, if the product is vegan or not, if the product is vegetarian or not, if the product is animal cruelty free, if the product contains palmoil, the nutriscore of the product and the VeganCheck Grade of the product as well where this data comes from.
+      parameters:
+        - in: path
+          name: barcode
+          required: true
+          description: The barcode of the product
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content: application/json
+        '400':
+          description: Wrong/bad/missing argument
+        '404':
+          description: Product not found
+        '429':
+          description: Rate limit exceeded
+        '500':
+          description: Server error
+        '504':
+          description: Database server took to long to respond
+
+  /v0/ingredients/{ingredientslist}:
+    get:
+      summary: Check if ingredients out of a ingredientslist are vegan
+      parameters:
+        - in: path
+          name: ingredientslist
+          required: true
+          description: A comma- and space-separated list of ingredients to check
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content: application/json
+        '400':
+          description: Missing required parameter
+        '404':
+          description: Missing required parameter
+        '500':
+          description: Server error
+
+  /v0/peta/crueltyfree:
+    get:
+      summary: Get a automatically daily-updated list of brands that produce animal cruelty free according to PETA
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Missing required parameter
+        '500':
+          description: Server error

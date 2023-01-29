@@ -1,0 +1,32 @@
+{
+  "name": "vegancheck-api",
+  "version": "0.2.0",
+  "description": "VeganCheck.me API, with endpoints v0/product/:barcode, v0/peta/crueltyfree and v0/ingredients/:ingredients",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "JokeNetwork, VeganCheck.me Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.2.5",
+    "body-parser": "^1.20.1",
+    "cheerio": "^1.0.0-rc.12",
+    "dom-parser": "^0.1.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "http": "^0.0.1-security",
+    "iconv-lite": "^0.6.3",
+    "ini": "^3.0.1",
+    "jsdom": "^21.1.0",
+    "lodash": "^4.17.21",
+    "mailer": "^0.6.7",
+    "nodemailer": "^6.9.1",
+    "querystring": "^0.2.1",
+    "request": "^2.88.2",
+    "url": "^0.11.0",
+    "xmldom": "^0.6.0"
+  }
+}
