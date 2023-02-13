@@ -129,7 +129,7 @@ module.exports = function (app) {
                       if (product.product.brands) {
                         try {
                           const response = await axios.get(
-                            "https://python.vegancheck.me/v0/peta/crueltyfree"
+                            "https://api.vegancheck.me/v0/peta/crueltyfree"
                           );
                           const peta = response.data;
                           const dnt = peta.PETA_DOES_NOT_TEST;
@@ -206,6 +206,7 @@ module.exports = function (app) {
                     const status = array.error;
                     if (status == "0") {
                       const desc = iconv.decode(Buffer.from(array.descr), "ISO-8859-1").toString();
+                      const decodeddesc = decodeURI(desc.replace("\n", ""));
                       apiname = "Open EAN Database";
                       baseuri = "https://opengtindb.org";
                       productname = iconv
@@ -233,8 +234,8 @@ module.exports = function (app) {
                         vegetarian = "true";
                       } else if (desc != null) {
                         headers = { "Content-Type": "text/plain" };
-                        result = await axios.get(
-                          `https://python.vegancheck.me/v0/ingredients/${desc}`,
+                        /* result = await axios.get(
+                          `https://api.vegancheck.me/v0/ingredients/${decodeddesc}`,
                           { headers }
                         );
                         json = result.data;
@@ -245,7 +246,7 @@ module.exports = function (app) {
                         } else {
                           vegan = "false";
                           processed = "true";
-                        }
+                        }*/
 
                         result = {
                           status: 200,
