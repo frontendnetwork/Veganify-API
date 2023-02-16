@@ -1,4 +1,4 @@
-<img width="80px" src="https://raw.githubusercontent.com/JokeNetwork/vegancheck.me/main/img/hero_icon.png" align="right" alt="VeganCheck Logo">
+<img width="80px" src="https://raw.githubusercontent.com/JokeNetwork/vegancheck.me/main/public/img/hero_icon.png" align="right" alt="VeganCheck Logo">
 
 # VeganCheck.me API (v0.2.0)
 
