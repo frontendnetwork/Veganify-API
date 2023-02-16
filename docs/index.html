@@ -65,8 +65,7 @@
       <h2>Requirements</h2>
       <ul>
         <li>
-          <a href="https://nodejs.org/en/download/">Node.js</a> (Reccomended
-          version: v18.13.0 or higher)
+          <a href="https://nodejs.org/en/download/">Node.js</a> (Recommended version: v18.13.0 or higher)
         </li>
         <li>
           <a href="https://docs.npmjs.com/cli/v8/commands/npm-install">npm</a>
@@ -77,10 +76,10 @@
         Assuming production use in the JokeNetwork/VeganCheck-API environment:
       </p>
       <p><strong>Start the service</strong></p>
-      <pre><code class="lang-bash">[jake@cassiopeia ~]$ supervisorctl start vegancheck-api
+      <pre><code class="lang-bash">[user@server ~]$ supervisorctl start vegancheck-api
 veganapi: started</code></pre>
       <p><strong>Restart the service (e.g. after update)</strong></p>
-      <pre><code class="lang-bash">[jake@cassiopeia ~]$ supervisorctl restart vegancheck-api
+      <pre><code class="lang-bash">[user@server ~]$ supervisorctl restart vegancheck-api
 veganapi: stopped
 veganapi: started</code></pre>
       <p>
@@ -90,7 +89,7 @@ veganapi: started</code></pre>
         >
       </p>
       <pre><code>[program:veganapi]
-directory=/home/jake/vegan-api
+directory=/home/user/vegan-api
 command=npm run start
 autostart=true
 autorestart=true
