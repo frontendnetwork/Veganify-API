@@ -12,8 +12,7 @@ module.exports = function (app) {
 
     if (!req.params.id) {
       barcode = req.body.barcode;
-    }
-    else if (!req.body.barcode) {
+    } else if (!req.body.barcode) {
       barcode = req.params.id;
     }
     if (!req.params.id && !req.body.barcode) {
@@ -22,15 +21,13 @@ module.exports = function (app) {
         code: "Bad request",
         message: "Missing argument v0/product/:barcode",
       });
-    } 
-    else if (isNaN(barcode)) {
+    } else if (isNaN(barcode)) {
       res.status(400).json({
-          status: "400",
-          code: "Bad request",
-          message: "Wrong argument v0/product/:barcode",
-        });
-    }
-    else {
+        status: "400",
+        code: "Bad request",
+        message: "Wrong argument v0/product/:barcode",
+      });
+    } else {
       let vegan = "n/a";
       let vegetarian = "n/a";
       let palmoil = "n/a";
@@ -111,6 +108,45 @@ module.exports = function (app) {
                     }
 
                     if (apiname == "OpenBeautyFacts") {
+                      if (array) {
+                        if (
+                          array.includes("en:vegan") ||
+                          array.includes("de:vegan")
+                        ) {
+                          vegan = "true";
+                        } else if (
+                          array.includes("en:non-vegan") ||
+                          array.includes("de:non-vegan")
+                        ) {
+                          vegan = "false";
+                        } else {
+                          vegan = "n/a";
+                        }
+                        if (
+                          array.includes("en:vegetarian") ||
+                          array.includes("de:vegetarian")
+                        ) {
+                          vegetarian = "true";
+                        } else if (array.includes("en:non-vegetarian")) {
+                          vegetarian = "false";
+                        } else {
+                          vegetarian = "n/a";
+                        }
+                        if (
+                          array.includes("en:palm-oil-free") ||
+                          array.includes("de:palmölfrei")
+                        ) {
+                          palmoil = "false";
+                        } else if (
+                          array.includes("en:palm-oil") ||
+                          array.includes("de:palm-oil")
+                        ) {
+                          palmoil = "true";
+                        }
+                        else {
+                          palmoil = "n/a";
+                        }
+                      }
                       if (product.product.labels_tags) {
                         const labels_tags = product.product.labels_tags;
                         if (
@@ -156,8 +192,13 @@ module.exports = function (app) {
                           array.includes("de:vegan")
                         ) {
                           vegan = "true";
-                        } else {
+                        } else if (
+                          array.includes("en:non-vegan") ||
+                          array.includes("de:non-vegan")
+                        ) {
                           vegan = "false";
+                        } else {
+                          vegan = "n/a";
                         }
                         if (
                           array.includes("en:vegetarian") ||
@@ -174,8 +215,14 @@ module.exports = function (app) {
                           array.includes("de:palmölfrei")
                         ) {
                           palmoil = "false";
-                        } else {
+                        } else if (
+                          array.includes("en:palm-oil") ||
+                          array.includes("de:palm-oil")
+                        ) {
                           palmoil = "true";
+                        }
+                        else {
+                          palmoil = "n/a";
                         }
                       }
                     }
@@ -205,7 +252,9 @@ module.exports = function (app) {
                     array = ini.parse(oedb.data);
                     const status = array.error;
                     if (status == "0") {
-                      const desc = iconv.decode(Buffer.from(array.descr), "ISO-8859-1").toString();
+                      const desc = iconv
+                        .decode(Buffer.from(array.descr), "ISO-8859-1")
+                        .toString();
                       const decodeddesc = decodeURI(desc.replace("\n", ""));
                       apiname = "Open EAN Database";
                       baseuri = "https://opengtindb.org";
