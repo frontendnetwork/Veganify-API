@@ -13,7 +13,7 @@ servers:
 
 paths:
   /v0/product/{barcode}:
-    get:
+    post:
       summary: Gives out the name of a product, if the product is vegan or not, if the product is vegetarian or not, if the product is animal cruelty free, if the product contains palmoil, the nutriscore of the product and the VeganCheck Grade of the product as well where this data comes from.
       parameters:
         - in: path
