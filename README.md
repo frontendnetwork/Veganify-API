@@ -1,12 +1,19 @@
-<img width="80px" src="https://user-images.githubusercontent.com/4144601/221289921-b5437f01-7b5c-415a-afd5-d49b926a9217.svg" align="right" alt="VeganCheck Logo">
+<div align="center">
+<img src="https://user-images.githubusercontent.com/4144601/221289921-b5437f01-7b5c-415a-afd5-d49b926a9217.svg" alt="VeganCheck API logo" width="128">
 
 # VeganCheck.me API (v0.2.0)
 
-This is the official VeganCheck.me API.
+The official API for [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
+  
+<br />
+
+<img src="https://user-images.githubusercontent.com/4144601/221717632-0d8ac44f-4eb0-43ef-906a-bc31e0021055.png" alt="">
+
+</div>
+
+## Documentation 
 
 Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/vegancheck-api) for a full documentation.
-
-An OpenAPI.yaml-file is located at the main branch of this repo. 
 
 To learn more about this repo, head to: [https://jokenetwork.github.io/VeganCheck.me-API/](https://jokenetwork.github.io/VeganCheck.me-API/).
 
