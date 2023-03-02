@@ -37,7 +37,6 @@ module.exports = function (app) {
           fs.readFile("./isvegan.json", "utf-8", (err, data) => {
             if (err) throw err;
             const isvegan = JSON.parse(data);
-            console.log(translated);
             if (translated === "false"){
               var response = ingredients.split(",");
             }
@@ -46,7 +45,7 @@ module.exports = function (app) {
             }
 
             var res2 = _.intersectionWith(isvegan, response, _.isEqual);
-            if (res2.length === 0 || res2.length === 2) {
+            if (res2.length === 0) {
               res2 = "translate";
             }
 
