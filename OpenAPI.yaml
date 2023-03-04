@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
   title: VeganCheck API
   version: '0.2.0'
@@ -6,13 +6,16 @@ info:
   contact:
     name: VeganCheck Team
     email: info@vegancheck.me
-    url: https://api.vegancheck.me
+    url: https://vegancheck.me/
+externalDocs:
+    description: VeganCheck.me API Documentation 
+    url: https://jokenetwork.de/vegancheck-api    
 
 servers:
-  - url: https://api.vegancheck.me
+  - url: https://api.vegancheck.me/v0
 
 paths:
-  /v0/product/{barcode}:
+  /product/{barcode}:
     post:
       summary: Gives out the name of a product, if the product is vegan or not, if the product is vegetarian or not, if the product is animal cruelty free, if the product contains palmoil, the nutriscore of the product and the VeganCheck Grade of the product as well where this data comes from.
       parameters:
@@ -25,7 +28,6 @@ paths:
       responses:
         '200':
           description: OK
-          content: application/json
         '400':
           description: Wrong/bad/missing argument
         '404':
@@ -37,7 +39,7 @@ paths:
         '504':
           description: Database server took to long to respond
 
-  /v0/ingredients/{ingredientslist}:
+  /ingredients/{ingredientslist}:
     get:
       summary: Check if ingredients out of a ingredientslist are vegan
       parameters:
@@ -50,7 +52,6 @@ paths:
       responses:
         '200':
           description: OK
-          content: application/json
         '400':
           description: Missing required parameter
         '404':
@@ -58,7 +59,7 @@ paths:
         '500':
           description: Server error
 
-  /v0/peta/crueltyfree:
+  /peta/crueltyfree:
     get:
       summary: Get a automatically daily-updated list of brands that produce animal cruelty free according to PETA
       responses:
