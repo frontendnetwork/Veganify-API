@@ -1,4 +1,4 @@
-name: Validate OpenAPI.yml
+name: OpenAPI Validation
 
 on: [push]
 
