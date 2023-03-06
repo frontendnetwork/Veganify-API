@@ -318,10 +318,10 @@ module.exports = function (app) {
                       }
                     } else {
                       const error = {
-                        status: 400,
+                        status: 404,
                         error: "Product not found",
                       };
-                      res.json(error);
+                      res.status(404).json(error);
                     }
                   }
                 });
