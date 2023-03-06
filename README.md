@@ -3,7 +3,7 @@
 
 # VeganCheck.me API (v0.2.0)
 
-The official API for [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
+The official API powering [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
   
 <br />
 
@@ -22,20 +22,19 @@ To learn more about this repo, head to: [https://jokenetwork.github.io/VeganChec
 
 The [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/JokeNetwork/VeganCheck.me-API/main/OpenAPI.yaml)
 
-## Endpoints
+### API Endpoints
 
-All endpoints are only accessible via HTTPS.
+> **Warning** <br />
+> All endpoints are only accessible via HTTPS. All HTTP requests will be rerouted to HTTPS.<br /> 
+> Making a request over HTTP may cause data to be transmitted unencrypted for a short time and the server to send a `301` code.
     
-### Available endpoints
+#### Available endpoints
 The following endpoints are available within the VeganCheck.me API:
+- POST: <https://api.vegancheck.me/v0/product/{barcode}>
+- GET: <https://api.vegancheck.me/v0/ingredients/{ingredientslist}>
+- GET: <https://api.vegancheck.me/v0/peta/crueltyfree>
 
-- `https://api.vegancheck.me/v0/grades/backend`
-
-   Warning: This endpoint is not publicly available in the repo and will not be published.
-- `https://api.vegancheck.me/v0/ingredients/{ingredientslist}`
-- `https://api.vegancheck.me/v0/peta/crueltyfree`
-- `https://api.vegancheck.me/v0/product/{barcode}`
-
-### Unavailable endpoints
-The following endpoints are currently unavailable within the VeganCheck.me API:
-- <del>`https://api.vegancheck.me/v0/peta/veganapproved`</del>
+#### Unavailable endpoints
+The following endpoints are currently unavailable within the public VeganCheck.me API. They're not on the roadmap and will not be published:
+- <del>GET: [https://api.vegancheck.me/v0/peta/veganapproved](https://api.vegancheck.me/v0/peta/veganapproved)</del>
+- <del>POST: <https://api.vegancheck.me/v0/grades/backend></del>
