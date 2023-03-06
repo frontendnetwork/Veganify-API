@@ -18,9 +18,9 @@ Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/veganch
 To learn more about this repo, head to: [https://jokenetwork.github.io/VeganCheck.me-API/](https://jokenetwork.github.io/VeganCheck.me-API/).
 
 ### Swagger
-There is currently no official Swagger documentation for the API, but the [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger.
-
 [![Validate OpenAPI.yml](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
+
+The [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/JokeNetwork/VeganCheck.me-API/main/OpenAPI.yaml)
 
 ## Endpoints
 
