@@ -17,6 +17,11 @@ Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/veganch
 
 To learn more about this repo, head to: [https://jokenetwork.github.io/VeganCheck.me-API/](https://jokenetwork.github.io/VeganCheck.me-API/).
 
+### Swagger
+There is currently no official Swagger documentation for the API, but the [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger.
+
+[![Validate OpenAPI.yml](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
+
 ## Endpoints
 
 All endpoints are only accessible via HTTPS.
@@ -30,7 +35,6 @@ The following endpoints are available within the VeganCheck.me API:
 - `https://api.vegancheck.me/v0/ingredients/{ingredientslist}`
 - `https://api.vegancheck.me/v0/peta/crueltyfree`
 - `https://api.vegancheck.me/v0/product/{barcode}`
-
 
 ### Unavailable endpoints
 The following endpoints are currently unavailable within the VeganCheck.me API:
