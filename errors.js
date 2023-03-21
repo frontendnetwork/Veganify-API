@@ -1,15 +1,48 @@
+var fs = require("fs");
+
 module.exports = function (app) {
   /* OpenAPI.yml definition */
-  app.get(["/OpenAPI.yaml", "/OpenAPI.yml", '/openapi', '/spec', '/specification', "/v0/OpenAPI.yaml", "/v0/OpenAPI.yml", '/v0/openapi', '/v0/spec', '/v0/specification'], (req, res) => {
-    res.sendFile(__dirname + "/OpenAPI.yaml", {
-      headers: {
-        "Content-Type": "application/yaml; charset=utf-8",
-      },
-    });
+  app.get(
+    [
+      "/OpenAPI.yaml",
+      "/OpenAPI.yml",
+      "/openapi",
+      "/spec",
+      "/specification",
+      "/v0/OpenAPI.yaml",
+      "/v0/OpenAPI.yml",
+      "/v0/openapi",
+      "/v0/spec",
+      "/v0/specification",
+    ],
+    (req, res) => {
+      fs.readFile(
+        __dirname + "/OpenAPI.yaml",
+        "utf8",
+        function (err, contents) {
+          res.writeHead(200, { "Content-Type": "text/yaml" });
+          res.write(contents);
+          res.end();
+        }
+      );
+    }
+  );
+
+  /* security.txt */
+  app.get("/.well-known/security.txt", (req, res) => {
+    fs.readFile(
+      __dirname + "/.well-known/security.txt",
+      "utf8",
+      function (err, contents) {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.write(contents);
+        res.end();
+      }
+    );
   });
 
   app.post("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 404,
       code: "Not found",
@@ -23,7 +56,7 @@ module.exports = function (app) {
   });
 
   app.get("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 404,
       code: "Not found",
@@ -37,7 +70,7 @@ module.exports = function (app) {
   });
 
   app.put("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 405,
       code: "Method not allowed",
@@ -50,7 +83,7 @@ module.exports = function (app) {
   });
 
   app.delete("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 405,
       code: "Method not allowed",
@@ -63,7 +96,7 @@ module.exports = function (app) {
   });
 
   app.patch("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 405,
       code: "Method not allowed",
@@ -76,7 +109,7 @@ module.exports = function (app) {
   });
 
   app.put("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 405,
       code: "Method not allowed",
@@ -89,7 +122,7 @@ module.exports = function (app) {
   });
 
   app.propfind("*", (req, res) => {
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     const result = {
       status: 405,
       code: "Method not allowed",
@@ -103,7 +136,9 @@ module.exports = function (app) {
 
   app.options("*", (req, res) => {
     const result = {
-      GET: { paths: ["/v0/ingredients/:ingredientslist", "v0/peta/crueltyfree"] },
+      GET: {
+        paths: ["/v0/ingredients/:ingredientslist", "v0/peta/crueltyfree"],
+      },
       POST: { paths: "/v0/product/:barcode" },
     };
     res.status(200).json(result);
