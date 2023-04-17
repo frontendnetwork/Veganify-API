@@ -4,9 +4,9 @@
 # VeganCheck.me API (v0.2.0)
 
 The official API powering [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
-  
+
 <br />
-  
+
 ![postman_dark](https://user-images.githubusercontent.com/4144601/232414583-466b133f-ef98-457b-a478-88f53e2e91cd.png#gh-dark-mode-only)
 ![postman_light](https://user-images.githubusercontent.com/4144601/232414600-76809abb-9ace-4801-8787-e116526da4e1.png#gh-light-mode-only)
 </div>
@@ -21,6 +21,10 @@ To learn more about this repo, head to: [https://jokenetwork.github.io/VeganChec
 [![Validate OpenAPI.yml](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
 
 The [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/JokeNetwork/VeganCheck.me-API/main/OpenAPI.yaml)
+
+### Postman
+
+Postman Collection is available for download here: [VeganCheck API.postman_collection.json.zip](https://github.com/JokeNetwork/VeganCheck.me-API/files/11247406/VeganCheck.API.postman_collection.json.zip)
 
 ### API Endpoints
 
