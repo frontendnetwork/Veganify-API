@@ -6,9 +6,9 @@
 The official API powering [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
   
 <br />
-
-<img src="https://user-images.githubusercontent.com/4144601/221717632-0d8ac44f-4eb0-43ef-906a-bc31e0021055.png" alt="">
-
+  
+![postman_dark](https://user-images.githubusercontent.com/4144601/232414583-466b133f-ef98-457b-a478-88f53e2e91cd.png#gh-dark-mode-only)
+![postman_light](https://user-images.githubusercontent.com/4144601/232414600-76809abb-9ace-4801-8787-e116526da4e1.png#gh-light-mode-only)
 </div>
 
 ## Documentation 
