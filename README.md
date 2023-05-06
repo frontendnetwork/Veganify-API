@@ -17,6 +17,8 @@ Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/veganch
 
 To learn more about this repo, head to: [https://jokenetwork.github.io/VeganCheck.me-API/](https://jokenetwork.github.io/VeganCheck.me-API/).
 
+There is an official [Wrapper for React available on npm](https://www.npmjs.com/package/@frontendnetwork/vegancheck).
+
 ### Swagger
 [![Validate OpenAPI.yml](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
 
