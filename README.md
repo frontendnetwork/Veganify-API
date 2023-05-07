@@ -3,7 +3,7 @@
 
 # VeganCheck.me API (v0.2.0)
 
-The official API powering [VeganCheck.me](https://github.com/jokenetwork/vegancheck.me).
+The official API powering [VeganCheck.me](https://github.com/frontendnetwork/vegancheck.me).
 
 <br />
 
@@ -15,18 +15,18 @@ The official API powering [VeganCheck.me](https://github.com/jokenetwork/veganch
 
 Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/vegancheck-api) for a full documentation.
 
-To learn more about this repo, head to: [https://jokenetwork.github.io/VeganCheck.me-API/](https://jokenetwork.github.io/VeganCheck.me-API/).
+To learn more about this repo, head to: [https://frontendnetwork.github.io/VeganCheck.me-API/](https://frontendnetwork.github.io/VeganCheck.me-API/).
 
 There is an official [Wrapper for React available on npm](https://www.npmjs.com/package/@frontendnetwork/vegancheck).
 
 ### Swagger
-[![Validate OpenAPI.yml](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
+[![Validate OpenAPI.yml](https://github.com/frontendnetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
 
-The [`OpenAPI.yml`](https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/JokeNetwork/VeganCheck.me-API/main/OpenAPI.yaml)
+The [`OpenAPI.yml`](https://github.com/frontendnetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/frontendnetwork/VeganCheck.me-API/main/OpenAPI.yaml)
 
 ### Postman
 
-Postman Collection is available for download here: [VeganCheck API.postman_collection.json.zip](https://github.com/JokeNetwork/VeganCheck.me-API/files/11247406/VeganCheck.API.postman_collection.json.zip)
+Postman Collection is available for download here: [VeganCheck API.postman_collection.json.zip](https://github.com/frontendnetwork/VeganCheck.me-API/files/11247406/VeganCheck.API.postman_collection.json.zip)
 
 ### API Endpoints
 
