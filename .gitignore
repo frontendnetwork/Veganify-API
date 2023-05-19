@@ -3,3 +3,5 @@ node_modules
 grades.js
 .DS_Store
 affinity/
+dist/
+src/grades.ts
