@@ -1,7 +1,5 @@
 node_modules
 .env
-grades.js
 .DS_Store
 affinity/
 dist/
-src/grades.ts

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "node dist/app.js",
-    "prestart": "tsc"
+    "build": "tsc"
   },
   "author": "JokeNetwork, VeganCheck.me Contributors",
   "license": "MIT",
