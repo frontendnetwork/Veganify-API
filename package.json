@@ -30,7 +30,7 @@
     "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
     "mailer": "^0.6.6",
-    "nodemailer": "^6.9.2",
+    "nodemailer": "^6.9.3",
     "querystring": "^0.2.1",
     "request": "^2.88.2",
     "url": "^0.11.0",
