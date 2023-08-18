@@ -1,7 +1,10 @@
 import fs from 'fs'
-import express, { type Application, type Request, type Response } from 'express'
+import { type Application, type Request, type Response } from 'express'
+import pino from 'pino';
 
-module.exports = function (app: Application): void {
+const logger = pino({ level: process.env.LOG_LEVEL || 'warn' });
+
+export default function (app: Application): void {
   /* OpenAPI.yml definition */
   app.get(
     [
@@ -20,10 +23,10 @@ module.exports = function (app: Application): void {
       fs.readFile('./OpenAPI.yaml',
         'utf8',
         (err: NodeJS.ErrnoException | null, contents: string) => {
-          if (err) {
-            console.error('Error reading file:', err);
-            res.status(500).send('Error reading OpenAPI specification');
-            return;
+          if (err != null) {
+            logger.error('Error reading file:', err)
+            res.status(500).send('Error reading OpenAPI specification')
+            return
           }
           res.writeHead(200, { 'Content-Type': 'text/yaml' })
           res.write(contents)
@@ -32,13 +35,13 @@ module.exports = function (app: Application): void {
       )
     }
   )
-  
 
   /* security.txt */
   app.get('/.well-known/security.txt', (req: Request, res: Response) => {
     fs.readFile('./.well-known/security.txt',
       'utf8',
       (err: NodeJS.ErrnoException | null, contents: string) => {
+        logger.warn(err)
         res.writeHead(200, { 'Content-Type': 'text/plain' })
         res.write(contents)
         res.end()

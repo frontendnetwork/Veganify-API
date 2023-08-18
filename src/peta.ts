@@ -1,9 +1,9 @@
-import { type Request, type Response, type Express } from 'express'
+import { type Request, type Response, type Application } from 'express'
 import path from 'path'
 
-module.exports = function (app: Express): void {
+export default function (app: Application): void {
   app.get('/v0/peta/:type', (req: Request, res: Response) => {
-    if (!req.params.type) {
+    if (req.params.type.length === 0) {
       res.status(400).json({
         status: '400',
         code: 'Bad request',
