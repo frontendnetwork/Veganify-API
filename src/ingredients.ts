@@ -1,12 +1,14 @@
-import express, { type Application, type Request, type Response } from 'express'
+import { type Application, type Request, type Response } from 'express'
 import fs from 'fs'
 import _ from 'lodash'
 import translate from 'deepl'
+import pino from 'pino';
 import dotenv from 'dotenv'
-import { text } from 'body-parser'
 dotenv.config()
 
-module.exports = function (app: Application): void {
+const logger = pino({ level: process.env.LOG_LEVEL || 'warn' });
+
+export default function (app: Application): void {
   app.get('/v0/ingredients/:ingredients', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Charset', 'utf-8')
@@ -19,7 +21,7 @@ module.exports = function (app: Application): void {
     }
 
     let ingredients: string
-    if (req.params.ingredients != undefined && req.params.ingredients != '') {
+    if (req.params.ingredients !== undefined && req.params.ingredients !== '') {
       ingredients = unescape(req.params.ingredients.toLowerCase()).replace(/\s/g, '')
 
       /* Translate to english */
@@ -27,7 +29,7 @@ module.exports = function (app: Application): void {
         free_api: true,
         text: ingredients,
         target_lang: 'EN',
-        auth_key: `${process.env.DEEPL_AUTH}`
+        auth_key: `${process.env.DEEPL_AUTH as string}`
       })
         .then((result: any) => {
           const targetlanguage = result.data.translations[0].detected_source_language
@@ -52,7 +54,7 @@ module.exports = function (app: Application): void {
               free_api: true,
               text: res2.join(','),
               target_lang: targetlanguage,
-              auth_key: `${process.env.DEEPL_AUTH}`
+              auth_key: `${process.env.DEEPL_AUTH as string}`
             })
               .then((result: any) => {
                 if (res2[0] === 'translate') {
@@ -67,6 +69,7 @@ module.exports = function (app: Application): void {
                     })
                   )
                 } else {
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const textValues = result.data.translations.map((translation: any) => translation.text)
                   const flagged = result.data.translations[0].text.split(',')
 
@@ -84,7 +87,7 @@ module.exports = function (app: Application): void {
                 }
               })
               .catch((error: Error) => {
-                console.warn(error)
+                logger.error(error)
                 res.status(429).send(
                   JSON.stringify({
                     code: 'Rate limit reached',
@@ -95,6 +98,7 @@ module.exports = function (app: Application): void {
           })
         })
         .catch((error: Error) => {
+          logger.error(error);
           fs.readFile('./isvegan.json', 'utf-8', (err: NodeJS.ErrnoException | null, data: string) => {
             if (err != null) throw err
             const isvegan = JSON.parse(data)
