@@ -1,10 +1,13 @@
 import express, { type Application, type Request, type Response } from 'express'
 import request from 'request'
 import nodemailer from 'nodemailer'
+import pino from 'pino';
 import dotenv from 'dotenv'
 dotenv.config()
 
-module.exports = function (app: Application): void {
+const logger = pino({ level: process.env.LOG_LEVEL || 'warn' });
+
+export default function (app: Application): void {
   app.use(express.json())
 
   app.post('/v0/grades/backend', (req: Request, res: Response) => {
@@ -48,10 +51,10 @@ module.exports = function (app: Application): void {
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error: Error | null, info: nodemailer.SentMessageInfo) => {
           if (error != null) {
-            console.log(error)
+            logger.warn(error)
             res.send('Error')
           } else {
-            console.log('Message sent: %s', info.messageId)
+            logger.info('Message sent: %s', info.messageId)
             res.send('Sent')
           }
         })

@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://user-images.githubusercontent.com/4144601/221289921-b5437f01-7b5c-415a-afd5-d49b926a9217.svg" alt="VeganCheck API logo" width="128">
 
-# VeganCheck.me API (v0.2.0)
+# VeganCheck.me API (v0.3)
 
 The official API powering [VeganCheck.me](https://github.com/frontendnetwork/vegancheck.me).
 

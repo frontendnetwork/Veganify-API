@@ -6,5 +6,5 @@
       "strict": true,
       "esModuleInterop": true
     },
-    "include": ["src/**/*", "jest.config.js"]
+    "include": ["src/**/*", "jest.config.js"],
   }
