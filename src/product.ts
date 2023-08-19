@@ -7,7 +7,7 @@ import pino from "pino";
 import dotenv from "dotenv";
 dotenv.config();
 
-const logger = pino({ level: process.env.LOG_LEVEL || "warn" });
+const logger = pino({ level: process.env.LOG_LEVEL || "info" });
 
 export default function (app: Application): void {
   app.post(
@@ -285,6 +285,7 @@ export default function (app: Application): void {
                           edituri,
                         },
                       };
+                      logger.info(result);
                       res.json(result);
                     } else {
                       axios
@@ -353,6 +354,7 @@ export default function (app: Application): void {
                                   baseuri,
                                 },
                               };
+                              logger.info(result);
                               res.json(result);
                             }
                           } else {
