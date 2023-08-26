@@ -3,7 +3,7 @@ FROM node:lts-alpine
 WORKDIR /app
 COPY . .
 RUN npm install
-RUN npm run start:prod
+RUN npm run build
 
 EXPOSE 8080
-CMD [ "node", "dist/app.js" ]
+CMD [ "node", "dist/main.js" ]
