@@ -52,7 +52,10 @@ export class ProductService {
       edituri = product.url;
       productname = product?.product_name;
       genericname = product?.generic_name;
-      nutriscore = product?.nutriscore_grade?.toUpperCase();
+
+      if (product.nutriscore_grade) {
+        nutriscore = product?.nutriscore_grade?.toUpperCase();
+      }
 
       if (product.labels_tags) {
         if (
