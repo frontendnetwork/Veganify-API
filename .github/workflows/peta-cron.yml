@@ -1,0 +1,34 @@
+name: PETA Cron Job
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+
+jobs:
+  fetch-and-save:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo on main branch
+      uses: actions/checkout@v2
+      with:
+        ref: main
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install axios cheerio qs jsdom
+
+    - name: Fetch PETA Data and Save
+      run: node .github/scripts/peta-cron.js
+
+    - name: Commit and push if there are changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add peta_cruelty_free.json
+        git commit -m "Update peta_cruelty_free.json" || echo "No changes to commit"
+        git push origin main
