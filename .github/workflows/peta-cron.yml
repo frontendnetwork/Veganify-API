@@ -32,4 +32,4 @@ jobs:
         git config --local user.name "GitHub Action"
         git add peta_cruelty_free.json
         git commit -m "Update peta_cruelty_free.json" || echo "No changes to commit"
-        git push origin staging 
+        git push origin staging --force
