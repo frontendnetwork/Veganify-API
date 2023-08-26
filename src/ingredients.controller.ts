@@ -1,28 +1,46 @@
-import { type Application, type Request, type Response } from "express";
+import {
+  Controller,
+  Get,
+  Param,
+  Res,
+  HttpStatus,
+  HttpException,
+} from "@nestjs/common";
+import { Response } from "express";
 import fs from "fs";
 import _ from "lodash";
 import translate from "deepl";
+import { ConfigService } from "@nestjs/config";
 import pino from "pino";
-import dotenv from "dotenv";
-dotenv.config();
 
-const logger = pino({ level: process.env.LOG_LEVEL || "info" });
+const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
 
-export default function (app: Application): void {
-  app.get("/v0/ingredients/:ingredients", (req: Request, res: Response) => {
+@Controller("v0/ingredients")
+export class IngredientsController {
+  constructor(private configService: ConfigService) {}
+
+  @Get(":ingredients")
+  async getIngredients(
+    @Param("ingredients") ingredientsParam: string,
+    @Res() res: Response
+  ) {
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Charset", "utf-8");
-    if (!req.params.ingredients) {
-      res.status(400).json({
-        status: "400",
-        code: "Bad request",
-        message: "Missing argument v0/ingredients/:ingredients",
-      });
+
+    if (!ingredientsParam) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          code: "Bad request",
+          message: "Missing argument v0/ingredients/:ingredients",
+        },
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     let ingredients: string;
-    if (req.params.ingredients !== undefined && req.params.ingredients !== "") {
-      ingredients = decodeURI(req.params.ingredients.toLowerCase()).replace(
+    if (ingredientsParam) {
+      ingredients = decodeURI(ingredientsParam.toLowerCase()).replace(
         /\s/g,
         ""
       );
@@ -152,5 +170,5 @@ export default function (app: Application): void {
       };
       res.json(result);
     }
-  });
+  }
 }
