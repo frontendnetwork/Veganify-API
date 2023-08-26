@@ -24,7 +24,7 @@ jobs:
       run: npm install axios cheerio qs jsdom
 
     - name: Fetch PETA Data and Save
-      run: node .github/scripts/peta-cron.js
+      run: node ${{ github.workspace }}/.github/scripts/peta-cron.js
 
     - name: Commit and push if there are changes
       run: |
@@ -32,4 +32,4 @@ jobs:
         git config --local user.name "GitHub Action"
         git add peta_cruelty_free.json
         git commit -m "Update peta_cruelty_free.json" || echo "No changes to commit"
-        git push origin main
+        git push origin staging 
