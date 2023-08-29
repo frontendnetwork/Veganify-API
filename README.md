@@ -22,7 +22,7 @@ There is an official [Wrapper for React available on npm](https://www.npmjs.com/
 ### Swagger
 [![Validate OpenAPI.yml](https://github.com/frontendnetwork/VeganCheck.me-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/VeganCheck.me-API/actions/workflows/validate.yml)
 
-The [`OpenAPI.yml`](https://github.com/frontendnetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) can be imported into Swagger and is available here: [Swagger Editor](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/frontendnetwork/VeganCheck.me-API/main/OpenAPI.yaml)
+The [`OpenAPI.yml`](https://github.com/frontendnetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml) is automatically available in [this Swagger UI](https://staging.api.vegancheck.me/api-docs).
 
 ### Postman
 
