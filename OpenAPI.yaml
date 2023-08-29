@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: VeganCheck API
-  version: '0.2.0'
+  version: '0.3.1'
   description: API for checking if products and ingredients are vegan
   contact:
     name: VeganCheck Team
@@ -9,7 +9,7 @@ info:
     url: https://vegancheck.me/
 externalDocs:
     description: VeganCheck.me API Documentation 
-    url: https://jokenetwork.de/vegancheck-api    
+    url: https://frontendnet.work/vegancheck-api    
 
 servers:
   - url: https://api.vegancheck.me/v0

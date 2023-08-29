@@ -13,7 +13,7 @@ The official API powering [VeganCheck.me](https://github.com/frontendnetwork/veg
 
 ## Documentation 
 
-Please refer to [VeganCheck.me API Documentation](https://jokenetwork.de/vegancheck-api) for a full documentation.
+Please refer to [VeganCheck.me API Documentation](https://frontendnet.work/vegancheck-api) for a full documentation.
 
 To learn more about this repo, head to: [https://frontendnetwork.github.io/VeganCheck.me-API/](https://frontendnetwork.github.io/VeganCheck.me-API/).
 
