@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Options, All, Res, Req, HttpException, HttpStatus } from '@nestjs/common';
 import fs from 'fs';
 import pino from 'pino';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 const logger = pino({ level: process.env.LOG_LEVEL ?? 'warn' });
 
 @Controller()
+@ApiExcludeController()
 export class ErrorsController {
   
   @Get(['/OpenAPI.yaml', '/OpenAPI.yml', '/openapi', '/spec', '/specification', '/v0/OpenAPI.yaml', '/v0/OpenAPI.yml', '/v0/openapi', '/v0/spec', '/v0/specification'])

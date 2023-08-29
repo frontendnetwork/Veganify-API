@@ -2,6 +2,7 @@ import { Controller, Param, Post, Res } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { Response } from "express";
 import pino from "pino";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
 
 const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
 
@@ -10,6 +11,23 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post(":barcode?")
+  @ApiTags("Product Information")
+  @ApiResponse({
+    status: 200,
+    description: "Request returned a positive result.",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Specified product is not in the database.",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Input Error / Bad Request.",
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal Server Error.",
+  })
   async getProductDetails(
     @Param("barcode") barcode: string,
     @Res() res: Response

@@ -12,6 +12,12 @@ import _ from "lodash";
 import translate from "deepl";
 import { ConfigService } from "@nestjs/config";
 import pino from "pino";
+import {
+  ApiResponse,
+  ApiTags,
+  ApiProperty,
+  ApiExcludeEndpoint,
+} from "@nestjs/swagger";
 
 const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
 
@@ -20,6 +26,15 @@ export class IngredientsController {
   constructor(private configService: ConfigService) {}
 
   @Get(":ingredients")
+  @ApiTags("Ingredients")
+  @ApiResponse({
+    status: 200,
+    description: "Request returned a positive result.",
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal Server Error.",
+  })
   async getIngredients(
     @Param("ingredients") ingredientsParam: string,
     @Res() res: Response
