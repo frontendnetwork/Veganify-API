@@ -51,7 +51,7 @@
       <h1>VeganCheck.me API Overview</h1>
       <p>
         <span class="Label mr-1 Label--success">Stable</span
-        ><span class="Label mr-1 Label--primary">v0.2.0</span
+        ><span class="Label mr-1 Label--primary">v0.3.1</span
         ><span class="Label mr-1 Label--accent">Public version</span>
       </p>
       <p>
@@ -59,42 +59,38 @@
       </p>
       <ul>
         <li><code>.env</code></li>
-        <li><code>grades.js</code></li>
         <li><code>node_modules/</code></li>
       </ul>
       <h2>Requirements</h2>
       <ul>
         <li>
-          <a href="https://nodejs.org/en/download/">Node.js</a> (Recommended version: v18.13.0 or higher)
+          <a href="https://nodejs.org/en/download/">Node.js</a> (Recommended
+          version: v18.17.0 or higher)
         </li>
         <li>
           <a href="https://docs.npmjs.com/cli/v8/commands/npm-install">npm</a>
         </li>
       </ul>
-      <h2>Initialize on the API server</h2>
+      <h2>Develop locally</h2>
       <p>
-        Assuming production use in the JokeNetwork/VeganCheck-API environment:
+        Start the NestJS server locally with the following command:
       </p>
       <p><strong>Start the service</strong></p>
-      <pre><code class="lang-bash">[user@server ~]$ supervisorctl start vegancheck-api
-veganapi: started</code></pre>
-      <p><strong>Restart the service (e.g. after update)</strong></p>
-      <pre><code class="lang-bash">[user@server ~]$ supervisorctl restart vegancheck-api
-veganapi: stopped
-veganapi: started</code></pre>
-      <p>
-        <strong
-          >Supervisor file located at
-          <code>etc/services.d/veganapi.ini</code></strong
-        >
-      </p>
-      <pre><code>[program:veganapi]
-directory=/home/user/vegan-api
-command=npm run start
-autostart=true
-autorestart=true
-environment=NODE_ENV=production
-startsecs=30</code></pre>
+      <pre><code class="lang-bash">npm install
+npm run start:dev </code></pre>
+<p><strong>Debug the service</strong></p>
+<pre><code class="lang-bash">npm install
+npm run start:debug</code></pre>
+<p><strong>Run PETA Cronjob manually</strong></p>
+<pre><code class="lang-bash">npm run get:peta</code></pre>
+      <h2>Build and deploy</h2>
+      <p><strong>Build the service</strong></p>
+<pre><code class="lang-bash">npm install
+npm run build
+npm run start</code></pre>
+
+Ideally deploy the API with the Dockerfile included in the project.
+
       <h2>OpenAPI specification</h2>
       <div x-data="{ open: false }">
         <div class="Box">
@@ -113,9 +109,9 @@ startsecs=30</code></pre>
           </div>
           <div class="Box-row d-flex flex-items-center">
             <div class="flex-auto">
-              <strong>Version 29/01/23</strong>
+              <strong>Version 29/08/23</strong>
               <div class="text-small color-fg-subtle">
-                Read the version from 29/01/23 here.
+                Read the version from 29/08/23 here.
               </div>
             </div>
             <button class="btn" @click="open = ! open">Read here</button>
@@ -129,7 +125,7 @@ startsecs=30</code></pre>
         ><code class="lang-bash">openapi: 3.0.1
 info:
   title: VeganCheck API
-  version: '0.2.0'
+  version: '0.3.1'
   description: API for checking if products and ingredients are vegan
   contact:
     name: VeganCheck Team
@@ -137,7 +133,7 @@ info:
     url: https://vegancheck.me/
 externalDocs:
     description: VeganCheck.me API Documentation 
-    url: https://jokenetwork.de/vegancheck-api    
+    url: https://frontendnet.work/vegancheck-api    
 
 servers:
   - url: https://api.vegancheck.me/v0
@@ -252,18 +248,18 @@ paths:
       </p>
       <ul>
         <li>
-          <a href="https://jokenetwork.de/vegancheck-api"
-            >VeganCheck.me API at JokeNetwork</a
+          <a href="https://frontendnet.work/vegancheck-api"
+            >VeganCheck.me API at Frontendnetwork</a
           >
         </li>
         <li>
-          <a href="https://jokenetwork.de/vegancheck-ingredients-api"
-            >VeganCheck.me Ingredients API at JokeNetwork</a
+          <a href="https://frontendnet.work/vegancheck-ingredients-api"
+            >VeganCheck.me Ingredients API at Frontendnetwork</a
           >
         </li>
         <li>
-          <a href="https://jokenetwork.de/vegancheck-peta-api"
-            >VeganCheck.me PETA API at JokeNetwork</a
+          <a href="https://frontendnet.work/vegancheck-peta-api"
+            >VeganCheck.me PETA API at Frontendnetwork</a
           >
         </li>
       </ul>
@@ -272,7 +268,7 @@ paths:
           &copy; <span id="date"></span>
           <a href="//vegancheck.me">VeganCheck.me</a> - Licensed under
           <a
-            href="https://github.com/JokeNetwork/vegancheck.me/blob/main/LICENSE"
+            href="https://github.com/frontendnetwork/vegancheck.me/blob/main/LICENSE"
             >MIT</a
           >
         </p>
