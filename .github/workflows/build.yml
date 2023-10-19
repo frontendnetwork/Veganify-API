@@ -1,19 +1,19 @@
 # Default GitHub build&push workflow
 # Docs: https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages
 
-name: Create and publish a Docker image
+name: Publish Docker image + Deploy
 
 on:
   push:
     branches:
-    - main
-    - release
-    - staging
+      - main
+      - release
+      - staging
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-          
+  
 jobs:
   build-and-push-prod:
     if: github.ref != 'refs/heads/staging'
@@ -44,6 +44,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
+        id: build-prod
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
@@ -51,7 +52,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Run Docker Compose
+  deploy-prod:
+    needs: build-and-push-prod
+    if: success() && github.ref != 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: SSH into the server and run Docker Compose
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -62,7 +69,7 @@ jobs:
             docker-compose stop vc-backend
             docker-compose pull vc-backend
             docker-compose up -d vc-backend
-          
+
   build-and-push-staging:
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
@@ -92,6 +99,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
+        id: build-staging
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
@@ -99,7 +107,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Run Docker Compose
+  deploy-staging:
+    needs: build-and-push-staging
+    if: success() && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: SSH into the server and run Docker Compose
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
