@@ -64,7 +64,7 @@
     "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
     "@types/nodemailer": "^6.4.13",
-    "@types/pump": "^1.1.1",
+    "@types/pump": "^1.1.2",
     "@types/request": "^2.48.11",
     "@types/split2": "^4.2.0",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
