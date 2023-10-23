@@ -43,7 +43,7 @@
     "mailer": "^0.6.6",
     "nestjs-pino": "^3.4.0",
     "nodemailer": "^6.9.4",
-    "pino": "^8.15.0",
+    "pino": "^8.16.0",
     "pino-http": "^8.5.0",
     "querystring": "^0.2.1",
     "reflect-metadata": "^0.1.13",
