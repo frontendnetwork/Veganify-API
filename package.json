@@ -33,7 +33,7 @@
     "dom-parser": "^0.1.6",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.11.0",
+    "express-rate-limit": "^7.1.2",
     "http": "^0.0.1-security",
     "iconv-lite": "^0.6.3",
     "ini": "^4.1.1",
