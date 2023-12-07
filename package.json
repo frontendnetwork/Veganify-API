@@ -76,6 +76,6 @@
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   }
 }
