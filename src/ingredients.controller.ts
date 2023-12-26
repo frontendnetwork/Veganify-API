@@ -15,8 +15,6 @@ import pino from "pino";
 import {
   ApiResponse,
   ApiTags,
-  ApiProperty,
-  ApiExcludeEndpoint,
 } from "@nestjs/swagger";
 
 const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });

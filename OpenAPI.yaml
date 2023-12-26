@@ -92,7 +92,11 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 tags: []
-servers: []
+servers:
+  - url: https://api.vegancheck.me
+    description: Production server
+  - url: https://api.staging.vegancheck.me
+    description: Staging server
 components:
   schemas:
     BarcodeDto:

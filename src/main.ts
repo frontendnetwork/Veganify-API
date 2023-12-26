@@ -22,7 +22,8 @@ async function bootstrap() {
       "https://frontendnet.work/vegancheck-api"
     )
     .setLicense("MIT", "https://opensource.org/licenses/MIT")
-    .setBasePath("/v0")
+    .addServer("https://api.vegancheck.me", "Production server")
+    .addServer("https://api.staging.vegancheck.me", "Staging server")
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
