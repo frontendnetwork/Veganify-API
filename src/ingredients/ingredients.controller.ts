@@ -146,7 +146,7 @@ export class IngredientsController {
     flaggedItems: string[] = []
   ) {
     const responseData: ResponseData = {
-      vegan: isVegan ? "true" : "false",
+      vegan: isVegan,
     };
 
     if (!isVegan) {
@@ -163,6 +163,6 @@ export class IngredientsController {
 }
 
 interface ResponseData {
-  vegan: string;
+  vegan: boolean;
   flagged?: string[];
 }
