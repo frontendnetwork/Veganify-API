@@ -4,7 +4,9 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ErrorsController } from "./errors.controller";
 import { GradesService } from "./grades.service";
 import { GradesController } from "./grades.controller";
-import { IngredientsController } from "./ingredients.controller";
+//import { IngredientsController } from "./ingredients.controller";
+import { IngredientsController } from "./ingredients/ingredients.controller";
+import { TranslationService } from "./ingredients/translation.service";
 import { ProductController } from "./product.controller";
 import { ProductService } from "./product.service";
 import { PetaController } from "./peta.controller";
@@ -28,7 +30,7 @@ import { LoggerModule } from "nestjs-pino";
     PetaController,
     ErrorsController,
   ],
-  providers: [GradesService, ProductService, ConfigService],
+  providers: [GradesService, ProductService, ConfigService, TranslationService],
 })
 export class AppModule implements NestModule {
   constructor(private readonly configService: ConfigService) {}

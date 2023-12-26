@@ -33,11 +33,21 @@ paths:
           in: path
           schema:
             type: string
+        - name: translate
+          required: true
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: Request returned a positive result.
         '500':
           description: Internal Server Error.
+        '503':
+          description: >-
+            Service Unavailable. Translation service is unavailable. Try again
+            with disabled translation (Results might vary). Add flag
+            ?translate=false to the request.
       tags:
         - Ingredients
   /v0/product/{barcode}:

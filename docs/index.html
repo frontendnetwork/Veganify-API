@@ -122,77 +122,149 @@ Ideally deploy the API with the Dockerfile included in the project.
           class="mt-3"
           x-show="open"
           @click.outside="open = false"
-        ><code class="lang-bash">openapi: 3.0.1
-info:
-  title: VeganCheck API
-  version: '0.3.1'
-  description: API for checking if products and ingredients are vegan
-  contact:
-    name: VeganCheck Team
-    email: info@vegancheck.me
-    url: https://vegancheck.me/
-externalDocs:
-    description: VeganCheck.me API Documentation 
-    url: https://frontendnet.work/vegancheck-api    
-
-servers:
-  - url: https://api.vegancheck.me/v0
-
-paths:
-  /product/{barcode}:
-    post:
-      summary: Gives out the name of a product, if the product is vegan or not, if the product is vegetarian or not, if the product is animal cruelty free, if the product contains palmoil, the nutriscore of the product and the VeganCheck Grade of the product as well where this data comes from.
-      parameters:
-        - in: path
-          name: barcode
-          required: true
-          description: The barcode of the product
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Wrong/bad/missing argument
-        '404':
-          description: Product not found
-        '429':
-          description: Rate limit exceeded
-        '500':
-          description: Server error
-        '504':
-          description: Database server took to long to respond
-
-  /ingredients/{ingredientslist}:
-    get:
-      summary: Check if ingredients out of a ingredientslist are vegan
-      parameters:
-        - in: path
-          name: ingredientslist
-          required: true
-          description: A comma- and space-separated list of ingredients to check
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Missing required parameter
-        '404':
-          description: Missing required parameter
-        '500':
-          description: Server error
-
-  /peta/crueltyfree:
-    get:
-      summary: Get a automatically daily-updated list of brands that produce animal cruelty free according to PETA
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Missing required parameter
-        '500':
-          description: Server error</code></pre>
+        ><code class="lang-bash">openapi: 3.0.0
+          paths:
+            /v0/grades/backend:
+              post:
+                operationId: GradesController_checkBarcode
+                parameters: []
+                requestBody:
+                  required: true
+                  description: The barcode to be checked
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BarcodeDto'
+                responses:
+                  '201':
+                    description: Request returned a positive result.
+                    content:
+                      application/json:
+                        schema:
+                          $ref: '#/components/schemas/backendResponseDto'
+                  '400':
+                    description: Input Error / Bad Request.
+                  '500':
+                    description: Internal Server Error.
+                tags:
+                  - Grades
+            /v0/ingredients/{ingredients}:
+              get:
+                operationId: IngredientsController_getIngredients
+                parameters:
+                  - name: ingredients
+                    required: true
+                    in: path
+                    schema:
+                      type: string
+                  - name: translate
+                    required: true
+                    in: query
+                    schema:
+                      type: boolean
+                responses:
+                  '200':
+                    description: Request returned a positive result.
+                  '500':
+                    description: Internal Server Error.
+                  '503':
+                    description: >-
+                      Service Unavailable. Translation service is unavailable. Try again
+                      with disabled translation (Results might vary). Add flag
+                      ?translate=false to the request.
+                tags:
+                  - Ingredients
+            /v0/product/{barcode}:
+              post:
+                operationId: ProductController_getProductDetails
+                parameters:
+                  - name: barcode
+                    required: true
+                    in: path
+                    schema:
+                      type: string
+                responses:
+                  '200':
+                    description: Request returned a positive result.
+                  '400':
+                    description: Input Error / Bad Request.
+                  '404':
+                    description: Specified product is not in the database.
+                  '500':
+                    description: Internal Server Error.
+                tags:
+                  - Product Information
+            /v0/peta/{type}:
+              get:
+                operationId: PetaController_getPetaByType
+                parameters:
+                  - name: type
+                    required: true
+                    in: path
+                    schema:
+                      type: string
+                responses:
+                  '200':
+                    description: Request returned a positive result.
+                  '400':
+                    description: Input Error / Bad Request.
+                  '404':
+                    description: Specified tyoe is not available.
+                  '500':
+                    description: Internal Server Error.
+                tags:
+                  - Peta
+          info:
+            title: VeganCheck API
+            description: API for checking if products and ingredients are vegan
+            version: 0.3.1
+            contact:
+              name: FrontendNetwork
+              url: https://vegancheck.me
+              email: info@vegancheck.me
+            license:
+              name: MIT
+              url: https://opensource.org/licenses/MIT
+          tags: []
+          servers:
+            - url: https://api.vegancheck.me
+              description: Production server
+            - url: https://api.staging.vegancheck.me
+              description: Staging server
+          components:
+            schemas:
+              BarcodeDto:
+                type: object
+                properties:
+                  barcode:
+                    type: string
+                    description: The barcode to be checked
+                    example: '4066600204404'
+                required:
+                  - barcode
+              backendResponseDto:
+                type: object
+                properties:
+                  barcode:
+                    type: string
+                    description: The barcode requested
+                    example: '12345678'
+                  name:
+                    type: string
+                    description: The name of the product
+                    example: Paulaner Spezi Zero
+                  grade:
+                    type: string
+                    description: The grade of the product
+                    example: B
+                required:
+                  - barcode
+                  - name
+                  - grade
+          externalDocs:
+            description: VeganCheck.me API Documentation
+            url: https://frontendnet.work/vegancheck-api
+          </code></pre>
       </div>
 
       <h2>Endpoints</h2>
