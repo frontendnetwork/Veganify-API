@@ -3,5 +3,5 @@ require_automerge_label = false
 merge.show_missing_automerge_label_message = false
 
 [merge.automerge_dependencies]
-versions = ["minor", "patch"]
+versions = ["minor", "patch", "major"]
 usernames = ["dependabot", "renovate"]
