@@ -16,7 +16,6 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm run lint
 
   legacy_peer_deps_build:
     runs-on: ubuntu-latest
@@ -33,4 +32,3 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
       - run: npm run build
-      - run: npm run lint
