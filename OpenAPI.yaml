@@ -91,21 +91,21 @@ paths:
       tags:
         - Peta
 info:
-  title: VeganCheck API
+  title: Veganify API
   description: API for checking if products and ingredients are vegan
   version: 0.3.1
   contact:
     name: FrontendNetwork
-    url: https://vegancheck.me
-    email: info@vegancheck.me
+    url: https://veganify.app
+    email: info@philip.media
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 tags: []
 servers:
-  - url: https://api.vegancheck.me
+  - url: https://api.veganify.app
     description: Production server
-  - url: https://api.staging.vegancheck.me
+  - url: https://api.staging.veganify.app
     description: Staging server
 components:
   schemas:
@@ -138,5 +138,5 @@ components:
         - name
         - grade
 externalDocs:
-  description: VeganCheck.me API Documentation
-  url: https://frontendnet.work/vegancheck-api
+  description: Veganify API Documentation
+  url: https://frontendnet.work/veganify-api

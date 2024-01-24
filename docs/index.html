@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
-    <title>VeganCheck.me API Overview</title>
+    <title>Veganify API Overview</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
@@ -44,11 +44,11 @@
       </span>
       <img
         width="80px"
-        src="https://raw.githubusercontent.com/JokeNetwork/vegancheck.me/main/public/img/hero_icon.png"
+        src="https://raw.githubusercontent.com/JokeNetwork/veganify.app/main/public/img/hero_icon.png"
         align="right"
-        alt="VeganCheck Logo"
+        alt="Veganify Logo"
       />
-      <h1>VeganCheck.me API Overview</h1>
+      <h1>Veganify API Overview</h1>
       <p>
         <span class="Label mr-1 Label--success">Stable</span
         ><span class="Label mr-1 Label--primary">v0.3.1</span
@@ -102,7 +102,7 @@ Ideally deploy the API with the Dockerfile included in the project.
               </div>
             </div>
             <a
-              href="https://github.com/JokeNetwork/VeganCheck.me-API/blob/main/OpenAPI.yaml"
+              href="https://github.com/JokeNetwork/Veganify-API/blob/main/OpenAPI.yaml"
               class="btn btn-primary"
               >Open in repo</a
             >
@@ -215,21 +215,21 @@ Ideally deploy the API with the Dockerfile included in the project.
                 tags:
                   - Peta
           info:
-            title: VeganCheck API
+            title: Veganify API
             description: API for checking if products and ingredients are vegan
             version: 0.3.1
             contact:
               name: FrontendNetwork
-              url: https://vegancheck.me
-              email: info@vegancheck.me
+              url: https://veganify.app
+              email: info@philip.media
             license:
               name: MIT
               url: https://opensource.org/licenses/MIT
           tags: []
           servers:
-            - url: https://api.vegancheck.me
+            - url: https://api.veganify.app
               description: Production server
-            - url: https://api.staging.vegancheck.me
+            - url: https://api.staging.veganify.app
               description: Staging server
           components:
             schemas:
@@ -262,8 +262,8 @@ Ideally deploy the API with the Dockerfile included in the project.
                   - name
                   - grade
           externalDocs:
-            description: VeganCheck.me API Documentation
-            url: https://frontendnet.work/vegancheck-api
+            description: Veganify API Documentation
+            url: https://frontendnet.work/veganify-api
           </code></pre>
       </div>
 
@@ -285,10 +285,10 @@ Ideally deploy the API with the Dockerfile included in the project.
         All endpoints are only accessible via HTTPS.
       </div>
       <h3>Available endpoints</h3>
-      <p>The following endpoints are available within the VeganCheck.me API:</p>
+      <p>The following endpoints are available within the veganify.app API:</p>
       <ul>
         <li>
-          <code>https://api.vegancheck.me/v0/grades/backend</code><br /><strong
+          <code>https://api.veganify.app/v0/grades/backend</code><br /><strong
             >Warning:</strong
           >
           This endpoint is not publicly available in the repo and will not be
@@ -296,21 +296,21 @@ Ideally deploy the API with the Dockerfile included in the project.
         </li>
         <li>
           <code
-            >https://api.vegancheck.me/v0/ingredients/{ingredientslist}</code
+            >https://api.veganify.app/v0/ingredients/{ingredientslist}</code
           >
         </li>
-        <li><code>https://api.vegancheck.me/v0/peta/crueltyfree</code></li>
-        <li><code>https://api.vegancheck.me/v0/product/{barcode}</code></li>
+        <li><code>https://api.veganify.app/v0/peta/crueltyfree</code></li>
+        <li><code>https://api.veganify.app/v0/product/{barcode}</code></li>
       </ul>
       <h3>Unavailable endpoints</h3>
       <p>
         The following endpoints are currently unavailable within the
-        VeganCheck.me API:
+        veganify.app API:
       </p>
       <ul>
         <li>
           <code style="text-decoration: line-through"
-            >https://api.vegancheck.me/v0/peta/veganapproved</code
+            >https://api.veganify.app/v0/peta/veganapproved</code
           >
         </li>
       </ul>
@@ -320,27 +320,27 @@ Ideally deploy the API with the Dockerfile included in the project.
       </p>
       <ul>
         <li>
-          <a href="https://frontendnet.work/vegancheck-api"
-            >VeganCheck.me API at Frontendnetwork</a
+          <a href="https://frontendnet.work/veganify-api"
+            >veganify.app API at Frontendnetwork</a
           >
         </li>
         <li>
-          <a href="https://frontendnet.work/vegancheck-ingredients-api"
-            >VeganCheck.me Ingredients API at Frontendnetwork</a
+          <a href="https://frontendnet.work/veganify-ingredients-api"
+            >veganify.app Ingredients API at Frontendnetwork</a
           >
         </li>
         <li>
-          <a href="https://frontendnet.work/vegancheck-peta-api"
-            >VeganCheck.me PETA API at Frontendnetwork</a
+          <a href="https://frontendnet.work/veganify-peta-api"
+            >veganify.app PETA API at Frontendnetwork</a
           >
         </li>
       </ul>
       <footer class="border-top">
         <p class="color-fg-muted mt-2">
           &copy; <span id="date"></span>
-          <a href="//vegancheck.me">VeganCheck.me</a> - Licensed under
+          <a href="//veganify.app">veganify.app</a> - Licensed under
           <a
-            href="https://github.com/frontendnetwork/vegancheck.me/blob/main/LICENSE"
+            href="https://github.com/frontendnetwork/veganify.app/blob/main/LICENSE"
             >MIT</a
           >
         </p>

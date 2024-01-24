@@ -27,7 +27,7 @@ export class ProductService {
 
     try {
       const gradeResponse = await this.httpService
-        .get(`https://grades.vegancheck.me/api/${barcode}.json`)
+        .get(`https://grades.veganify.app/api/${barcode}.json`)
         .toPromise();
       if (gradeResponse?.data !== "404") {
         const gradesource = gradeResponse?.data;
@@ -94,7 +94,7 @@ export class ProductService {
 
       if (product?.product?.brands) {
         const petaResponse = await axios.get(
-          "https://api.vegancheck.me/v0/peta/crueltyfree"
+          "https://api.veganify.app/v0/peta/crueltyfree"
         );
         const dnt = petaResponse.data.PETA_DOES_NOT_TEST;
         const tester = dnt.toString().toLowerCase();
