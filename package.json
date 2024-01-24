@@ -1,7 +1,7 @@
 {
-  "name": "vegancheck-api",
+  "name": "veganify-api",
   "version": "0.3.1",
-  "description": "VeganCheck.me API, with endpoints v0/product/:barcode, v0/peta/crueltyfree and v0/ingredients/:ingredients",
+  "description": "Veganify API, with endpoints v0/product/:barcode, v0/peta/crueltyfree and v0/ingredients/:ingredients",
   "main": "dist/app.js",
   "scripts": {
     "start": "nest start",
@@ -12,7 +12,7 @@
     "lint": "nest lint",
     "get:peta": "node .github/scripts/peta-cron.js"
   },
-  "author": "JokeNetwork, VeganCheck.me Contributors",
+  "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",
   "dependencies": {
     "@nestjs/axios": "^3.0.1",

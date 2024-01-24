@@ -24,7 +24,7 @@ jobs:
 
     environment: 
       name: Production
-      url: https://api.vegancheck.me
+      url: https://api.veganify.app
 
     steps:
       - name: Checkout repository
@@ -79,7 +79,7 @@ jobs:
 
     environment: 
       name: Staging
-      url: https://staging.api.vegancheck.me
+      url: https://staging.api.veganify.app
       
     steps:
       - name: Checkout repository

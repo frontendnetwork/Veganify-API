@@ -9,21 +9,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = app.get(Logger);
   const options = new DocumentBuilder()
-    .setTitle("VeganCheck API")
+    .setTitle("Veganify API")
     .setDescription("API for checking if products and ingredients are vegan")
     .setVersion("0.3.1")
     .setContact(
       "FrontendNetwork",
-      "https://vegancheck.me",
-      "info@vegancheck.me"
+      "https://veganify.app",
+      "info@philip.media"
     )
     .setExternalDoc(
-      "VeganCheck.me API Documentation",
-      "https://frontendnet.work/vegancheck-api"
+      "Veganify API Documentation",
+      "https://frontendnet.work/veganify-api"
     )
     .setLicense("MIT", "https://opensource.org/licenses/MIT")
-    .addServer("https://api.vegancheck.me", "Production server")
-    .addServer("https://api.staging.vegancheck.me", "Staging server")
+    .addServer("https://api.veganify.app", "Production server")
+    .addServer("https://api.staging.veganify.app", "Staging server")
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
