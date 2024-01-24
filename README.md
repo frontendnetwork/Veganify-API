@@ -18,7 +18,7 @@ Please refer to [Veganify API Documentation](https://frontendnet.work/veganify-a
 
 To learn more about this repo, head to: [https://frontendnetwork.github.io/Veganify-API/](https://frontendnetwork.github.io/Veganify-API/).
 
-There is an official [Wrapper for React available on npm](https://www.npmjs.com/package/@frontendnetwork/vegancheck).
+There is an official [Wrapper for React available on npm](https://www.npmjs.com/package/@frontendnetwork/veganify).
 
 ### Swagger
 
