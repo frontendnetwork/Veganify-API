@@ -61,7 +61,7 @@ export class IngredientsController {
     const shouldTranslate = translateFlag === true;
 
     try {
-      isVegan = await readJsonFile("./isvegan.json");
+      isVegan = await readJsonFile("./isnotvegan.json");
       let response;
 
       if (shouldTranslate) {
