@@ -15,7 +15,7 @@
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/axios": "^3.0.1",
+    "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.3.2",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^10.3.2",
