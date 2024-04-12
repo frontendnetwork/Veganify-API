@@ -13,7 +13,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  
+
 jobs:
   build-and-push-prod:
     if: github.ref != 'refs/heads/staging'
@@ -22,7 +22,7 @@ jobs:
       contents: read
       packages: write
 
-    environment: 
+    environment:
       name: Production
       url: https://api.veganify.app
 
@@ -52,24 +52,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  deploy-prod:
-    needs: build-and-push-prod
-    if: success() && github.ref != 'refs/heads/staging'
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: SSH into the server and run Docker Compose
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} 
-          script: |
-            cd vegancheck
-            docker-compose stop vc-backend
-            docker-compose pull vc-backend
-            docker-compose up -d vc-backend
-
   build-and-push-staging:
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
@@ -77,10 +59,10 @@ jobs:
       contents: read
       packages: write
 
-    environment: 
+    environment:
       name: Staging
       url: https://staging.api.veganify.app
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
