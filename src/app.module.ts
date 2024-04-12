@@ -11,22 +11,28 @@ import { ProductService } from "./product.service";
 import { PetaController } from "./peta.controller";
 import { RateLimiterMiddleware } from "./rate-limiter.middleware";
 import { LoggerModule } from "nestjs-pino";
+import { HealthController } from "./health/health.controller";
+import { TerminusModule } from "@nestjs/terminus";
+import { HealthModule } from "./health/health.module";
 
 @Module({
   imports: [
+    HealthModule,
     HttpModule,
     ConfigModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
-        level: "warn",
+        level: "info",
       },
     }),
+    TerminusModule,
   ],
   controllers: [
     GradesController,
     IngredientsController,
     ProductController,
     PetaController,
+    HealthController,
     ErrorsController,
   ],
   providers: [GradesService, ProductService, ConfigService, TranslationService],
