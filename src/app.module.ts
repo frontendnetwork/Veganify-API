@@ -4,7 +4,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ErrorsController } from "./errors.controller";
 import { GradesService } from "./grades.service";
 import { GradesController } from "./grades.controller";
-//import { IngredientsController } from "./ingredients.controller";
 import { IngredientsController } from "./ingredients/ingredients.controller";
 import { TranslationService } from "./ingredients/translation.service";
 import { ProductController } from "./product.controller";
