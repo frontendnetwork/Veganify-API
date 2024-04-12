@@ -109,7 +109,7 @@ export class IngredientsController {
 
       let result = _.intersectionWith(isVegan, response, _.isEqual);
 
-      if (shouldTranslate && targetLanguage !== "EN") {
+      if (shouldTranslate && targetLanguage !== "EN" && result.length > 0) {
         try {
           const backTranslationResult =
             await this.translationService.translateText(
