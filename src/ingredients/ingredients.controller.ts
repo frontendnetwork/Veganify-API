@@ -6,6 +6,7 @@ import {
   Res,
   HttpStatus,
   HttpException,
+  Logger,
 } from "@nestjs/common";
 import { Response } from "express";
 import _ from "lodash";
@@ -17,6 +18,7 @@ import { readJsonFile } from "./jsonFileReader";
 @Controller("v0/ingredients")
 export class IngredientsController {
   constructor(private translationService: TranslationService) {}
+  private readonly logger = new Logger(IngredientsController.name);
 
   @Get(":ingredients")
   @ApiTags("Ingredients")
@@ -79,6 +81,7 @@ export class IngredientsController {
         } catch (error) {
           if (error instanceof Error) {
             if (error.message === "Translate timed out") {
+              this.logger.error(`Translation service is unavailable: ${error}`);
               res.status(HttpStatus.SERVICE_UNAVAILABLE).send({
                 code: "Service Unavailable",
                 status: "503",
@@ -87,6 +90,7 @@ export class IngredientsController {
               });
               return;
             } else {
+              this.logger.error(`Error during translation: ${error}`);
               res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
                 code: "Internal Server Error",
                 status: "500",
@@ -95,6 +99,7 @@ export class IngredientsController {
               return;
             }
           } else {
+            this.logger.error(`Unknown error: ${error}`);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
               code: "Internal Server Error",
               status: "500",
@@ -121,6 +126,7 @@ export class IngredientsController {
 
           this.sendResponse(res, result.length === 0, result);
         } catch (error) {
+          this.logger.error(`Error during back translation: ${error}`);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
             code: "Internal Server Error",
             status: "500",
@@ -132,6 +138,7 @@ export class IngredientsController {
         this.sendResponse(res, result.length === 0, result);
       }
     } catch (error) {
+      this.logger.error(`Error reading file: ${error}`);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         code: "Internal Server Error",
         status: "500",

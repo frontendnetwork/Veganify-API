@@ -8,16 +8,17 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import fs from "fs";
 import pino from "pino";
 import { ApiExcludeController } from "@nestjs/swagger";
 
-const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
-
 @Controller()
 @ApiExcludeController()
 export class ErrorsController {
+  private readonly logger = new Logger(ErrorsController.name);
+
   @Get([
     "/OpenAPI.yaml",
     "/OpenAPI.yml",
@@ -36,7 +37,14 @@ export class ErrorsController {
       "utf8",
       (err: NodeJS.ErrnoException | null, contents: string) => {
         if (err != null) {
-          logger.error("Error reading file:", err);
+          this.logger.error("Error reading file:", err);
+          throw new HttpException(
+            "Error reading OpenAPI specification",
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+        }
+        if (err) {
+          this.logger.error("Error reading file:", err);
           throw new HttpException(
             "Error reading OpenAPI specification",
             HttpStatus.INTERNAL_SERVER_ERROR
@@ -55,7 +63,7 @@ export class ErrorsController {
       "utf8",
       (err: NodeJS.ErrnoException | null, contents: string) => {
         if (err != null) {
-          logger.warn(err);
+          this.logger.warn(err);
         }
         res.setHeader("Content-Type", "text/plain");
         res.send(contents);
@@ -65,6 +73,7 @@ export class ErrorsController {
 
   @Post("*")
   handlePostWildcard(@Req() req: any, @Res() res: any): void {
+    this.logger.log(`Posted to non existing endpoint: ${req.originalUrl}`);
     this.handleWildcard(
       req,
       res,
@@ -76,6 +85,7 @@ export class ErrorsController {
 
   @Get("*")
   handleGetWildcard(@Req() req: any, @Res() res: any): void {
+    this.logger.log(`Get to non existing endpoint: ${req.originalUrl}`);
     this.handleWildcard(
       req,
       res,

@@ -1,13 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import nodemailer from "nodemailer";
-import pino from "pino";
 import { Observable } from "rxjs";
 import { AxiosResponse } from "axios";
 
 @Injectable()
 export class GradesService {
-  private readonly logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
+  private readonly logger = new Logger(GradesService.name);
   private readonly transporter = nodemailer.createTransport({
     host: "smtp.ionos.de",
     port: 587,
@@ -35,7 +34,7 @@ export class GradesService {
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
-      this.logger.info("Message sent: %s", info.messageId);
+      this.logger.log("Message sent: %s", info.messageId);
     } catch (error) {
       this.logger.warn(error);
       throw new Error("Error sending mail");

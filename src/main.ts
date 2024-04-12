@@ -12,11 +12,7 @@ async function bootstrap() {
     .setTitle("Veganify API")
     .setDescription("API for checking if products and ingredients are vegan")
     .setVersion("0.3.1")
-    .setContact(
-      "FrontendNetwork",
-      "https://veganify.app",
-      "info@philip.media"
-    )
+    .setContact("FrontendNetwork", "https://veganify.app", "info@philip.media")
     .setExternalDoc(
       "Veganify API Documentation",
       "https://frontendnet.work/veganify-api"

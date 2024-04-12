@@ -1,14 +1,12 @@
-import { Controller, Param, Post, Res } from "@nestjs/common";
+import { Controller, Param, Post, Res, Logger } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { Response } from "express";
-import pino from "pino";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-
-const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
 
 @Controller("v0/product")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+  private readonly logger = new Logger(ProductController.name);
 
   @Post(":barcode?")
   @ApiTags("Product Information")
@@ -36,7 +34,7 @@ export class ProductController {
       const result = await this.productService.fetchProductDetails(barcode);
       return res.status(200).json(result);
     } catch (error) {
-      logger.error(error);
+      this.logger.error(error);
       if ((error as any).status === 404)
         return res
           .status(404)

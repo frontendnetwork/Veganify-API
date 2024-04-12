@@ -1,15 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import axios from "axios";
 import * as ini from "ini";
 import * as iconv from "iconv-lite";
-import pino from "pino";
-
-const logger = pino({ level: process.env.LOG_LEVEL ?? "warn" });
 
 @Injectable()
 export class ProductService {
   constructor(private httpService: HttpService) {}
+  private readonly logger = new Logger(ProductService.name);
 
   async fetchProductDetails(barcode: string) {
     let productname: string = "n/a";
@@ -38,7 +36,7 @@ export class ProductService {
         }
       }
     } catch (error) {
-      logger.info(error);
+      this.logger.error(error);
     }
 
     const response = await axios.get(
