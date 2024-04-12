@@ -106,21 +106,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  deploy-staging:
-    needs: build-and-push-staging
-    if: success() && github.ref == 'refs/heads/staging'
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: SSH into the server and run Docker Compose
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }} 
-          script: |
-            cd vegancheck
-            docker-compose stop vc-backend-staging
-            docker-compose pull vc-backend-staging
-            docker-compose up -d vc-backend-staging
