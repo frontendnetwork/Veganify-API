@@ -22,7 +22,7 @@ import { HealthModule } from "./health/health.module";
     ConfigModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
-        level: "info",
+        level: "warn",
       },
     }),
     TerminusModule,
