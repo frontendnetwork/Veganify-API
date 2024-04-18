@@ -15,7 +15,6 @@ export class HealthService {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck("DeepL", "https://deepl.com"),
       () => this.http.pingCheck("Ping", "https://8.8.8.8"),
     ]);
   }
