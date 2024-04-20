@@ -11,7 +11,6 @@ import {
   Logger,
 } from "@nestjs/common";
 import fs from "fs";
-import pino from "pino";
 import { ApiExcludeController } from "@nestjs/swagger";
 
 @Controller()
