@@ -5,6 +5,7 @@ import {
   Res,
   HttpException,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Response } from "express";
 import { GradesService } from "./grades.service";
@@ -34,6 +35,7 @@ export class BarcodeDto {
 
 @Controller("v0/grades")
 export class GradesController {
+  private readonly logger = new Logger(GradesController.name);
   constructor(private gradesService: GradesService) {}
 
   @Post("backend")
@@ -75,8 +77,8 @@ export class GradesController {
       res.send(response?.data);
     } catch (error) {
       if ((error as any).response?.status === 404) {
-        await this.gradesService.notifyMissingBarcode(barcode);
         res.send("Sent");
+        await this.gradesService.notifyMissingBarcode(barcode);
       } else {
         throw new HttpException("Error", HttpStatus.INTERNAL_SERVER_ERROR);
       }
