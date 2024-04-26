@@ -21,6 +21,6 @@
     "./src/**/*.ts",
     "jest.config.js",
     "tests/**/*.js",
-    "tests/errors.controller.spec.ts"
+    "tests/**/*.ts"
   ]
 }

@@ -35,6 +35,7 @@ export class ProductController {
       return res.status(200).json(result);
     } catch (error) {
       this.logger.error(error);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((error as any).status === 404)
         return res
           .status(404)

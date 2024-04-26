@@ -19,7 +19,7 @@ export class ProductService {
     let nutriscore: "n/a" | "A" | "B" | "C" | "D" | "E" | "F" = "n/a";
     let grade: string = "n/a";
     let apiname: string = "n/a";
-    let processed: boolean = false;
+    const processed: boolean = false;
     let baseuri: string = "n/a";
     let edituri: string = "n/a";
 
