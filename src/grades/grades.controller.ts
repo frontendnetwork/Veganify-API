@@ -10,28 +10,8 @@ import {
 import { Response } from "express";
 import { GradesService } from "./grades.service";
 import { ApiResponse, ApiTags, ApiBody, ApiProperty } from "@nestjs/swagger";
-
-export class backendResponseDto {
-  @ApiProperty({ description: "The barcode requested", example: "12345678" })
-  barcode: string = "4066600204404";
-
-  @ApiProperty({
-    description: "The name of the product",
-    example: "Paulaner Spezi Zero",
-  })
-  name: string = "Paulaner Spezi Zero";
-
-  @ApiProperty({ description: "The grade of the product", example: "B" })
-  grade: string = "B";
-}
-
-export class BarcodeDto {
-  @ApiProperty({
-    description: "The barcode to be checked",
-    example: "4066600204404",
-  })
-  barcode: string = "4066600204404";
-}
+import { BarcodeDto } from "./dtos/BarcodeDto";
+import { backendResponseDto } from "./dtos/backendResponseDto";
 
 @Controller("v0/grades")
 export class GradesController {

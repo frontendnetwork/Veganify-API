@@ -1,7 +1,7 @@
 
 const request = require('supertest');
 const express = require('express');
-const errors = require('../dist/errors'); 
+const errors = require('../dist/errors');
 
 let app;
 
@@ -9,8 +9,6 @@ beforeEach(() => {
   app = express();
   errors(app);
 });
-
-// Then you can write your tests as before:
 
 describe('App', () => {
   it('should respond with OpenAPI.yaml content for /OpenAPI.yaml', async () => {

@@ -9,7 +9,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "build": "nest build",
-    "lint": "nest lint",
+    "lint": "eslint .",
     "get:peta": "node .github/scripts/peta-cron.js"
   },
   "author": "JokeNetwork, Veganify Contributors",
