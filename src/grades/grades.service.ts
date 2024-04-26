@@ -1,21 +1,13 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import nodemailer from "nodemailer";
-import { Observable } from "rxjs";
+import { lastValueFrom, Observable } from "rxjs";
 import { AxiosResponse } from "axios";
 
 @Injectable()
 export class GradesService {
   private readonly logger = new Logger(GradesService.name);
-  private readonly transporter = nodemailer.createTransport({
-    host: "smtp.ionos.de",
-    port: 587,
-    secure: false,
-    auth: {
-      user: "grades@vegancheck.me",
-      pass: process.env.MAILPWD,
-    },
-  });
+  private readonly pushoverUser = process.env.PUSHOVER_USER;
+  private readonly pushoverToken = process.env.PUSHOVER_TOKEN;
 
   constructor(private httpService: HttpService) {}
 
@@ -25,19 +17,24 @@ export class GradesService {
   }
 
   async notifyMissingBarcode(barcode: string): Promise<void> {
-    const mailOptions = {
-      from: '"Veganify" <grades@vegancheck.me>',
-      to: "philip@brembeck.me",
-      subject: `Veganify Grade: ${barcode}`,
-      html: `This product has to be checked: <b>${barcode}</b>`,
+    const pushoverUrl = "https://api.pushover.net/1/messages.json";
+    const message = `This product has to be checked: ${barcode}`;
+
+    const postData = {
+      token: this.pushoverToken,
+      user: this.pushoverUser,
+      message: message,
+      priority: 0,
     };
 
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log("Message sent:", info.messageId);
+      const response = await lastValueFrom(
+        this.httpService.post(pushoverUrl, postData)
+      );
+      this.logger.log("Pushover notification sent:", response.data);
     } catch (error) {
-      this.logger.warn(error);
-      throw new Error("Error sending mail");
+      this.logger.warn("Failed to send Pushover notification:", error);
+      throw new Error("Error sending Pushover notification");
     }
   }
 }
