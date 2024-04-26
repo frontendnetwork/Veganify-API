@@ -5,35 +5,17 @@ import {
   Res,
   HttpException,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Response } from "express";
 import { GradesService } from "./grades.service";
 import { ApiResponse, ApiTags, ApiBody, ApiProperty } from "@nestjs/swagger";
-
-export class backendResponseDto {
-  @ApiProperty({ description: "The barcode requested", example: "12345678" })
-  barcode: string = "4066600204404";
-
-  @ApiProperty({
-    description: "The name of the product",
-    example: "Paulaner Spezi Zero",
-  })
-  name: string = "Paulaner Spezi Zero";
-
-  @ApiProperty({ description: "The grade of the product", example: "B" })
-  grade: string = "B";
-}
-
-export class BarcodeDto {
-  @ApiProperty({
-    description: "The barcode to be checked",
-    example: "4066600204404",
-  })
-  barcode: string = "4066600204404";
-}
+import { BarcodeDto } from "./dtos/BarcodeDto";
+import { backendResponseDto } from "./dtos/backendResponseDto";
 
 @Controller("v0/grades")
 export class GradesController {
+  private readonly logger = new Logger(GradesController.name);
   constructor(private gradesService: GradesService) {}
 
   @Post("backend")
@@ -75,8 +57,8 @@ export class GradesController {
       res.send(response?.data);
     } catch (error) {
       if ((error as any).response?.status === 404) {
-        await this.gradesService.notifyMissingBarcode(barcode);
         res.send("Sent");
+        await this.gradesService.notifyMissingBarcode(barcode);
       } else {
         throw new HttpException("Error", HttpStatus.INTERNAL_SERVER_ERROR);
       }
