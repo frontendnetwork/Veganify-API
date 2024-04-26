@@ -12,6 +12,7 @@ import { GradesService } from "./grades.service";
 import { ApiResponse, ApiTags, ApiBody, ApiProperty } from "@nestjs/swagger";
 import { BarcodeDto } from "./dtos/BarcodeDto";
 import { backendResponseDto } from "./dtos/backendResponseDto";
+import { lastValueFrom } from "rxjs";
 
 @Controller("v0/grades")
 export class GradesController {
@@ -46,13 +47,16 @@ export class GradesController {
       barcode.length > 16 ||
       !/^\d+$/.test(barcode)
     ) {
-      throw new HttpException("Error", HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        "Input has to be a barcode.",
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     try {
-      const response = await this.gradesService
-        .checkBarcode(barcode)
-        .toPromise();
+      const response = await lastValueFrom(
+        this.gradesService.checkBarcode(barcode)
+      );
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.send(response?.data);
     } catch (error) {
@@ -60,7 +64,10 @@ export class GradesController {
         res.send("Sent");
         await this.gradesService.notifyMissingBarcode(barcode);
       } else {
-        throw new HttpException("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          "An error happened on the server.",
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
       }
     }
   }
