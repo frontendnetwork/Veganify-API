@@ -12,7 +12,7 @@ export class GradesService {
     port: 587,
     secure: false,
     auth: {
-      user: "grades@veganify.app",
+      user: "grades@vegancheck.me",
       pass: process.env.MAILPWD,
     },
   });
@@ -26,7 +26,7 @@ export class GradesService {
 
   async notifyMissingBarcode(barcode: string): Promise<void> {
     const mailOptions = {
-      from: '"Veganify" <grades@veganify.app>',
+      from: '"Veganify" <grades@vegancheck.me>',
       to: "philip@brembeck.me",
       subject: `Veganify Grade: ${barcode}`,
       html: `This product has to be checked: <b>${barcode}</b>`,
@@ -34,7 +34,7 @@ export class GradesService {
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log("Message sent: %s", info.messageId);
+      this.logger.log("Message sent:", info.messageId);
     } catch (error) {
       this.logger.warn(error);
       throw new Error("Error sending mail");
