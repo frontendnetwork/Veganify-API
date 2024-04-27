@@ -10,7 +10,9 @@
     "start:prod": "node dist/main",
     "build": "nest build",
     "lint": "eslint .",
-    "get:peta": "node .github/scripts/peta-cron.js"
+    "get:peta": "node .github/scripts/peta-cron.js",
+    "test": "jest",
+    "test:cov": "jest --coverage"
   },
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",

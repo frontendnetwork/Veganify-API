@@ -7,3 +7,4 @@ node_modules 2/
 .DS_Store
 affinity/
 dist/
+coverage/

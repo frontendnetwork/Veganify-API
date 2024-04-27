@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { HttpException } from "@nestjs/common";
 import * as fs from "fs";
-import { ErrorsController } from "../src/errors.controller";
+import { ErrorsController } from "./errors.controller";
 
 jest.mock("fs", () => ({
   readFile: jest.fn(),
