@@ -1,7 +1,7 @@
 {
   "name": "veganify-api",
-  "version": "0.3.1",
-  "description": "Veganify API, with endpoints v0/product/:barcode, v0/peta/crueltyfree and v0/ingredients/:ingredients",
+  "version": "0.5.1",
+  "description": "Veganify API",
   "main": "dist/app.js",
   "scripts": {
     "start": "nest start",
@@ -43,9 +43,7 @@
     "js-yaml": "^4.1.0",
     "jsdom": "^24.0.0",
     "lodash": "^4.17.21",
-    "mailer": "^0.6.6",
     "nestjs-pino": "^4.0.0",
-    "nodemailer": "^6.9.13",
     "pino": "^9.0.0",
     "pino-http": "^9.0.0",
     "querystring": "^0.2.1",
@@ -67,7 +65,6 @@
     "@types/js-yaml": "^4.0.9",
     "@types/jsdom": "^21.1.6",
     "@types/lodash": "^4.17.0",
-    "@types/nodemailer": "^6.4.14",
     "@types/pump": "^1.1.3",
     "@types/request": "^2.48.12",
     "@types/split2": "^4.2.3",
