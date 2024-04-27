@@ -3,6 +3,7 @@ import { HttpService } from "@nestjs/axios";
 import axios from "axios";
 import * as ini from "ini";
 import * as iconv from "iconv-lite";
+import { firstValueFrom } from "rxjs";
 
 @Injectable()
 export class ProductService {
@@ -24,9 +25,9 @@ export class ProductService {
     let edituri: string = "n/a";
 
     try {
-      const gradeResponse = await this.httpService
-        .get(`https://grades.veganify.app/api/${barcode}.json`)
-        .toPromise();
+      const gradeResponse = await firstValueFrom(
+        this.httpService.get(`https://grades.veganify.app/api/${barcode}.json`)
+      );
       if (gradeResponse?.data !== "404") {
         const gradesource = gradeResponse?.data;
 
