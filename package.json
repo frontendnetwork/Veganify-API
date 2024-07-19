@@ -76,7 +76,7 @@
     "eslint-plugin-promise": "^6.4.0",
     "jest": "^29.7.0",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.2",
+    "ts-jest": "^29.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   }
