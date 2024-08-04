@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { Response } from "express";
 import { GradesService } from "./grades.service";
-import { ApiResponse, ApiTags, ApiBody, ApiProperty } from "@nestjs/swagger";
+import { ApiResponse, ApiTags, ApiBody } from "@nestjs/swagger";
 import { BarcodeDto } from "./dtos/BarcodeDto";
 import { backendResponseDto } from "./dtos/backendResponseDto";
 import { lastValueFrom } from "rxjs";
@@ -60,6 +60,7 @@ export class GradesController {
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.send(response?.data);
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((error as any).response?.status === 404) {
         res.send("Sent");
         await this.gradesService.notifyMissingBarcode(barcode);

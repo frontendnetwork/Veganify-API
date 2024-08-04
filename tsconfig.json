@@ -17,5 +17,10 @@
     "noEmitOnError": true
   },
   "exclude": ["node_modules"],
-  "include": ["./src/**/*.ts", "jest.config.js", "tests/**/*.js"]
+  "include": [
+    "./src/**/*.ts",
+    "jest.config.js",
+    "tests/**/*.js",
+    "tests/**/*.ts"
+  ]
 }
