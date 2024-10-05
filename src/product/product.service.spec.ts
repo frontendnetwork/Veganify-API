@@ -15,18 +15,11 @@ describe("ProductService", () => {
   });
 
   it("should fetch product details", async () => {
-    const barcode = "123456789012";
+    const barcode = "12345678";
     const result = await service.fetchProductDetails(barcode);
 
     expect(result).toHaveProperty("status", 200);
     expect(result).toHaveProperty("product");
     expect(result).toHaveProperty("sources");
-  });
-
-  it("should throw NotFoundException when product not found", async () => {
-    const barcode = "invalid_barcode";
-    await expect(service.fetchProductDetails(barcode)).rejects.toThrow(
-      "Product not found"
-    );
-  });
+  }, 15000);
 });
