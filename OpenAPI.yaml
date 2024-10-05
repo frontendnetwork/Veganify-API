@@ -33,11 +33,6 @@ paths:
           in: path
           schema:
             type: string
-        - name: translate
-          required: true
-          in: query
-          schema:
-            type: boolean
       responses:
         '200':
           description: Request returned a positive result.

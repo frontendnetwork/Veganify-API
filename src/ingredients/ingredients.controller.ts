@@ -9,11 +9,11 @@ import {
   Logger,
 } from "@nestjs/common";
 import { Response } from "express";
-import _ from "lodash";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { TranslationService } from "./translation.service";
 import { ParseBooleanPipe } from "./parse-boolean.pipe";
 import { readJsonFile } from "./jsonFileReader";
+import { DeeplLanguages } from "deepl";
 
 @Controller("v0/ingredients")
 export class IngredientsController {
@@ -38,7 +38,7 @@ export class IngredientsController {
   async getIngredients(
     @Param("ingredients") ingredientsParam: string,
     @Res() res: Response,
-    @Query("translate", ParseBooleanPipe) translateFlag: boolean = true
+    @Query("translate", ParseBooleanPipe) translateFlag = true
   ) {
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Charset", "utf-8");
@@ -54,31 +54,36 @@ export class IngredientsController {
       );
     }
 
-    let ingredients = decodeURI(ingredientsParam.toLowerCase()).replace(
-      /\s/g,
-      ""
-    );
-    let isVegan, targetLanguage;
+    const ingredients = this.parseIngredients(ingredientsParam);
+    let isNotVegan: string[],
+      isVegan: string[],
+      targetLanguage: DeeplLanguages = "EN";
 
     const shouldTranslate = translateFlag === true;
 
     try {
-      isVegan = await readJsonFile("./isnotvegan.json");
-      let response;
+      isNotVegan = ((await readJsonFile("./isnotvegan.json")) as string[]).map(
+        (item: string) => item.toLowerCase()
+      );
+      isVegan = ((await readJsonFile("./isvegan.json")) as string[]).map(
+        (item: string) => item.toLowerCase()
+      );
+      let response: string[];
 
       if (shouldTranslate) {
         try {
           const translationResult = await this.translationService.translateText(
-            ingredients,
+            ingredients.join(","),
             "EN",
             1500
           );
-          targetLanguage =
-            translationResult.data.translations[0].detected_source_language;
+          targetLanguage = translationResult.data.translations[0]
+            .detected_source_language as DeeplLanguages;
           const translated = translationResult.data.translations[0].text;
 
-          response = translated.split(",");
+          response = this.parseIngredients(translated);
         } catch (error) {
+          // Error handling remains the same
           if (error instanceof Error) {
             if (error.message === "Translate timed out") {
               this.logger.error(`Translation service is unavailable: ${error}`);
@@ -109,22 +114,47 @@ export class IngredientsController {
           }
         }
       } else {
-        response = ingredients.split(",");
+        response = ingredients;
       }
 
-      let result = _.intersectionWith(isVegan, response, _.isEqual);
+      let notVeganResult = response.filter((item: string) =>
+        isNotVegan.includes(item)
+      );
+      let veganResult = response.filter((item: string) =>
+        isVegan.includes(item)
+      );
+      let unknownResult = response.filter(
+        (item: string) => !isNotVegan.includes(item) && !isVegan.includes(item)
+      );
 
-      if (shouldTranslate && targetLanguage !== "EN" && result.length > 0) {
+      if (
+        shouldTranslate &&
+        targetLanguage !== "EN" &&
+        (notVeganResult.length > 0 ||
+          veganResult.length > 0 ||
+          unknownResult.length > 0)
+      ) {
         try {
           const backTranslationResult =
             await this.translationService.translateText(
-              result.join(","),
+              [...notVeganResult, ...veganResult, ...unknownResult].join(","),
               targetLanguage,
               1500
             );
-          result = backTranslationResult.data.translations[0].text.split(",");
+          const backTranslated = this.parseIngredients(
+            backTranslationResult.data.translations[0].text
+          );
 
-          this.sendResponse(res, result.length === 0, result);
+          notVeganResult = backTranslated.slice(0, notVeganResult.length);
+          veganResult = backTranslated.slice(
+            notVeganResult.length,
+            notVeganResult.length + veganResult.length
+          );
+          unknownResult = backTranslated.slice(
+            notVeganResult.length + veganResult.length
+          );
+
+          this.sendResponse(res, notVeganResult, veganResult, unknownResult);
         } catch (error) {
           this.logger.error(`Error during back translation: ${error}`);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
@@ -135,7 +165,7 @@ export class IngredientsController {
           return;
         }
       } else {
-        this.sendResponse(res, result.length === 0, result);
+        this.sendResponse(res, notVeganResult, veganResult, unknownResult);
       }
     } catch (error) {
       this.logger.error(`Error reading file: ${error}`);
@@ -147,18 +177,29 @@ export class IngredientsController {
     }
   }
 
+  private parseIngredients(ingredientsString: string): string[] {
+    // Decode URI component to handle %20 and other encoded characters
+    const decoded = decodeURIComponent(ingredientsString);
+
+    // Split by comma, trim whitespace, and filter out empty strings
+    return decoded
+      .split(",")
+      .map((item) => item.trim().toLowerCase())
+      .filter((item) => item !== "");
+  }
+
   private sendResponse(
     res: Response,
-    isVegan: boolean,
-    flaggedItems: string[] = []
+    notVeganItems: string[],
+    veganItems: string[],
+    unknownItems: string[]
   ) {
     const responseData: ResponseData = {
-      vegan: isVegan,
+      vegan: notVeganItems.length === 0,
+      surely_vegan: veganItems,
+      not_vegan: notVeganItems,
+      maybe_vegan: unknownItems,
     };
-
-    if (!isVegan) {
-      responseData.flagged = flaggedItems;
-    }
 
     res.status(HttpStatus.OK).send({
       code: "OK",
@@ -171,5 +212,7 @@ export class IngredientsController {
 
 interface ResponseData {
   vegan: boolean;
-  flagged?: string[];
+  surely_vegan: string[];
+  not_vegan: string[];
+  maybe_vegan: string[];
 }
