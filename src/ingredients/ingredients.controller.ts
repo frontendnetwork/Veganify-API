@@ -20,6 +20,31 @@ export class IngredientsController {
   constructor(private translationService: TranslationService) {}
   private readonly logger = new Logger(IngredientsController.name);
 
+  private isNotVegan: string[] = [];
+  private isVegan: string[] = [];
+
+  async onModuleInit() {
+    this.isNotVegan = await this.loadAndPreprocessList("./isnotvegan.json");
+    this.isVegan = await this.loadAndPreprocessList("./isvegan.json");
+  }
+
+  private async loadAndPreprocessList(filename: string): Promise<string[]> {
+    const list = (await readJsonFile(filename)) as string[];
+    return list.map((item) => item.toLowerCase());
+  }
+
+  private sophisticatedMatch(ingredient: string, list: string[]): boolean {
+    const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
+
+    if (list.includes(normalizedIngredient)) return true;
+
+    const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
+    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, ""))))
+      return true;
+
+    return false;
+  }
+
   @Get(":ingredients")
   @ApiTags("Ingredients")
   @ApiResponse({

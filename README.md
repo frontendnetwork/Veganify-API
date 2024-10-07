@@ -45,11 +45,11 @@ npm install
 npm run start:dev
 ```
 
-Before commiting any changes, you need to make sure that your code passes the linter and the tests. Run `npm run lint` and `npm run test` to check if everything is ok.
+Before committing any changes, you need to make sure that your code passes the linter and the tests. Run `npm run lint` and `npm run test` to check if everything is ok.
 
 ### Updating the Vegan and Non-Vegan ingredient lists
 
-Before commiting changes to the `isnotvegan.json` and `isvegan.json` lists, format and process them by running the following command:
+Before committing changes to the `isnotvegan.json` and `isvegan.json` lists, format and process them by running the following command:
 
 ```bash
 npm run process:vegan
