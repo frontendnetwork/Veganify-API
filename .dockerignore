@@ -2,3 +2,5 @@ node_modules/
 README.md 
 SECURITY.md
 docs/
+scripts/
+.env.example
