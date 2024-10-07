@@ -16,25 +16,13 @@ The official API powering [Veganify](https://github.com/frontendnetwork/veganify
 
 Please refer to [Veganify API Documentation](https://frontendnet.work/veganify-api) for a full documentation.
 
-To learn more about this repo, head to: [https://frontendnetwork.github.io/Veganify-API/](https://frontendnetwork.github.io/Veganify-API/).
-
-There is an official [Wrapper for React available on npm](https://www.npmjs.com/package/@frontendnetwork/veganify).
+There is an official [Wrapper for React, Vue, Svelte, and more available on npm](https://www.npmjs.com/package/@frontendnetwork/veganify).
 
 ### Swagger
 
-[![Validate OpenAPI.yml](https://github.com/frontendnetwork/veganify-API/actions/workflows/validate.yml/badge.svg)](https://github.com/JokeNetwork/Veganify-API/actions/workflows/validate.yml)
+[![Validate OpenAPI.yml](https://github.com/frontendnetwork/veganify-API/actions/workflows/validate.yml/badge.svg)](https://github.com/frontendnetwork/Veganify-API/actions/workflows/validate.yml)
 
-The [`OpenAPI.yml`](https://github.com/frontendnetwork/Veganify-API/blob/main/OpenAPI.yaml) is automatically available in [this Swagger UI](https://staging.api.veganify.app/api-docs).
-
-### Postman
-
-Postman Collection is available for download here: [Veganify API.postman_collection.json.zip](https://github.com/frontendnetwork/Veganify-API/files/11247406/VeganCheck.API.postman_collection.json.zip)
-
-### API Endpoints
-
-> **Warning** <br />
-> All endpoints are only accessible via HTTPS. All HTTP requests will be rerouted to HTTPS.<br />
-> Making a request over HTTP may cause data to be transmitted unencrypted for a short time and the server to send a `301` code.
+The [`OpenAPI.yml`](https://github.com/frontendnetwork/Veganify-API/blob/main/OpenAPI.yaml) is automatically available in [this Swagger UI](https://api.veganify.app/api-docs).
 
 #### Available endpoints
 
@@ -44,9 +32,26 @@ The following endpoints are available within the Veganify API:
 - GET: <https://api.veganify.app/v0/ingredients/{ingredientslist}>
 - GET: <https://api.veganify.app/v0/peta/crueltyfree>
 
-#### Unavailable endpoints
+## Development
 
-The following endpoints are currently unavailable within the public Veganify API. They're not on the roadmap and will not be published:
+To run the API locally, you first need to set up the environment variables. You can do this by creating a `.env` file based on the `.env.example` file.
+Here, you need to set `DEEPL_AUTH` to a valid DeepL API key (you can get one [here](https://www.deepl.com/docs-api/) for free), `PUSHOVER_TOKEN` and `PUSHOVER_USER` can be left blank, and `USER_ID_OEANDB` to your OpenEANDB user key.
+For Development purposes, you can just provide a dummy value for the `USER_ID_OEANDB` key.
 
-- <del>GET: [https://api.veganify.app/v0/peta/veganapproved](https://api.veganify.ap/v0/peta/veganapproved)</del>
-- <del>POST: <https://api.veganify.app/v0/grades/backend></del>
+After setting up the `.env` file, you can run the following commands to get everything up and running:
+
+```bash
+npm install
+npm run start:dev
+```
+
+Before commiting any changes, you need to make sure that your code passes the linter and the tests. Run `npm run lint` and `npm run test` to check if everything is ok.
+
+### Updating the Vegan and Non-Vegan ingredient lists
+
+Before commiting changes to the `isnotvegan.json` and `isvegan.json` lists, format and process them by running the following command:
+
+```bash
+npm run process:vegan
+npm run process:notvegan
+```

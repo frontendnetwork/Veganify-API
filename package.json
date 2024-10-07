@@ -12,7 +12,10 @@
     "lint": "eslint .",
     "get:peta": "node .github/scripts/peta-cron.js",
     "test": "jest",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "process:ingredients": "bun scripts/processIngredients.js",
+    "process:vegan": "npm run process:ingredients ../isvegan.json",
+    "process:notvegan": "npm run process:ingredients ../isnotvegan.json"
   },
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",
