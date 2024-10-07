@@ -108,7 +108,6 @@ export class IngredientsController {
 
           response = this.parseIngredients(translated);
         } catch (error) {
-          // Error handling remains the same
           if (error instanceof Error) {
             if (error.message === "Translate timed out") {
               this.logger.error(`Translation service is unavailable: ${error}`);
