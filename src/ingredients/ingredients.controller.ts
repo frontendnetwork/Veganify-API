@@ -7,6 +7,7 @@ import {
   HttpStatus,
   HttpException,
   Logger,
+  OnModuleInit,
 } from "@nestjs/common";
 import { Response } from "express";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -16,7 +17,7 @@ import { readJsonFile } from "./jsonFileReader";
 import { DeeplLanguages } from "deepl";
 
 @Controller("v0/ingredients")
-export class IngredientsController {
+export class IngredientsController implements OnModuleInit {
   constructor(private translationService: TranslationService) {}
   private readonly logger = new Logger(IngredientsController.name);
 
@@ -80,19 +81,11 @@ export class IngredientsController {
     }
 
     const ingredients = this.parseIngredients(ingredientsParam);
-    let isNotVegan: string[],
-      isVegan: string[],
-      targetLanguage: DeeplLanguages = "EN";
+    let targetLanguage: DeeplLanguages = "EN";
 
     const shouldTranslate = translateFlag === true;
 
     try {
-      isNotVegan = ((await readJsonFile("./isnotvegan.json")) as string[]).map(
-        (item: string) => item.toLowerCase()
-      );
-      isVegan = ((await readJsonFile("./isvegan.json")) as string[]).map(
-        (item: string) => item.toLowerCase()
-      );
       let response: string[];
 
       if (shouldTranslate) {
@@ -141,14 +134,17 @@ export class IngredientsController {
         response = ingredients;
       }
 
+      // Use sophisticatedMatch for categorizing ingredients
       let notVeganResult = response.filter((item: string) =>
-        isNotVegan.includes(item)
+        this.sophisticatedMatch(item, this.isNotVegan)
       );
       let veganResult = response.filter((item: string) =>
-        isVegan.includes(item)
+        this.sophisticatedMatch(item, this.isVegan)
       );
       let unknownResult = response.filter(
-        (item: string) => !isNotVegan.includes(item) && !isVegan.includes(item)
+        (item: string) =>
+          !this.sophisticatedMatch(item, this.isNotVegan) &&
+          !this.sophisticatedMatch(item, this.isVegan)
       );
 
       if (
@@ -192,7 +188,7 @@ export class IngredientsController {
         this.sendResponse(res, notVeganResult, veganResult, unknownResult);
       }
     } catch (error) {
-      this.logger.error(`Error reading file: ${error}`);
+      this.logger.error(`Error processing request: ${error}`);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         code: "Internal Server Error",
         status: "500",
