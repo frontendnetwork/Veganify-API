@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
 export class RateLimiterMiddleware implements NestMiddleware {
   private readonly limiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 150,
+    max: 350,
     message: '{status: "429", code: "Rate limit reached"}',
   });
 
