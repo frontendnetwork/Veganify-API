@@ -47,7 +47,7 @@
     "jsdom": "^25.0.1",
     "lodash": "^4.17.21",
     "nestjs-pino": "^4.1.0",
-    "pino": "^9.4.0",
+    "pino": "^9.5.0",
     "pino-http": "^10.3.0",
     "querystring": "^0.2.1",
     "reflect-metadata": "^0.2.2",
