@@ -4,6 +4,7 @@
   "description": "Veganify API",
   "main": "dist/app.js",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -14,8 +15,8 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "process:ingredients": "bun scripts/processIngredients.js",
-    "process:vegan": "npm run process:ingredients ../isvegan.json",
-    "process:notvegan": "npm run process:ingredients ../isnotvegan.json"
+    "process:vegan": "pnpm run process:ingredients ../isvegan.json",
+    "process:notvegan": "pnpm run process:ingredients ../isnotvegan.json"
   },
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",
