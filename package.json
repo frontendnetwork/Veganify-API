@@ -28,7 +28,7 @@
     "@nestjs/platform-express": "^10.4.5",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/terminus": "^10.2.3",
-    "@types/axios": "^0.14.0",
+    "@types/axios": "^0.14.4",
     "@types/body-parser": "^1.19.5",
     "@types/dotenv": "^8.2.0",
     "@types/iconv-lite": "^0.0.1",
