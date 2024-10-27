@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { IngredientsController } from "../v0/ingredients.controller";
+import { IngredientsV1Controller } from "../v1/ingredients.controller";
 import { TranslationService } from "../shared/services/translation.service";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
@@ -7,8 +7,8 @@ import * as jsonFileReader from "../shared/utils/jsonFileReader";
 
 jest.mock("../shared/utils/jsonFileReader");
 
-describe("IngredientsController", () => {
-  let controller: IngredientsController;
+describe("IngredientsV1Controller", () => {
+  let controller: IngredientsV1Controller;
   let translationService: jest.Mocked<TranslationService>;
 
   const mockResponse = () => {
@@ -21,7 +21,7 @@ describe("IngredientsController", () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [IngredientsController],
+      controllers: [IngredientsV1Controller],
       providers: [
         {
           provide: TranslationService,
@@ -32,7 +32,7 @@ describe("IngredientsController", () => {
       ],
     }).compile();
 
-    controller = module.get<IngredientsController>(IngredientsController);
+    controller = module.get<IngredientsV1Controller>(IngredientsV1Controller);
     translationService = module.get(
       TranslationService
     ) as jest.Mocked<TranslationService>;
@@ -44,6 +44,8 @@ describe("IngredientsController", () => {
           return Promise.resolve(["milk", "egg"]);
         } else if (filename === "./isvegan.json") {
           return Promise.resolve(["tofu", "soy"]);
+        } else if (filename === "./ismaybenotvegan.json") {
+          return Promise.resolve(["sugar", "wine"]);
         }
         return Promise.resolve([]);
       });
@@ -58,7 +60,7 @@ describe("IngredientsController", () => {
   describe("getIngredients", () => {
     it("should return ingredients categorization without translation", async () => {
       const res = mockResponse();
-      await controller.getIngredients("tofu,milk,unknown", res, false);
+      await controller.getIngredients("tofu,milk,sugar,unknown", res, false);
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
@@ -69,7 +71,28 @@ describe("IngredientsController", () => {
           vegan: false,
           surely_vegan: ["tofu"],
           not_vegan: ["milk"],
-          maybe_vegan: ["unknown"],
+          maybe_not_vegan: ["sugar"],
+          unknown: ["unknown"],
+        },
+      });
+    });
+
+    it("should handle ingredients that appear in multiple lists", async () => {
+      const res = mockResponse();
+      // Testing priority: not_vegan > maybe_not_vegan > vegan
+      await controller.getIngredients("sugar,soy,milk", res, false);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        status: "200",
+        message: "Success",
+        data: {
+          vegan: false,
+          surely_vegan: ["soy"],
+          not_vegan: ["milk"],
+          maybe_not_vegan: ["sugar"],
+          unknown: [],
         },
       });
     });
@@ -79,12 +102,26 @@ describe("IngredientsController", () => {
       translationService.translateText.mockResolvedValueOnce({
         data: {
           translations: [
-            { detected_source_language: "DE", text: "tofu,milk,unknown" },
+            {
+              detected_source_language: "DE",
+              text: "tofu,milch,zucker,unbekannt",
+            },
           ],
         },
       });
 
-      await controller.getIngredients("tofu,milch,unbekannt", res, true);
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [
+            {
+              text: "tofu,milk,sugar,unknown",
+              detected_source_language: "",
+            },
+          ],
+        },
+      });
+
+      await controller.getIngredients("tofu,milch,zucker,unbekannt", res, true);
 
       expect(translationService.translateText).toHaveBeenCalledTimes(2);
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -96,7 +133,8 @@ describe("IngredientsController", () => {
           vegan: false,
           surely_vegan: ["tofu"],
           not_vegan: ["milk"],
-          maybe_vegan: ["unknown"],
+          maybe_not_vegan: ["sugar"],
+          unknown: ["unknown"],
         },
       });
     });
@@ -128,7 +166,7 @@ describe("IngredientsController", () => {
 
     it("should handle compound ingredients", async () => {
       const res = mockResponse();
-      await controller.getIngredients("soy milk,egg white", res, false);
+      await controller.getIngredients("soy milk,wine,egg white", res, false);
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
@@ -139,7 +177,27 @@ describe("IngredientsController", () => {
           vegan: false,
           surely_vegan: [],
           not_vegan: [],
-          maybe_vegan: ["soy milk", "egg white"],
+          maybe_not_vegan: ["wine"],
+          unknown: ["soy milk", "egg white"],
+        },
+      });
+    });
+
+    it("should mark product as non-vegan if it contains maybe-not-vegan ingredients", async () => {
+      const res = mockResponse();
+      await controller.getIngredients("tofu,sugar", res, false);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        status: "200",
+        message: "Success",
+        data: {
+          vegan: false, // Should be false because sugar is maybe-not-vegan
+          surely_vegan: ["tofu"],
+          not_vegan: [],
+          maybe_not_vegan: ["sugar"],
+          unknown: [],
         },
       });
     });

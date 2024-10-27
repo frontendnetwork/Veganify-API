@@ -24,6 +24,26 @@ paths:
           description: Internal Server Error.
       tags:
         - Grades
+  /v0/product/{barcode}:
+    post:
+      operationId: ProductController_getProductDetails
+      parameters:
+        - name: barcode
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request returned a positive result.
+        '400':
+          description: Input Error / Bad Request.
+        '404':
+          description: Specified product is not in the database.
+        '500':
+          description: Internal Server Error.
+      tags:
+        - Product Information
   /v0/ingredients/{ingredients}:
     get:
       operationId: IngredientsController_getIngredients
@@ -45,11 +65,11 @@ paths:
             ?translate=false to the request.
       tags:
         - Ingredients
-  /v0/product/{barcode}:
-    post:
-      operationId: ProductController_getProductDetails
+  /v1/ingredients/{ingredients}:
+    get:
+      operationId: IngredientsV1Controller_getIngredients
       parameters:
-        - name: barcode
+        - name: ingredients
           required: true
           in: path
           schema:
@@ -57,14 +77,15 @@ paths:
       responses:
         '200':
           description: Request returned a positive result.
-        '400':
-          description: Input Error / Bad Request.
-        '404':
-          description: Specified product is not in the database.
         '500':
           description: Internal Server Error.
+        '503':
+          description: >-
+            Service Unavailable. Translation service is unavailable. Try again
+            with disabled translation (Results might vary). Add flag
+            ?translate=false to the request.
       tags:
-        - Product Information
+        - Ingredients
   /v0/peta/{type}:
     get:
       operationId: PetaController_getPetaByType
