@@ -4,8 +4,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ErrorsController } from "./errors.controller";
 import { GradesService } from "./grades/grades.service";
 import { GradesController } from "./grades/grades.controller";
-import { IngredientsController } from "./ingredients/ingredients.controller";
-import { TranslationService } from "./ingredients/translation.service";
 import { ProductController } from "./product/product.controller";
 import { ProductService } from "./product/product.service";
 import { PetaController } from "./peta/peta.controller";
@@ -14,6 +12,10 @@ import { LoggerModule } from "nestjs-pino";
 import { HealthController } from "./health/health.controller";
 import { TerminusModule } from "@nestjs/terminus";
 import { HealthModule } from "./health/health.module";
+import { IngredientsModule } from "./ingredients/ingredients.module";
+import { IngredientsController } from "./ingredients/v0/ingredients.controller";
+import { IngredientsV1Controller } from "./ingredients/v1/ingredients.controller";
+import { TranslationService } from "./ingredients/shared/services/translation.service";
 
 @Module({
   imports: [
@@ -26,16 +28,18 @@ import { HealthModule } from "./health/health.module";
       },
     }),
     TerminusModule,
+    IngredientsModule,
   ],
   controllers: [
     GradesController,
-    IngredientsController,
     ProductController,
+    IngredientsController,
+    IngredientsV1Controller,
     PetaController,
     HealthController,
     ErrorsController,
   ],
-  providers: [GradesService, ProductService, ConfigService, TranslationService],
+  providers: [GradesService, ProductService, TranslationService, ConfigService],
 })
 export class AppModule implements NestModule {
   constructor(private readonly configService: ConfigService) {}
@@ -46,6 +50,7 @@ export class AppModule implements NestModule {
       .forRoutes(
         GradesController,
         IngredientsController,
+        IngredientsV1Controller,
         ProductController,
         PetaController,
         ErrorsController
