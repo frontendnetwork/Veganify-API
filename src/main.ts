@@ -1,9 +1,12 @@
+import { writeFileSync } from "fs";
+
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { writeFileSync } from "fs";
-import { AppModule } from "./app.module";
-import { Logger } from "nestjs-pino";
 import * as yaml from "js-yaml";
+import { Logger } from "nestjs-pino";
+
+import { AppModule } from "./app.module";
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

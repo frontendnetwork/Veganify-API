@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from "@nestjs/testing";
+import { Response } from "express";
+
 import { ProductController } from "../product.controller";
 import { ProductService } from "../product.service";
-import { Response } from "express";
 
 interface MockResult {
   status: number;

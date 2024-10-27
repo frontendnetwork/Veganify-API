@@ -1,6 +1,8 @@
+import * as path from "path";
+
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
-import * as path from "path";
+
 import { PetaController } from "../peta.controller";
 
 describe("PetaController", () => {
