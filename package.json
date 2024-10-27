@@ -16,7 +16,8 @@
     "test:cov": "jest --coverage",
     "process:ingredients": "bun scripts/processIngredients.js",
     "process:vegan": "pnpm run process:ingredients ../isvegan.json",
-    "process:notvegan": "pnpm run process:ingredients ../isnotvegan.json"
+    "process:notvegan": "pnpm run process:ingredients ../isnotvegan.json",
+    "process:maybenotvegan": "pnpm run process:ingredients ../ismaybenotvegan.json"
   },
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",

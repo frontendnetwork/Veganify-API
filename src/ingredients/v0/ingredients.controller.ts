@@ -11,10 +11,11 @@ import {
 } from "@nestjs/common";
 import { Response } from "express";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { TranslationService } from "./translation.service";
-import { ParseBooleanPipe } from "./parse-boolean.pipe";
-import { readJsonFile } from "./jsonFileReader";
+import { TranslationService } from "../shared/services/translation.service";
+import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
+import { readJsonFile } from "../shared/utils/jsonFileReader";
 import { DeeplLanguages } from "deepl";
+import { V0ResponseData } from "./dto/response.dto";
 
 @Controller("v0/ingredients")
 export class IngredientsController implements OnModuleInit {
@@ -214,8 +215,8 @@ export class IngredientsController implements OnModuleInit {
     veganItems: string[],
     unknownItems: string[]
   ) {
-    const responseData: ResponseData = {
-      vegan: notVeganItems.length === 0,
+    const responseData: V0ResponseData = {
+      vegan: notVeganItems.length === 0 && unknownItems.length === 0,
       surely_vegan: veganItems,
       not_vegan: notVeganItems,
       maybe_vegan: unknownItems,
@@ -228,11 +229,4 @@ export class IngredientsController implements OnModuleInit {
       data: responseData,
     });
   }
-}
-
-interface ResponseData {
-  vegan: boolean;
-  surely_vegan: string[];
-  not_vegan: string[];
-  maybe_vegan: string[];
 }
