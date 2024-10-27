@@ -1,7 +1,9 @@
 import { Controller, Param, Post, Res, Logger } from "@nestjs/common";
-import { ProductService } from "./product.service";
-import { Response } from "express";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
+
+import { ProductService } from "./product.service";
+
 
 @Controller("v0/product")
 export class ProductController {

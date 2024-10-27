@@ -7,12 +7,14 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
-import { Response } from "express";
-import { GradesService } from "./grades.service";
 import { ApiResponse, ApiTags, ApiBody } from "@nestjs/swagger";
-import { BarcodeDto } from "./dtos/BarcodeDto";
-import { backendResponseDto } from "./dtos/backendResponseDto";
+import { Response } from "express";
 import { lastValueFrom } from "rxjs";
+
+import { backendResponseDto } from "./dtos/backendResponseDto";
+import { BarcodeDto } from "./dtos/BarcodeDto";
+import { GradesService } from "./grades.service";
+
 
 @Controller("v0/grades")
 export class GradesController {

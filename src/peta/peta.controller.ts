@@ -1,12 +1,13 @@
-import { Controller, Get, Param, Res, HttpStatus } from "@nestjs/common";
-import { Response } from "express";
 import * as path from "path";
+
+import { Controller, Get, Param, Res, HttpStatus } from "@nestjs/common";
 import {
   ApiResponse,
   ApiTags,
   ApiProperty,
   ApiExcludeEndpoint,
 } from "@nestjs/swagger";
+import { Response } from "express";
 
 export class petaType {
   @ApiProperty({

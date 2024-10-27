@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import { lastValueFrom, Observable } from "rxjs";
+import { Injectable, Logger } from "@nestjs/common";
 import { AxiosResponse } from "axios";
+import { lastValueFrom, Observable } from "rxjs";
 
 @Injectable()
 export class GradesService {
