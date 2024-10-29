@@ -28,7 +28,7 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.4.6",
     "@nestjs/platform-express": "^10.4.6",
-    "@nestjs/swagger": "^7.4.2",
+    "@nestjs/swagger": "^8.0.0",
     "@nestjs/terminus": "^10.2.3",
     "@types/body-parser": "^1.19.5",
     "@types/ini": "^4.1.1",
