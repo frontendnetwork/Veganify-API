@@ -1,21 +1,22 @@
-import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { HttpModule } from "@nestjs/axios";
+import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { ErrorsController } from "./errors.controller";
-import { GradesService } from "./grades/grades.service";
-import { GradesController } from "./grades/grades.controller";
-import { ProductController } from "./product/product.controller";
-import { ProductService } from "./product/product.service";
-import { PetaController } from "./peta/peta.controller";
-import { RateLimiterMiddleware } from "./rate-limiter.middleware";
-import { LoggerModule } from "nestjs-pino";
-import { HealthController } from "./health/health.controller";
 import { TerminusModule } from "@nestjs/terminus";
+import { LoggerModule } from "nestjs-pino";
+
+import { ErrorsController } from "./errors.controller";
+import { GradesController } from "./grades/grades.controller";
+import { GradesService } from "./grades/grades.service";
+import { HealthController } from "./health/health.controller";
 import { HealthModule } from "./health/health.module";
 import { IngredientsModule } from "./ingredients/ingredients.module";
+import { TranslationService } from "./ingredients/shared/services/translation.service";
 import { IngredientsController } from "./ingredients/v0/ingredients.controller";
 import { IngredientsV1Controller } from "./ingredients/v1/ingredients.controller";
-import { TranslationService } from "./ingredients/shared/services/translation.service";
+import { PetaController } from "./peta/peta.controller";
+import { ProductController } from "./product/product.controller";
+import { ProductService } from "./product/product.service";
+import { RateLimiterMiddleware } from "./rate-limiter.middleware";
 
 @Module({
   imports: [

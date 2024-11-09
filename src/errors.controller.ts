@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import fs from "fs";
+
 import {
   Controller,
   Get,
@@ -11,7 +13,6 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
-import fs from "fs";
 import { ApiExcludeController } from "@nestjs/swagger";
 
 @Controller()

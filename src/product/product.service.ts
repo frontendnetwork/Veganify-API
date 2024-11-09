@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import axios from "axios";
-import * as ini from "ini";
 import * as iconv from "iconv-lite";
+import * as ini from "ini";
 import { firstValueFrom } from "rxjs";
 
 @Injectable()

@@ -1,6 +1,8 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { HttpException } from "@nestjs/common";
 import * as fs from "fs";
+
+import { HttpException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+
 import { ErrorsController } from "./errors.controller";
 
 jest.mock("fs", () => ({
