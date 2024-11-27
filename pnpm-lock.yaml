@@ -100,8 +100,8 @@ importers:
         specifier: ^10.2.3
         version: 10.2.3(chokidar@3.6.0)(typescript@5.7.2)
       '@nestjs/testing':
-        specifier: ^10.4.8
-        version: 10.4.8(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.8)(@nestjs/platform-express@10.4.8)
+        specifier: ^10.4.9
+        version: 10.4.9(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.8)(@nestjs/platform-express@10.4.8)
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
@@ -672,8 +672,8 @@ packages:
       typeorm:
         optional: true
 
-  '@nestjs/testing@10.4.8':
-    resolution: {integrity: sha512-VusUnVgfY6KUc0gKU7ER9QQ2QyCoO770wcAfgLhtqydezt/w07FvqT6uOtb/Tf4SMfUbxx6AJwte6UUmkewbnQ==}
+  '@nestjs/testing@10.4.9':
+    resolution: {integrity: sha512-+zkhjXluB3nnZgOjLoyjFQkpVUMqtsZhyVw8mlfxtOc6DHTtColhzX/iCQHGyTXQRIvBbBYmJc6qI+DKfOfLvg==}
     peerDependencies:
       '@nestjs/common': ^10.0.0
       '@nestjs/core': ^10.0.0
@@ -4178,7 +4178,7 @@ snapshots:
     optionalDependencies:
       '@nestjs/axios': 3.1.2(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.8)(rxjs@7.8.1)
 
-  '@nestjs/testing@10.4.8(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.8)(@nestjs/platform-express@10.4.8)':
+  '@nestjs/testing@10.4.9(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.8)(@nestjs/platform-express@10.4.8)':
     dependencies:
       '@nestjs/common': 10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.8(@nestjs/common@10.4.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.8)(reflect-metadata@0.2.2)(rxjs@7.8.1)
