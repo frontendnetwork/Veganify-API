@@ -1,8 +1,8 @@
-FROM node:lts-alpine
+FROM oven/bun:1-alpine
 WORKDIR /app
 COPY . .
 RUN corepack enable
 RUN pnpm install
 RUN pnpm run build
 EXPOSE 8080
-CMD [ "node", "dist/main.js" ]
+CMD [ "bun", "dist/main.js" ]
