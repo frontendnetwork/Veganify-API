@@ -1,3 +1,6 @@
+import * as path from "path";
+import { Worker } from "worker_threads";
+
 import {
   Controller,
   Get,
@@ -12,7 +15,6 @@ import {
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { DeeplLanguages } from "deepl";
 import { Response } from "express";
-
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
@@ -42,16 +44,33 @@ export class IngredientsV1Controller implements OnModuleInit {
     return list.map((item) => item.toLowerCase());
   }
 
-  private sophisticatedMatch(ingredient: string, list: string[]): boolean {
-    const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
+  private runWorker(ingredients: string[]): Promise<{
+    notVeganResult: string[];
+    maybeNotVeganResult: string[];
+    veganResult: string[];
+    unknownResult: string[];
+  }> {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(
+        path.resolve(__dirname, "ingredient.worker.js"),
+        {
+          workerData: {
+            ingredients,
+            isNotVegan: this.isNotVegan,
+            isMaybeNotVegan: this.isMaybeNotVegan,
+            isVegan: this.isVegan,
+          },
+        }
+      );
 
-    if (list.includes(normalizedIngredient)) return true;
-
-    const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
-    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, ""))))
-      return true;
-
-    return false;
+      worker.on("message", resolve);
+      worker.on("error", reject);
+      worker.on("exit", (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
+    });
   }
 
   @Get(":ingredients")
@@ -142,24 +161,12 @@ export class IngredientsV1Controller implements OnModuleInit {
         response = ingredients;
       }
 
-      // Use sophisticatedMatch for categorizing ingredients
-      let notVeganResult = response.filter((item: string) =>
-        this.sophisticatedMatch(item, this.isNotVegan)
-      );
-      let maybeNotVeganResult = response.filter(
-        (item: string) =>
-          !this.sophisticatedMatch(item, this.isNotVegan) &&
-          this.sophisticatedMatch(item, this.isMaybeNotVegan)
-      );
-      let veganResult = response.filter((item: string) =>
-        this.sophisticatedMatch(item, this.isVegan)
-      );
-      let unknownResult = response.filter(
-        (item: string) =>
-          !this.sophisticatedMatch(item, this.isNotVegan) &&
-          !this.sophisticatedMatch(item, this.isMaybeNotVegan) &&
-          !this.sophisticatedMatch(item, this.isVegan)
-      );
+      const {
+        notVeganResult,
+        maybeNotVeganResult,
+        veganResult,
+        unknownResult,
+      } = await this.runWorker(response);
 
       if (
         shouldTranslate &&
@@ -185,18 +192,21 @@ export class IngredientsV1Controller implements OnModuleInit {
             backTranslationResult.data.translations[0].text
           );
 
-          notVeganResult = backTranslated.slice(0, notVeganResult.length);
-          maybeNotVeganResult = backTranslated.slice(
+          const translatedNotVegan = backTranslated.slice(
+            0,
+            notVeganResult.length
+          );
+          const translatedMaybeNotVegan = backTranslated.slice(
             notVeganResult.length,
             notVeganResult.length + maybeNotVeganResult.length
           );
-          veganResult = backTranslated.slice(
+          const translatedVegan = backTranslated.slice(
             notVeganResult.length + maybeNotVeganResult.length,
             notVeganResult.length +
               maybeNotVeganResult.length +
               veganResult.length
           );
-          unknownResult = backTranslated.slice(
+          const translatedUnknown = backTranslated.slice(
             notVeganResult.length +
               maybeNotVeganResult.length +
               veganResult.length
@@ -204,10 +214,10 @@ export class IngredientsV1Controller implements OnModuleInit {
 
           this.sendResponse(
             res,
-            notVeganResult,
-            maybeNotVeganResult,
-            veganResult,
-            unknownResult
+            translatedNotVegan,
+            translatedMaybeNotVegan,
+            translatedVegan,
+            translatedUnknown
           );
         } catch (error) {
           this.logger.error(`Error during back translation: ${error}`);
