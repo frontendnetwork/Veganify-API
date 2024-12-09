@@ -4,14 +4,13 @@ import { Response } from "express";
 
 import { ProductService } from "./product.service";
 
-
 @Controller("v0/product")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   private readonly logger = new Logger(ProductController.name);
 
   @Post(":barcode?")
-  @ApiTags("Product Information")
+  @ApiTags("Product")
   @ApiResponse({
     status: 200,
     description: "Request returned a positive result.",

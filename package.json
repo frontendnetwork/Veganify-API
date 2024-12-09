@@ -8,7 +8,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "bun dist/main.js",
     "build": "nest build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -18,7 +18,9 @@
     "process:ingredients": "bun scripts/processIngredients.js",
     "process:vegan": "pnpm run process:ingredients ../isvegan.json",
     "process:notvegan": "pnpm run process:ingredients ../isnotvegan.json",
-    "process:maybenotvegan": "pnpm run process:ingredients ../ismaybenotvegan.json"
+    "process:maybenotvegan": "pnpm run process:ingredients ../ismaybenotvegan.json",
+    "process:all": "concurrently --names \"vegan,not vegan,maybe vegan\" --prefix-colors \"green,red,yellow\" \"pnpm process:vegan\" \"pnpm process:notvegan\" \"pnpm process:maybenotvegan\"",
+    "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"pnpm lint\" \"tsc --noEmit\" \"pnpm test\""
   },
   "author": "JokeNetwork, Veganify Contributors",
   "license": "MIT",
@@ -64,6 +66,7 @@
     "@types/pump": "^1.1.3",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
+    "concurrently": "^9.1.0",
     "eslint": "^9.16.0",
     "eslint-import-resolver-typescript": "^3.7.0",
     "eslint-plugin-import": "^2.31.0",
