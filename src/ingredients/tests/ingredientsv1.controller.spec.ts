@@ -125,6 +125,7 @@ describe("IngredientsV1Controller", () => {
 
     it("should handle ingredients that appear in multiple lists", async () => {
       const res = mockResponse();
+      // Testing priority: not_vegan > maybe_not_vegan > vegan
       await controller.getIngredients("sugar,soy,milk", res, false);
 
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
