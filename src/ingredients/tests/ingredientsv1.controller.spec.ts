@@ -185,20 +185,26 @@ describe("IngredientsV1Controller", () => {
       });
     });
 
-    it("should handle translation service unavailable", async () => {
+    it("should process untranslated ingredients when translation fails", async () => {
       const res = mockResponse();
       translationService.translateText.mockRejectedValueOnce(
         new Error("Translate timed out")
       );
 
-      await controller.getIngredients("ingredient", res, true);
+      await controller.getIngredients("tofu,milk,sugar", res, true);
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.SERVICE_UNAVAILABLE);
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
-        code: "Service Unavailable",
-        status: "503",
-        message:
-          "Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
+        code: "OK",
+        status: "200",
+        message: "Success",
+        data: {
+          vegan: false,
+          surely_vegan: ["tofu"],
+          not_vegan: ["milk"],
+          maybe_not_vegan: ["sugar"],
+          unknown: [],
+        },
       });
     });
 

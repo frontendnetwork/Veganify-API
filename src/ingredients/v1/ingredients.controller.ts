@@ -77,16 +77,12 @@ export class IngredientsV1Controller implements OnModuleInit {
   @ApiTags("Ingredients")
   @ApiResponse({
     status: 200,
-    description: "Request returned a positive result.",
+    description:
+      "Request returned a positive result. If translation fails, results will be based on untranslated ingredients.",
   })
   @ApiResponse({
     status: 500,
     description: "Internal Server Error.",
-  })
-  @ApiResponse({
-    status: 503,
-    description:
-      "Service Unavailable. Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
   })
   async getIngredients(
     @Param("ingredients") ingredientsParam: string,
@@ -128,34 +124,11 @@ export class IngredientsV1Controller implements OnModuleInit {
 
           response = this.parseIngredients(translated);
         } catch (error) {
-          if (error instanceof Error) {
-            if (error.message === "Translate timed out") {
-              this.logger.error(`Translation service is unavailable: ${error}`);
-              res.status(HttpStatus.SERVICE_UNAVAILABLE).send({
-                code: "Service Unavailable",
-                status: "503",
-                message:
-                  "Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
-              });
-              return;
-            } else {
-              this.logger.error(`Error during translation: ${error}`);
-              res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-                code: "Internal Server Error",
-                status: "500",
-                message: "An error occurred during the translation process",
-              });
-              return;
-            }
-          } else {
-            this.logger.error(`Unknown error: ${error}`);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-              code: "Internal Server Error",
-              status: "500",
-              message: "An unknown error occurred while processing the request",
-            });
-            return;
-          }
+          this.logger.warn(
+            `Translation failed, proceeding with untranslated ingredients: ${error}`
+          );
+          response = ingredients;
+          targetLanguage = "EN";
         }
       } else {
         response = ingredients;
@@ -220,13 +193,16 @@ export class IngredientsV1Controller implements OnModuleInit {
             translatedUnknown
           );
         } catch (error) {
-          this.logger.error(`Error during back translation: ${error}`);
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-            code: "Internal Server Error",
-            status: "500",
-            message: "An error occurred during the back translation process",
-          });
-          return;
+          this.logger.warn(
+            `Back translation failed, using untranslated results: ${error}`
+          );
+          this.sendResponse(
+            res,
+            notVeganResult,
+            maybeNotVeganResult,
+            veganResult,
+            unknownResult
+          );
         }
       } else {
         this.sendResponse(

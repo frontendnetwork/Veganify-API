@@ -79,14 +79,11 @@ paths:
             type: string
       responses:
         '200':
-          description: Request returned a positive result.
+          description: >-
+            Request returned a positive result. If translation fails, results
+            will be based on untranslated ingredients.
         '500':
           description: Internal Server Error.
-        '503':
-          description: >-
-            Service Unavailable. Translation service is unavailable. Try again
-            with disabled translation (Results might vary). Add flag
-            ?translate=false to the request.
       tags:
         - IngredientsV1
         - Ingredients
