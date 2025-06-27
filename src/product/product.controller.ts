@@ -28,9 +28,14 @@ export class ProductController {
     description: "Internal Server Error.",
   })
   async getProductDetails(
-    @Param("barcode") barcode: string,
+    @Param("barcode") barcode: string = "",
     @Res() res: Response
   ) {
+    if (!/^\d{4,25}$/.test(barcode)) {
+      return res
+        .status(400)
+        .json({ status: 400, error: "Invalid barcode format" });
+    }
     try {
       const result = await this.productService.fetchProductDetails(barcode);
       return res.status(200).json(result);
