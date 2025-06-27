@@ -53,8 +53,8 @@ export class ProductService {
     }
 
     // Process OpenFoodFacts data
-    if (openFoodFactsResponse.data.status === 1) {
-      const product = openFoodFactsResponse.data.product;
+    if (openFoodFactsResponse.status === 1) {
+      const product = openFoodFactsResponse.product;
       apiname = "OpenFoodFacts";
       baseuri = "https://world.openfoodfacts.org";
       edituri = product.url;
@@ -101,7 +101,7 @@ export class ProductService {
       }
 
       if (product?.product?.brands) {
-        const dnt = petaResponse.data.PETA_DOES_NOT_TEST;
+        const dnt = petaResponse.PETA_DOES_NOT_TEST;
         const tester = dnt.toString().toLowerCase();
 
         if (tester.includes(product.product.brands.toLowerCase())) {
@@ -112,7 +112,7 @@ export class ProductService {
     } else {
       // Try OpenEANDB as fallback
       const openEanDbResponse = await this.fetchOpenEanDb(barcode);
-      const array = ini.parse(openEanDbResponse.data);
+      const array = ini.parse(openEanDbResponse);
 
       if (array.error === "0") {
         apiname = "Open EAN Database";
@@ -177,12 +177,22 @@ export class ProductService {
     return this.fetchWithCache(
       key,
       async () => {
-        const gradeResponse = await firstValueFrom(
-          this.httpService.get(
-            `https://grades.veganify.app/api/${barcode}.json`
-          )
-        );
-        return gradeResponse?.data;
+        try {
+          const gradeResponse = await firstValueFrom(
+            this.httpService.get(
+              `https://grades.veganify.app/api/${barcode}.json`
+            )
+          );
+          return gradeResponse?.data;
+        } catch (error) {
+          // If it's a 404, return "404" string as expected by the processing logic
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 404) {
+            return "404";
+          }
+          // Re-throw other errors
+          throw error;
+        }
       },
       60 * 60 // Cache grades for 1 hour
     );
@@ -192,10 +202,22 @@ export class ProductService {
     const key = this.cacheService.generateOpenFoodFactsKey(barcode);
     return this.fetchWithCache(
       key,
-      () =>
-        axios.get(
-          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-        ),
+      async () => {
+        try {
+          const response = await axios.get(
+            `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+          );
+          return response.data; // Extract only the data, not the entire response
+        } catch (error) {
+          // If it's a 404, return a proper response structure
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 404) {
+            return { status: 0, product: null };
+          }
+          // Re-throw other errors
+          throw error;
+        }
+      },
       24 * 60 * 60 // Cache for 24 hours
     );
   }
@@ -204,7 +226,12 @@ export class ProductService {
     const key = this.cacheService.generatePetaKey();
     return this.fetchWithCache(
       key,
-      () => axios.get("https://api.veganify.app/v0/peta/crueltyfree"),
+      async () => {
+        const response = await axios.get(
+          "https://api.veganify.app/v0/peta/crueltyfree"
+        );
+        return response.data; // Extract only the data, not the entire response
+      },
       24 * 60 * 60 // Cache for 24 hours
     );
   }
@@ -213,10 +240,12 @@ export class ProductService {
     const key = this.cacheService.generateOpenEANDBKey(barcode);
     return this.fetchWithCache(
       key,
-      () =>
-        axios.get(
+      async () => {
+        const response = await axios.get(
           `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
-        ),
+        );
+        return response.data; // Extract only the data, not the entire response
+      },
       7 * 24 * 60 * 60 // Cache for 7 days (less frequently updated)
     );
   }
