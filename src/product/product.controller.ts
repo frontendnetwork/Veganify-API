@@ -28,7 +28,15 @@ export class ProductController {
     description: "Internal Server Error.",
   })
   async getProductDetails(
-    @Param("barcode") barcode: string,
+    @Param("barcode") barcode: string = "",
+    @Res() res: Response
+  ) {
+    // Validate barcode format (e.g., numeric-only and 12-13 characters long)
+    if (!/^\d{12,13}$/.test(barcode)) {
+      return res
+        .status(400)
+        .json({ status: 400, error: "Invalid barcode format" });
+    }
     @Res() res: Response
   ) {
     try {
