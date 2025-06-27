@@ -1,3 +1,5 @@
+import * as crypto from "crypto";
+
 import {
   Injectable,
   NestMiddleware,
@@ -9,51 +11,61 @@ import { NextFunction, Request, Response } from "express";
 
 import { RedisService } from "./config/redis.service";
 
-interface RateLimitInfo {
-  count: number;
-  resetTime: number;
-}
-
 @Injectable()
 export class RedisRateLimiterMiddleware implements NestMiddleware {
   private readonly logger = new Logger(RedisRateLimiterMiddleware.name);
   private readonly maxRequests = 350;
   private readonly windowMs = 60 * 1000; // 60 seconds
+  private readonly fallbackLimit = 50; // Stricter limit when Redis is down
+  private inMemoryCounters = new Map<
+    string,
+    { count: number; resetTime: number }
+  >();
 
   constructor(private readonly redisService: RedisService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
+      const clientIp = this.extractClientIp(req);
+      const rateLimitKey = `rate_limit:${clientIp}`;
+
       // Check Redis health before proceeding
-      if (!(await this.redisService.isHealthy())) {
-        this.logger.error("Redis is not healthy, bypassing rate limit check");
-        return next();
+      const redisHealthy = await this.redisService.isHealthy();
+
+      if (!redisHealthy) {
+        this.logger.warn(
+          "Redis is not healthy, using in-memory fallback rate limiting"
+        );
+        return this.handleInMemoryRateLimit(req, res, next, clientIp);
       }
 
-      const key = req.ip || req.connection.remoteAddress || "unknown";
-      const rateLimitKey = `rate_limit:${key}`;
-
-      // Get current rate limit info
-      const currentInfo = await this.getRateLimitInfo(rateLimitKey);
+      // Use Redis atomic operations to prevent race conditions
       const now = Date.now();
+      const windowStart = Math.floor(now / this.windowMs) * this.windowMs;
+      const windowKey = `${rateLimitKey}:${windowStart}`;
 
-      // Check if window has reset
-      if (now > currentInfo.resetTime) {
-        // Reset window
-        await this.resetRateLimit(rateLimitKey);
-        currentInfo.count = 0;
-        currentInfo.resetTime = now + this.windowMs;
+      // Atomic increment with expiration
+      const currentCount = await this.redisService.incr(windowKey);
+
+      // Set expiration only if this is the first request in the window
+      if (currentCount === 1) {
+        await this.redisService.expire(
+          windowKey,
+          Math.ceil(this.windowMs / 1000)
+        );
       }
 
       // Check if limit exceeded
-      if (currentInfo.count >= this.maxRequests) {
-        const retryAfter = Math.ceil((currentInfo.resetTime - now) / 1000);
+      if (currentCount > this.maxRequests) {
+        const retryAfter = Math.ceil(
+          (windowStart + this.windowMs - now) / 1000
+        );
 
         res.set({
           "Retry-After": String(retryAfter),
           "X-RateLimit-Limit": String(this.maxRequests),
           "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(currentInfo.resetTime),
+          "X-RateLimit-Reset": String(windowStart + this.windowMs),
         });
 
         throw new HttpException(
@@ -66,15 +78,11 @@ export class RedisRateLimiterMiddleware implements NestMiddleware {
         );
       }
 
-      // Increment counter
-      currentInfo.count++;
-      await this.setRateLimitInfo(rateLimitKey, currentInfo);
-
       // Add rate limit headers
       res.set({
         "X-RateLimit-Limit": String(this.maxRequests),
-        "X-RateLimit-Remaining": String(this.maxRequests - currentInfo.count),
-        "X-RateLimit-Reset": String(currentInfo.resetTime),
+        "X-RateLimit-Remaining": String(this.maxRequests - currentCount),
+        "X-RateLimit-Reset": String(windowStart + this.windowMs),
       });
 
       next();
@@ -84,44 +92,119 @@ export class RedisRateLimiterMiddleware implements NestMiddleware {
       }
 
       this.logger.error("Rate limiter error:", error);
-      // On error, allow the request to proceed
+      // On error, allow the request to proceed but log the issue
       next();
     }
   }
 
-  private async getRateLimitInfo(key: string): Promise<RateLimitInfo> {
-    try {
-      const data = await this.redisService.get(key);
-      if (data) {
-        return JSON.parse(data);
+  private extractClientIp(req: Request): string {
+    // Check for X-Forwarded-For header first (most reliable behind proxies)
+    const forwardedFor = req.headers["x-forwarded-for"];
+    if (forwardedFor) {
+      // X-Forwarded-For can contain multiple IPs, take the first one
+      const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+      const clientIp = ips.split(",")[0].trim();
+      if (this.isValidIp(clientIp)) {
+        return clientIp;
       }
-    } catch (error) {
-      this.logger.warn(`Failed to get rate limit info for ${key}:`, error);
     }
 
-    return {
-      count: 0,
-      resetTime: Date.now() + this.windowMs,
-    };
+    // Check for X-Real-IP header
+    const realIp = req.headers["x-real-ip"];
+    if (realIp && this.isValidIp(realIp as string)) {
+      return realIp as string;
+    }
+
+    // Fallback to req.ip (Express.js sets this from trusted proxy settings)
+    if (req.ip && this.isValidIp(req.ip)) {
+      return req.ip;
+    }
+
+    // Last resort fallback
+    const remoteAddr =
+      req.connection?.remoteAddress || req.socket?.remoteAddress;
+    if (remoteAddr && this.isValidIp(remoteAddr)) {
+      return remoteAddr;
+    }
+
+    // If no valid IP found, use a hash of user agent and other identifiers
+    const identifier = `${req.headers["user-agent"] || ""}-${
+      req.headers["accept-language"] || ""
+    }`;
+    return crypto
+      .createHash("sha256")
+      .update(identifier)
+      .digest("hex")
+      .substring(0, 16);
   }
 
-  private async setRateLimitInfo(
-    key: string,
-    info: RateLimitInfo
+  private isValidIp(ip: string): boolean {
+    // Basic IP validation (IPv4 and IPv6)
+    const ipv4Regex =
+      /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    return ipv4Regex.test(ip) || ipv6Regex.test(ip);
+  }
+
+  private async handleInMemoryRateLimit(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    clientIp: string
   ): Promise<void> {
-    try {
-      const ttl = Math.ceil((info.resetTime - Date.now()) / 1000);
-      await this.redisService.set(key, JSON.stringify(info), ttl);
-    } catch (error) {
-      this.logger.warn(`Failed to set rate limit info for ${key}:`, error);
+    const now = Date.now();
+    const windowStart = Math.floor(now / this.windowMs) * this.windowMs;
+
+    // Get or create in-memory counter
+    let counter = this.inMemoryCounters.get(clientIp);
+    if (!counter || counter.resetTime <= now) {
+      counter = { count: 0, resetTime: windowStart + this.windowMs };
+      this.inMemoryCounters.set(clientIp, counter);
     }
+
+    // Increment counter
+    counter.count++;
+
+    // Check if limit exceeded (using stricter fallback limit)
+    if (counter.count > this.fallbackLimit) {
+      const retryAfter = Math.ceil((counter.resetTime - now) / 1000);
+
+      res.set({
+        "Retry-After": String(retryAfter),
+        "X-RateLimit-Limit": String(this.fallbackLimit),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": String(counter.resetTime),
+        "X-RateLimit-Fallback": "true",
+      });
+
+      throw new HttpException(
+        {
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          error: "Too Many Requests",
+          message: `Rate limit exceeded (fallback mode). Try again in ${retryAfter} seconds.`,
+        },
+        HttpStatus.TOO_MANY_REQUESTS
+      );
+    }
+
+    // Add rate limit headers
+    res.set({
+      "X-RateLimit-Limit": String(this.fallbackLimit),
+      "X-RateLimit-Remaining": String(this.fallbackLimit - counter.count),
+      "X-RateLimit-Reset": String(counter.resetTime),
+      "X-RateLimit-Fallback": "true",
+    });
+
+    next();
   }
 
-  private async resetRateLimit(key: string): Promise<void> {
-    try {
-      await this.redisService.del(key);
-    } catch (error) {
-      this.logger.warn(`Failed to reset rate limit for ${key}:`, error);
+  // Clean up old in-memory entries periodically
+  private cleanupInMemoryCounters(): void {
+    const now = Date.now();
+    for (const [key, counter] of this.inMemoryCounters.entries()) {
+      if (counter.resetTime <= now) {
+        this.inMemoryCounters.delete(key);
+      }
     }
   }
 }

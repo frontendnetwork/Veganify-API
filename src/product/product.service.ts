@@ -39,45 +39,22 @@ export class ProductService {
     let baseuri: string = "n/a";
     let edituri: string = "n/a";
 
-    // Try to get grade from cache first
-    try {
-      const gradeKey = this.cacheService.generateGradeKey(barcode);
-      const gradeData = await this.cacheService.getOrSet(
-        gradeKey,
-        async () => {
-          const gradeResponse = await firstValueFrom(
-            this.httpService.get(
-              `https://grades.veganify.app/api/${barcode}.json`
-            )
-          );
-          return gradeResponse?.data;
-        },
-        60 * 60 // Cache grades for 1 hour
-      );
+    // Fetch all data in parallel
+    const [gradeData, openFoodFactsResponse, petaResponse] = await Promise.all([
+      this.fetchGrade(barcode),
+      this.fetchOpenFoodFacts(barcode),
+      this.fetchPeta(),
+    ]);
 
-      if (gradeData !== "404") {
-        if (gradeData && gradeData.grade) {
-          grade = gradeData.grade;
-          productname = gradeData.name;
-        }
-      }
-    } catch (error) {
-      this.logger.error(error);
+    // Process grade data
+    if (gradeData !== "404" && gradeData && gradeData.grade) {
+      grade = gradeData.grade;
+      productname = gradeData.name;
     }
 
-    // Cache OpenFoodFacts response
-    const openFoodFactsKey = `openfoodfacts:${barcode}`;
-    const response = await this.cacheService.getOrSet(
-      openFoodFactsKey,
-      () =>
-        axios.get(
-          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-        ),
-      24 * 60 * 60 // Cache for 24 hours
-    );
-
-    if (response.data.status === 1) {
-      const product = response.data.product;
+    // Process OpenFoodFacts data
+    if (openFoodFactsResponse.data.status === 1) {
+      const product = openFoodFactsResponse.data.product;
       apiname = "OpenFoodFacts";
       baseuri = "https://world.openfoodfacts.org";
       edituri = product.url;
@@ -124,14 +101,6 @@ export class ProductService {
       }
 
       if (product?.product?.brands) {
-        // Cache PETA data
-        const petaKey = this.cacheService.generatePetaKey();
-        const petaResponse = await this.cacheService.getOrSet(
-          petaKey,
-          () => axios.get("https://api.veganify.app/v0/peta/crueltyfree"),
-          24 * 60 * 60 // Cache for 24 hours
-        );
-
         const dnt = petaResponse.data.PETA_DOES_NOT_TEST;
         const tester = dnt.toString().toLowerCase();
 
@@ -141,18 +110,9 @@ export class ProductService {
         }
       }
     } else {
-      // Cache OpenEANDB response
-      const openEanDbKey = `openeandb:${barcode}`;
-      const oedb = await this.cacheService.getOrSet(
-        openEanDbKey,
-        () =>
-          axios.get(
-            `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
-          ),
-        7 * 24 * 60 * 60 // Cache for 7 days (less frequently updated)
-      );
-
-      const array = ini.parse(oedb.data);
+      // Try OpenEANDB as fallback
+      const openEanDbResponse = await this.fetchOpenEanDb(barcode);
+      const array = ini.parse(openEanDbResponse.data);
 
       if (array.error === "0") {
         apiname = "Open EAN Database";
@@ -200,5 +160,64 @@ export class ProductService {
         edituri,
       },
     };
+  }
+
+  // Generic helper for cached API calls
+  private fetchWithCache<T>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    ttlSeconds: number
+  ): Promise<T> {
+    return this.cacheService.getOrSet(key, fetchFn, ttlSeconds);
+  }
+
+  // Extract each API call into its own method
+  private async fetchGrade(barcode: string) {
+    const key = this.cacheService.generateGradeKey(barcode);
+    return this.fetchWithCache(
+      key,
+      async () => {
+        const gradeResponse = await firstValueFrom(
+          this.httpService.get(
+            `https://grades.veganify.app/api/${barcode}.json`
+          )
+        );
+        return gradeResponse?.data;
+      },
+      60 * 60 // Cache grades for 1 hour
+    );
+  }
+
+  private async fetchOpenFoodFacts(barcode: string) {
+    const key = this.cacheService.generateOpenFoodFactsKey(barcode);
+    return this.fetchWithCache(
+      key,
+      () =>
+        axios.get(
+          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+        ),
+      24 * 60 * 60 // Cache for 24 hours
+    );
+  }
+
+  private async fetchPeta() {
+    const key = this.cacheService.generatePetaKey();
+    return this.fetchWithCache(
+      key,
+      () => axios.get("https://api.veganify.app/v0/peta/crueltyfree"),
+      24 * 60 * 60 // Cache for 24 hours
+    );
+  }
+
+  private async fetchOpenEanDb(barcode: string) {
+    const key = this.cacheService.generateOpenEANDBKey(barcode);
+    return this.fetchWithCache(
+      key,
+      () =>
+        axios.get(
+          `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
+        ),
+      7 * 24 * 60 * 60 // Cache for 7 days (less frequently updated)
+    );
   }
 }

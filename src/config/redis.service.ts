@@ -38,7 +38,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       });
 
       this.client.on("error", (error: Error) => {
-        this.logger.error("Redis connection error:", error);
+        const config = this.redisConfigService.getRedisConfig();
+        this.logger.error(
+          `Redis connection error for ${config.host}:${config.port}:`,
+          error
+        );
       });
 
       this.client.on("ready", () => {
@@ -116,6 +120,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async ttl(key: string): Promise<number> {
     const prefixedKey = this.getPrefixedKey(key);
     return this.client.ttl(prefixedKey);
+  }
+
+  async setNxPx(
+    key: string,
+    value: string,
+    ttlMs: number
+  ): Promise<string | null> {
+    const prefixedKey = this.getPrefixedKey(key);
+    return this.client.set(prefixedKey, value, {
+      NX: true,
+      PX: ttlMs,
+    });
   }
 
   private getPrefixedKey(key: string): string {
