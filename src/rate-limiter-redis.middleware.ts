@@ -6,13 +6,17 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  OnModuleInit,
+  OnModuleDestroy,
 } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 
 import { RedisService } from "./config/redis.service";
 
 @Injectable()
-export class RedisRateLimiterMiddleware implements NestMiddleware {
+export class RedisRateLimiterMiddleware
+  implements NestMiddleware, OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(RedisRateLimiterMiddleware.name);
   private readonly maxRequests = 350;
   private readonly windowMs = 60 * 1000; // 60 seconds
@@ -21,8 +25,22 @@ export class RedisRateLimiterMiddleware implements NestMiddleware {
     string,
     { count: number; resetTime: number }
   >();
+  private cleanupInterval?: NodeJS.Timeout;
 
   constructor(private readonly redisService: RedisService) {}
+
+  onModuleInit() {
+    // Schedule cleanup every 5 minutes
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupInMemoryCounters();
+    }, 5 * 60 * 1000);
+  }
+
+  onModuleDestroy() {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+    }
+  }
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
@@ -200,11 +218,22 @@ export class RedisRateLimiterMiddleware implements NestMiddleware {
 
   // Clean up old in-memory entries periodically
   private cleanupInMemoryCounters(): void {
+    const beforeCount = this.inMemoryCounters.size;
     const now = Date.now();
+
     for (const [key, counter] of this.inMemoryCounters.entries()) {
       if (counter.resetTime <= now) {
         this.inMemoryCounters.delete(key);
       }
+    }
+
+    const afterCount = this.inMemoryCounters.size;
+    const cleanedCount = beforeCount - afterCount;
+
+    if (cleanedCount > 0) {
+      this.logger.debug(
+        `Cleaned up ${cleanedCount} expired in-memory rate limit entries. Remaining: ${afterCount}`
+      );
     }
   }
 }
