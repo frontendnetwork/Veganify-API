@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
 import { LoggerModule } from "nestjs-pino";
 
+import { RedisModule } from "./config/redis.module";
 import { ErrorsController } from "./errors.controller";
 import { GradesController } from "./grades/grades.controller";
 import { GradesService } from "./grades/grades.service";
@@ -16,7 +17,7 @@ import { IngredientsV1Controller } from "./ingredients/v1/ingredients.controller
 import { PetaController } from "./peta/peta.controller";
 import { ProductController } from "./product/product.controller";
 import { ProductService } from "./product/product.service";
-import { RateLimiterMiddleware } from "./rate-limiter.middleware";
+import { RedisRateLimiterMiddleware } from "./rate-limiter-redis.middleware";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RateLimiterMiddleware } from "./rate-limiter.middleware";
     }),
     TerminusModule,
     IngredientsModule,
+    RedisModule,
   ],
   controllers: [
     GradesController,
@@ -46,15 +48,6 @@ export class AppModule implements NestModule {
   constructor(private readonly configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RateLimiterMiddleware)
-      .forRoutes(
-        GradesController,
-        IngredientsController,
-        IngredientsV1Controller,
-        ProductController,
-        PetaController,
-        ErrorsController
-      );
+    consumer.apply(RedisRateLimiterMiddleware).exclude("health").forRoutes("*");
   }
 }

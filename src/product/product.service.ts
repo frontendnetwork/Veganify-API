@@ -5,12 +5,27 @@ import * as iconv from "iconv-lite";
 import * as ini from "ini";
 import { firstValueFrom } from "rxjs";
 
+import { CacheService } from "../config/cache.service";
+
 @Injectable()
 export class ProductService {
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    private cacheService: CacheService
+  ) {}
   private readonly logger = new Logger(ProductService.name);
 
   async fetchProductDetails(barcode: string) {
+    const cacheKey = this.cacheService.generateProductKey(barcode);
+
+    return this.cacheService.getOrSet(
+      cacheKey,
+      () => this.fetchProductDetailsFromAPIs(barcode),
+      24 * 60 * 60 // Cache for 24 hours
+    );
+  }
+
+  private async fetchProductDetailsFromAPIs(barcode: string) {
     let productname: string = "n/a";
     let genericname: string = "n/a";
     let vegan: boolean | "n/a" = "n/a";
@@ -24,24 +39,41 @@ export class ProductService {
     let baseuri: string = "n/a";
     let edituri: string = "n/a";
 
+    // Try to get grade from cache first
     try {
-      const gradeResponse = await firstValueFrom(
-        this.httpService.get(`https://grades.veganify.app/api/${barcode}.json`)
+      const gradeKey = this.cacheService.generateGradeKey(barcode);
+      const gradeData = await this.cacheService.getOrSet(
+        gradeKey,
+        async () => {
+          const gradeResponse = await firstValueFrom(
+            this.httpService.get(
+              `https://grades.veganify.app/api/${barcode}.json`
+            )
+          );
+          return gradeResponse?.data;
+        },
+        60 * 60 // Cache grades for 1 hour
       );
-      if (gradeResponse?.data !== "404") {
-        const gradesource = gradeResponse?.data;
 
-        if (gradesource && gradesource.grade) {
-          grade = gradesource.grade;
-          productname = gradesource.name;
+      if (gradeData !== "404") {
+        if (gradeData && gradeData.grade) {
+          grade = gradeData.grade;
+          productname = gradeData.name;
         }
       }
     } catch (error) {
       this.logger.error(error);
     }
 
-    const response = await axios.get(
-      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+    // Cache OpenFoodFacts response
+    const openFoodFactsKey = `openfoodfacts:${barcode}`;
+    const response = await this.cacheService.getOrSet(
+      openFoodFactsKey,
+      () =>
+        axios.get(
+          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+        ),
+      24 * 60 * 60 // Cache for 24 hours
     );
 
     if (response.data.status === 1) {
@@ -92,9 +124,14 @@ export class ProductService {
       }
 
       if (product?.product?.brands) {
-        const petaResponse = await axios.get(
-          "https://api.veganify.app/v0/peta/crueltyfree"
+        // Cache PETA data
+        const petaKey = this.cacheService.generatePetaKey();
+        const petaResponse = await this.cacheService.getOrSet(
+          petaKey,
+          () => axios.get("https://api.veganify.app/v0/peta/crueltyfree"),
+          24 * 60 * 60 // Cache for 24 hours
         );
+
         const dnt = petaResponse.data.PETA_DOES_NOT_TEST;
         const tester = dnt.toString().toLowerCase();
 
@@ -104,9 +141,17 @@ export class ProductService {
         }
       }
     } else {
-      const oedb = await axios.get(
-        `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
+      // Cache OpenEANDB response
+      const openEanDbKey = `openeandb:${barcode}`;
+      const oedb = await this.cacheService.getOrSet(
+        openEanDbKey,
+        () =>
+          axios.get(
+            `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
+          ),
+        7 * 24 * 60 * 60 // Cache for 7 days (less frequently updated)
       );
+
       const array = ini.parse(oedb.data);
 
       if (array.error === "0") {
