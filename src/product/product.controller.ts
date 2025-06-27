@@ -31,14 +31,11 @@ export class ProductController {
     @Param("barcode") barcode: string = "",
     @Res() res: Response
   ) {
-    // Validate barcode format (e.g., numeric-only and 12-13 characters long)
-    if (!/^\d{12,13}$/.test(barcode)) {
+    if (!/^\d{4,25}$/.test(barcode)) {
       return res
         .status(400)
         .json({ status: 400, error: "Invalid barcode format" });
     }
-    @Res() res: Response
-  ) {
     try {
       const result = await this.productService.fetchProductDetails(barcode);
       return res.status(200).json(result);
