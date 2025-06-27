@@ -1,4 +1,11 @@
-import { Controller, Param, Post, Res, Logger } from "@nestjs/common";
+import {
+  Controller,
+  Param,
+  Post,
+  Res,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
@@ -41,11 +48,15 @@ export class ProductController {
       return res.status(200).json(result);
     } catch (error) {
       this.logger.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((error as any).status === 404)
+
+      // Handle NestJS exceptions
+      if (error instanceof NotFoundException) {
         return res
           .status(404)
           .json({ status: 404, error: "Product not found" });
+      }
+
+      // Handle other errors
       return res
         .status(500)
         .json({ status: 500, error: "Internal server error" });
