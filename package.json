@@ -51,7 +51,7 @@
     "jsdom": "^27.2.0",
     "lodash": "^4.17.21",
     "nestjs-pino": "^4.4.0",
-    "pino": "^9.6.0",
+    "pino": "^9.14.0",
     "pino-http": "^10.4.0",
     "rate-limiter-flexible": "^8.3.0",
     "redis": "^5.5.6",
