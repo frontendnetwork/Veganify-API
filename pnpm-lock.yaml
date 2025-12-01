@@ -48,8 +48,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
       cheerio:
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.1.2
+        version: 1.1.2
       deepl:
         specifier: ^1.0.13
         version: 1.0.13
@@ -1704,9 +1704,9 @@ packages:
   cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
 
-  cheerio@1.0.0:
-    resolution: {integrity: sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==}
-    engines: {node: '>=18.17'}
+  cheerio@1.1.2:
+    resolution: {integrity: sha512-IkxPpb5rS/d1IiLbHMgfPuS0FgiWTtFIm/Nj+2woXDLTZ7fOT2eqzgYbdMlLweqlHbsZjxEChoVK+7iph7jyQg==}
+    engines: {node: '>=20.18.1'}
 
   chokidar@4.0.3:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
@@ -1846,15 +1846,15 @@ packages:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
 
-  css-select@5.1.0:
-    resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
+  css-select@5.2.2:
+    resolution: {integrity: sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==}
 
   css-tree@3.1.0:
     resolution: {integrity: sha512-0eW44TGN5SQXU1mWSkKwFstI/22X2bG1nYzZTYMAWjylYURhse752YgbE4Cx46AC+bAvI+/dYTPRk1LqSUnu6w==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
-  css-what@6.1.0:
-    resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
+  css-what@6.2.2:
+    resolution: {integrity: sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==}
     engines: {node: '>= 6'}
 
   cssstyle@5.3.3:
@@ -1983,8 +1983,8 @@ packages:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
 
-  domutils@3.1.0:
-    resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
+  domutils@3.2.2:
+    resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
   dotenv-expand@12.0.1:
     resolution: {integrity: sha512-LaKRbou8gt0RNID/9RoI+J2rvXsBRPMV7p+ElHlPhcSARbCPDYcYG2s1TIzAfWv4YSgyY5taidWzzs31lNV3yQ==}
@@ -2025,8 +2025,8 @@ packages:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
 
-  encoding-sniffer@0.2.0:
-    resolution: {integrity: sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==}
+  encoding-sniffer@0.2.1:
+    resolution: {integrity: sha512-5gvq20T6vfpekVtqrYQsSCFZ1wEg5+wW0/QaZMWkFr6BqD3NfKs0rLCx4rrVlSWJeZb5NBJgVLswK/w2MWU+Gw==}
 
   enhanced-resolve@5.18.1:
     resolution: {integrity: sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==}
@@ -2526,8 +2526,8 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
-  htmlparser2@9.1.0:
-    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
+  htmlparser2@10.0.0:
+    resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
 
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
@@ -3226,14 +3226,11 @@ packages:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
 
-  parse5-htmlparser2-tree-adapter@7.0.0:
-    resolution: {integrity: sha512-B77tOZrqqfUfnVcOrUvfdLbz4pu4RopLD/4vmu3HUPswwTA8OH0EMW9BlWR2B0RCoiZRAHEUu7IxeP1Pd1UU+g==}
+  parse5-htmlparser2-tree-adapter@7.1.0:
+    resolution: {integrity: sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==}
 
   parse5-parser-stream@7.1.2:
     resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
-
-  parse5@7.1.2:
-    resolution: {integrity: sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==}
 
   parse5@7.3.0:
     resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
@@ -3884,9 +3881,9 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
-  undici@6.19.7:
-    resolution: {integrity: sha512-HR3W/bMGPSr90i8AAp2C4DM3wChFdJPLrWYpIS++LxS8K+W535qftjt+4MyjNYHeWabMj1nvtmLIi7l++iq91A==}
-    engines: {node: '>=18.17'}
+  undici@7.16.0:
+    resolution: {integrity: sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==}
+    engines: {node: '>=20.18.1'}
 
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
@@ -5808,24 +5805,24 @@ snapshots:
   cheerio-select@2.1.0:
     dependencies:
       boolbase: 1.0.0
-      css-select: 5.1.0
-      css-what: 6.1.0
+      css-select: 5.2.2
+      css-what: 6.2.2
       domelementtype: 2.3.0
       domhandler: 5.0.3
-      domutils: 3.1.0
+      domutils: 3.2.2
 
-  cheerio@1.0.0:
+  cheerio@1.1.2:
     dependencies:
       cheerio-select: 2.1.0
       dom-serializer: 2.0.0
       domhandler: 5.0.3
-      domutils: 3.1.0
-      encoding-sniffer: 0.2.0
-      htmlparser2: 9.1.0
-      parse5: 7.1.2
-      parse5-htmlparser2-tree-adapter: 7.0.0
+      domutils: 3.2.2
+      encoding-sniffer: 0.2.1
+      htmlparser2: 10.0.0
+      parse5: 7.3.0
+      parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 6.19.7
+      undici: 7.16.0
       whatwg-mimetype: 4.0.0
 
   chokidar@4.0.3:
@@ -5948,12 +5945,12 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  css-select@5.1.0:
+  css-select@5.2.2:
     dependencies:
       boolbase: 1.0.0
-      css-what: 6.1.0
+      css-what: 6.2.2
       domhandler: 5.0.3
-      domutils: 3.1.0
+      domutils: 3.2.2
       nth-check: 2.1.1
 
   css-tree@3.1.0:
@@ -5961,7 +5958,7 @@ snapshots:
       mdn-data: 2.12.2
       source-map-js: 1.2.1
 
-  css-what@6.1.0: {}
+  css-what@6.2.2: {}
 
   cssstyle@5.3.3:
     dependencies:
@@ -6072,7 +6069,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  domutils@3.1.0:
+  domutils@3.2.2:
     dependencies:
       dom-serializer: 2.0.0
       domelementtype: 2.3.0
@@ -6106,7 +6103,7 @@ snapshots:
 
   encodeurl@2.0.0: {}
 
-  encoding-sniffer@0.2.0:
+  encoding-sniffer@0.2.1:
     dependencies:
       iconv-lite: 0.6.3
       whatwg-encoding: 3.1.1
@@ -6739,12 +6736,12 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  htmlparser2@9.1.0:
+  htmlparser2@10.0.0:
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
-      domutils: 3.1.0
-      entities: 4.5.0
+      domutils: 3.2.2
+      entities: 6.0.1
 
   http-errors@2.0.0:
     dependencies:
@@ -7607,7 +7604,7 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
-  parse5-htmlparser2-tree-adapter@7.0.0:
+  parse5-htmlparser2-tree-adapter@7.1.0:
     dependencies:
       domhandler: 5.0.3
       parse5: 7.3.0
@@ -7615,10 +7612,6 @@ snapshots:
   parse5-parser-stream@7.1.2:
     dependencies:
       parse5: 7.3.0
-
-  parse5@7.1.2:
-    dependencies:
-      entities: 4.5.0
 
   parse5@7.3.0:
     dependencies:
@@ -8285,7 +8278,7 @@ snapshots:
 
   undici-types@7.16.0: {}
 
-  undici@6.19.7: {}
+  undici@7.16.0: {}
 
   universalify@2.0.1: {}
 
