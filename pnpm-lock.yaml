@@ -160,8 +160,8 @@ importers:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@24.10.1)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3))
       supertest:
-        specifier: ^7.0.0
-        version: 7.0.0
+        specifier: ^7.1.4
+        version: 7.1.4
       ts-jest:
         specifier: ^29.4.6
         version: 29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@24.10.1)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3)))(typescript@5.9.3)
@@ -948,10 +948,17 @@ packages:
       '@nestjs/platform-express':
         optional: true
 
+  '@noble/hashes@1.8.0':
+    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@nuxtjs/opencollective@0.3.2':
     resolution: {integrity: sha512-um0xL3fO7Mf4fDxcqx9KryrB7zgRM5JSlvGN5AGkP6JLM5XEKyjeAiPbNxdXVXQ16isuAhYpvP88NgL2BGd6aA==}
     engines: {node: '>=8.0.0', npm: '>=5.0.0'}
     hasBin: true
+
+  '@paralleldrive/cuid2@2.3.1':
+    resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -2353,8 +2360,9 @@ packages:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
-  formidable@3.5.1:
-    resolution: {integrity: sha512-WJWKelbRHN41m5dumb0/k8TeAx7Id/y3a+Z7QfhxP/htI9Js5zYaEDtG8uMgG0vM0lOlqnmjE99/kfpOYi/0Og==}
+  formidable@3.5.4:
+    resolution: {integrity: sha512-YikH+7CUTOtP44ZTnUhR7Ic2UASBPOqmaRkRKxRbywPTe5VxF7RRCck4af9wutiZ/QKM5nME9Bie2fFaPz5Gug==}
+    engines: {node: '>=14.0.0'}
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -2507,10 +2515,6 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
-
-  hexoid@1.0.0:
-    resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
-    engines: {node: '>=8'}
 
   html-encoding-sniffer@4.0.0:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
@@ -3727,15 +3731,13 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  superagent@9.0.1:
-    resolution: {integrity: sha512-CcRSdb/P2oUVaEpQ87w9Obsl+E9FruRd6b2b7LdiBtJoyMr2DQt7a89anAfiX/EL59j9b2CbRFvf2S91DhuCww==}
+  superagent@10.2.3:
+    resolution: {integrity: sha512-y/hkYGeXAj7wUMjxRbB21g/l6aAEituGXM9Rwl4o20+SX3e8YOSV6BxFXl+dL3Uk0mjSL3kCbNkwURm8/gEDig==}
     engines: {node: '>=14.18.0'}
-    deprecated: Please upgrade to superagent v10.2.2+, see release notes at https://github.com/forwardemail/superagent/releases/tag/v10.2.2 - maintenance is supported by Forward Email @ https://forwardemail.net
 
-  supertest@7.0.0:
-    resolution: {integrity: sha512-qlsr7fIC0lSddmA3tzojvzubYxvlGtzumcdHgPwbFWMISQwL22MhM2Y3LNt+6w9Yyx7559VW5ab70dgphm8qQA==}
+  supertest@7.1.4:
+    resolution: {integrity: sha512-tjLPs7dVyqgItVFirHYqe2T+MfWc2VOBQ8QFKKbWTA3PU7liZR8zoSpAi/C1k1ilm9RsXIKYf197oap9wXGVYg==}
     engines: {node: '>=14.18.0'}
-    deprecated: Please upgrade to supertest v7.1.3+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.3 - maintenance is supported by Forward Email @ https://forwardemail.net
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -5059,6 +5061,8 @@ snapshots:
     optionalDependencies:
       '@nestjs/platform-express': 10.4.20(@nestjs/common@10.4.16(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.15)
 
+  '@noble/hashes@1.8.0': {}
+
   '@nuxtjs/opencollective@0.3.2':
     dependencies:
       chalk: 4.1.2
@@ -5066,6 +5070,10 @@ snapshots:
       node-fetch: 2.6.13
     transitivePeerDependencies:
       - encoding
+
+  '@paralleldrive/cuid2@2.3.1':
+    dependencies:
+      '@noble/hashes': 1.8.0
 
   '@pinojs/redact@0.4.0': {}
 
@@ -6710,10 +6718,10 @@ snapshots:
       hasown: 2.0.2
       mime-types: 2.1.35
 
-  formidable@3.5.1:
+  formidable@3.5.4:
     dependencies:
+      '@paralleldrive/cuid2': 2.3.1
       dezalgo: 1.0.4
-      hexoid: 1.0.0
       once: 1.4.0
 
   forwarded@0.2.0: {}
@@ -6865,8 +6873,6 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
-
-  hexoid@1.0.0: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
@@ -8318,25 +8324,24 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  superagent@9.0.1:
+  superagent@10.2.3:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
       debug: 4.4.3
       fast-safe-stringify: 2.1.1
       form-data: 4.0.5
-      formidable: 3.5.1
+      formidable: 3.5.4
       methods: 1.1.2
       mime: 2.6.0
       qs: 6.14.0
-      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
-  supertest@7.0.0:
+  supertest@7.1.4:
     dependencies:
       methods: 1.1.2
-      superagent: 9.0.1
+      superagent: 10.2.3
     transitivePeerDependencies:
       - supports-color
 
