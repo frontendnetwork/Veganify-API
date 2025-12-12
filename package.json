@@ -45,7 +45,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
     "http": "^0.0.1-security",
-    "iconv-lite": "^0.7.0",
+    "iconv-lite": "^0.7.1",
     "ini": "^5.0.0",
     "js-yaml": "^4.1.1",
     "jsdom": "^27.3.0",
