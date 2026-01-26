@@ -35,7 +35,7 @@
     "@nestjs/terminus": "^11.0.0",
     "@types/body-parser": "^1.19.6",
     "@types/ini": "^4.1.1",
-    "axios": "^1.13.2",
+    "axios": "^1.13.3",
     "body-parser": "^2.2.2",
     "cache-manager-redis-store": "^3.0.1",
     "cheerio": "^1.1.2",
