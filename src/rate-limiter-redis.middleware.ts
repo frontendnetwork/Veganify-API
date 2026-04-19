@@ -25,7 +25,7 @@ export class RedisRateLimiterMiddleware
 		string,
 		{ count: number; resetTime: number }
 	>();
-	private cleanupInterval?: ReturnType<typeof setInterval>;
+	private cleanupInterval?: NodeJS.Timeout;
 
 	constructor(private readonly redisService: RedisService) {}
 
@@ -36,7 +36,7 @@ export class RedisRateLimiterMiddleware
 				this.cleanupInMemoryCounters();
 			},
 			5 * 60 * 1000,
-		);
+		) as unknown as NodeJS.Timeout;
 	}
 
 	onModuleDestroy() {
