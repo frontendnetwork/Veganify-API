@@ -16,7 +16,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
   private readonly logger = new Logger(ProductController.name);
 
-  @Post(":barcode?")
+  @Post(":barcode")
   @ApiTags("Product")
   @ApiResponse({
     status: 200,
