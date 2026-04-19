@@ -1,9 +1,15 @@
-import { Controller, Param, Post, Res, Logger } from "@nestjs/common";
+import {
+  Controller,
+  Param,
+  Post,
+  Res,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
 import { ProductService } from "./product.service";
-
 
 @Controller("v0/product")
 export class ProductController {
@@ -11,7 +17,7 @@ export class ProductController {
   private readonly logger = new Logger(ProductController.name);
 
   @Post(":barcode?")
-  @ApiTags("Product Information")
+  @ApiTags("Product")
   @ApiResponse({
     status: 200,
     description: "Request returned a positive result.",
@@ -29,19 +35,28 @@ export class ProductController {
     description: "Internal Server Error.",
   })
   async getProductDetails(
-    @Param("barcode") barcode: string,
+    @Param("barcode") barcode: string = "",
     @Res() res: Response
   ) {
+    if (!/^\d{4,25}$/.test(barcode)) {
+      return res
+        .status(400)
+        .json({ status: 400, error: "Invalid barcode format" });
+    }
     try {
       const result = await this.productService.fetchProductDetails(barcode);
       return res.status(200).json(result);
     } catch (error) {
       this.logger.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((error as any).status === 404)
+
+      // Handle NestJS exceptions
+      if (error instanceof NotFoundException) {
         return res
           .status(404)
           .json({ status: 404, error: "Product not found" });
+      }
+
+      // Handle other errors
       return res
         .status(500)
         .json({ status: 500, error: "Internal server error" });

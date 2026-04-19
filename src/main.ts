@@ -7,7 +7,6 @@ import { Logger } from "nestjs-pino";
 
 import { AppModule } from "./app.module";
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = app.get(Logger);
@@ -23,6 +22,7 @@ async function bootstrap() {
     .setLicense("MIT", "https://opensource.org/licenses/MIT")
     .addServer("https://api.veganify.app", "Production server")
     .addServer("https://api.staging.veganify.app", "Staging server")
+    .addServer("http://localhost:8080", "Local server")
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

@@ -7,6 +7,51 @@ import * as jsonFileReader from "../shared/utils/jsonFileReader";
 import { IngredientsV1Controller } from "../v1/ingredients.controller";
 
 jest.mock("../shared/utils/jsonFileReader");
+jest.mock("worker_threads", () => ({
+  Worker: jest.fn().mockImplementation((_, { workerData }) => {
+    return {
+      on: jest.fn().mockImplementation((event, callback) => {
+        if (event === "message") {
+          const { ingredients, isNotVegan, isMaybeNotVegan, isVegan } =
+            workerData;
+
+          const notVeganResult = ingredients.filter((item: string) =>
+            isNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+          );
+
+          const maybeNotVeganResult = ingredients.filter(
+            (item: string) =>
+              !isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) &&
+              isMaybeNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+          );
+
+          const veganResult = ingredients.filter((item: string) =>
+            isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+          );
+
+          const unknownResult = ingredients.filter(
+            (item: string) =>
+              !isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) &&
+              !isMaybeNotVegan.includes(
+                item.toLowerCase().replace(/\s+/g, "")
+              ) &&
+              !isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+          );
+
+          setTimeout(() => {
+            callback({
+              notVeganResult,
+              maybeNotVeganResult,
+              veganResult,
+              unknownResult,
+            });
+          }, 0);
+        }
+      }),
+      postMessage: jest.fn(),
+    };
+  }),
+}));
 
 describe("IngredientsV1Controller", () => {
   let controller: IngredientsV1Controller;
@@ -140,20 +185,26 @@ describe("IngredientsV1Controller", () => {
       });
     });
 
-    it("should handle translation service unavailable", async () => {
+    it("should process untranslated ingredients when translation fails", async () => {
       const res = mockResponse();
       translationService.translateText.mockRejectedValueOnce(
         new Error("Translate timed out")
       );
 
-      await controller.getIngredients("ingredient", res, true);
+      await controller.getIngredients("tofu,milk,sugar", res, true);
 
-      expect(res.status).toHaveBeenCalledWith(HttpStatus.SERVICE_UNAVAILABLE);
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
-        code: "Service Unavailable",
-        status: "503",
-        message:
-          "Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
+        code: "OK",
+        status: "200",
+        message: "Success",
+        data: {
+          vegan: false,
+          surely_vegan: ["tofu"],
+          not_vegan: ["milk"],
+          maybe_not_vegan: ["sugar"],
+          unknown: [],
+        },
       });
     });
 
@@ -194,7 +245,7 @@ describe("IngredientsV1Controller", () => {
         status: "200",
         message: "Success",
         data: {
-          vegan: false, // Should be false because sugar is maybe-not-vegan
+          vegan: false,
           surely_vegan: ["tofu"],
           not_vegan: [],
           maybe_not_vegan: ["sugar"],
