@@ -40,6 +40,7 @@ describe("PetaController", () => {
     it('should return the cruelty-free JSON file when type is "crueltyfree"', () => {
       controller.getPetaByType("crueltyfree", res);
       expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.sendFile).toHaveBeenCalledTimes(1);
       expect(res.sendFile).toHaveBeenCalledWith(
         path.join(__dirname, "../../../peta_cruelty_free.json"),
         {
