@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import translate, { DeeplLanguages } from "deepl";
+import translate, { type DeeplLanguages } from "deepl";
 
 import { CacheService } from "../../../config/cache.service";
 
@@ -48,9 +48,7 @@ export class TranslationService {
     targetLang: DeeplLanguages,
     timeout: number
   ): Promise<DeepLTranslationResult> {
-    this.logger.debug(
-      `Performing translation for: ${text.substring(0, 50)}...`
-    );
+    this.logger.debug(`Performing translation for: ${text.slice(0, 50)}...`);
 
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Translate timed out")), timeout)
@@ -58,7 +56,7 @@ export class TranslationService {
 
     const translatePromise = translate({
       free_api: true,
-      text: text,
+      text,
       target_lang: targetLang,
       auth_key: `${process.env.DEEPL_AUTH as string}`,
     }) as Promise<DeepLTranslationResult>;

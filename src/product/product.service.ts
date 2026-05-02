@@ -1,5 +1,5 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import axios from "axios";
 import * as iconv from "iconv-lite";
 import * as ini from "ini";
@@ -13,7 +13,6 @@ export class ProductService {
     private httpService: HttpService,
     private cacheService: CacheService
   ) {}
-  private readonly logger = new Logger(ProductService.name);
 
   async fetchProductDetails(barcode: string) {
     const cacheKey = this.cacheService.generateProductKey(barcode);
@@ -26,18 +25,18 @@ export class ProductService {
   }
 
   private async fetchProductDetailsFromAPIs(barcode: string) {
-    let productname: string = "n/a";
-    let genericname: string = "n/a";
+    let productname = "n/a";
+    let genericname = "n/a";
     let vegan: boolean | "n/a" = "n/a";
     let vegetarian: boolean | "n/a" = "n/a";
     let animaltestfree: boolean | "n/a" = "n/a";
     let palmoil: boolean | "n/a" = "n/a";
     let nutriscore: "n/a" | "A" | "B" | "C" | "D" | "E" | "F" = "n/a";
-    let grade: string = "n/a";
-    let apiname: string = "n/a";
+    let grade = "n/a";
+    let apiname = "n/a";
     const processed: boolean = false;
-    let baseuri: string = "n/a";
-    let edituri: string = "n/a";
+    let baseuri = "n/a";
+    let edituri = "n/a";
 
     // Fetch all data in parallel
     const [gradeData, openFoodFactsResponse, petaResponse] = await Promise.all([
@@ -120,7 +119,7 @@ export class ProductService {
         edituri = `https://opengtindb.org/index.php?cmd=ean1&ean=${barcode}`;
         productname = iconv
           .decode(
-            Buffer.from(array.name + " " + array.detailname),
+            Buffer.from(`${array.name} ${array.detailname}`),
             "ISO-8859-1"
           )
           .toString();

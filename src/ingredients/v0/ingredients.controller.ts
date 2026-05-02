@@ -1,24 +1,23 @@
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  type OnModuleInit,
   Param,
   Query,
   Res,
-  HttpStatus,
-  HttpException,
-  Logger,
-  OnModuleInit,
 } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { DeeplLanguages } from "deepl";
-import { Response } from "express";
+import type { DeeplLanguages } from "deepl";
+import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
 
-
-import { V0ResponseData } from "./dto/response.dto";
+import type { V0ResponseData } from "./dto/response.dto";
 
 @Controller("v0/ingredients")
 export class IngredientsController implements OnModuleInit {
@@ -41,11 +40,14 @@ export class IngredientsController implements OnModuleInit {
   private sophisticatedMatch(ingredient: string, list: string[]): boolean {
     const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
 
-    if (list.includes(normalizedIngredient)) return true;
+    if (list.includes(normalizedIngredient)) {
+      return true;
+    }
 
     const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
-    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, ""))))
+    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
       return true;
+    }
 
     return false;
   }
@@ -115,24 +117,22 @@ export class IngredientsController implements OnModuleInit {
                   "Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
               });
               return;
-            } else {
-              this.logger.error(`Error during translation: ${error}`);
-              res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-                code: "Internal Server Error",
-                status: "500",
-                message: "An error occurred during the translation process",
-              });
-              return;
             }
-          } else {
-            this.logger.error(`Unknown error: ${error}`);
+            this.logger.error(`Error during translation: ${error}`);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
               code: "Internal Server Error",
               status: "500",
-              message: "An unknown error occurred while processing the request",
+              message: "An error occurred during the translation process",
             });
             return;
           }
+          this.logger.error(`Unknown error: ${error}`);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+            code: "Internal Server Error",
+            status: "500",
+            message: "An unknown error occurred while processing the request",
+          });
+          return;
         }
       } else {
         response = ingredients;
@@ -147,8 +147,10 @@ export class IngredientsController implements OnModuleInit {
       );
       let unknownResult = response.filter(
         (item: string) =>
-          !this.sophisticatedMatch(item, this.isNotVegan) &&
-          !this.sophisticatedMatch(item, this.isVegan)
+          !(
+            this.sophisticatedMatch(item, this.isNotVegan) ||
+            this.sophisticatedMatch(item, this.isVegan)
+          )
       );
 
       if (

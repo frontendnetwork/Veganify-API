@@ -1,5 +1,4 @@
-import * as crypto from "crypto";
-
+import * as crypto from "node:crypto";
 import { Injectable, Logger } from "@nestjs/common";
 
 import { RedisService } from "./redis.service";
@@ -134,7 +133,7 @@ export class CacheService {
       .createHash("sha256")
       .update(text)
       .digest("hex")
-      .substring(0, 16);
+      .slice(0, 16);
     return `translation:${targetLang}:${textHash}`;
   }
 }

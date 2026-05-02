@@ -1,22 +1,32 @@
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
+
+// bun:test does not export Mocked<T> yet; define a local utility
+type Mocked<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? ReturnType<typeof mock> & T[K]
+    : T[K];
+};
 
 import { TranslationService } from "../shared/services/translation.service";
 import * as jsonFileReader from "../shared/utils/jsonFileReader";
 import { IngredientsController } from "../v0/ingredients.controller";
 
-jest.mock("../shared/utils/jsonFileReader");
+mock.module("../shared/utils/jsonFileReader", () => ({
+  readJsonFile: mock(),
+}));
 
 describe("IngredientsController", () => {
   let controller: IngredientsController;
-  let translationService: jest.Mocked<TranslationService>;
+  let translationService: Mocked<TranslationService>;
 
   const mockResponse = () => {
     const res: Partial<Response> = {};
-    res.status = jest.fn().mockReturnValue(res);
-    res.send = jest.fn().mockReturnValue(res);
-    res.setHeader = jest.fn().mockReturnValue(res);
+    res.status = mock().mockReturnValue(res);
+    res.send = mock().mockReturnValue(res);
+    res.setHeader = mock().mockReturnValue(res);
     return res as Response;
   };
 
@@ -27,7 +37,7 @@ describe("IngredientsController", () => {
         {
           provide: TranslationService,
           useValue: {
-            translateText: jest.fn(),
+            translateText: mock(),
           },
         },
       ],
@@ -36,18 +46,19 @@ describe("IngredientsController", () => {
     controller = module.get<IngredientsController>(IngredientsController);
     translationService = module.get(
       TranslationService
-    ) as jest.Mocked<TranslationService>;
+    ) as Mocked<TranslationService>;
 
-    jest
-      .spyOn(jsonFileReader, "readJsonFile")
-      .mockImplementation((filename: string) => {
+    spyOn(jsonFileReader, "readJsonFile").mockImplementation(
+      (filename: string): Promise<any> => {
         if (filename === "./isnotvegan.json") {
           return Promise.resolve(["milk", "egg"]);
-        } else if (filename === "./isvegan.json") {
+        }
+        if (filename === "./isvegan.json") {
           return Promise.resolve(["tofu", "soy"]);
         }
         return Promise.resolve([]);
-      });
+      }
+    );
 
     await controller.onModuleInit();
   });

@@ -1,67 +1,78 @@
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
+
+// bun:test does not export Mocked<T> yet; define a local utility
+type Mocked<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? ReturnType<typeof mock> & T[K]
+    : T[K];
+};
 
 import { TranslationService } from "../shared/services/translation.service";
 import * as jsonFileReader from "../shared/utils/jsonFileReader";
 import { IngredientsV1Controller } from "../v1/ingredients.controller";
 
-jest.mock("../shared/utils/jsonFileReader");
-jest.mock("worker_threads", () => ({
-  Worker: jest.fn().mockImplementation((_, { workerData }) => {
-    return {
-      on: jest.fn().mockImplementation((event, callback) => {
-        if (event === "message") {
-          const { ingredients, isNotVegan, isMaybeNotVegan, isVegan } =
-            workerData;
+mock.module("../shared/utils/jsonFileReader", () => ({
+  readJsonFile: mock(),
+}));
 
-          const notVeganResult = ingredients.filter((item: string) =>
-            isNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
-          );
+mock.module("worker_threads", () => ({
+  Worker: mock().mockImplementation((_, { workerData }) => ({
+    on: mock().mockImplementation((event, callback) => {
+      if (event === "message") {
+        const { ingredients, isNotVegan, isMaybeNotVegan, isVegan } =
+          workerData;
 
-          const maybeNotVeganResult = ingredients.filter(
-            (item: string) =>
-              !isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) &&
-              isMaybeNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
-          );
+        const notVeganResult = ingredients.filter((item: string) =>
+          isNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+        );
 
-          const veganResult = ingredients.filter((item: string) =>
-            isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
-          );
+        const maybeNotVeganResult = ingredients.filter(
+          (item: string) =>
+            !isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) &&
+            isMaybeNotVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+        );
 
-          const unknownResult = ingredients.filter(
-            (item: string) =>
-              !isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) &&
-              !isMaybeNotVegan.includes(
+        const veganResult = ingredients.filter((item: string) =>
+          isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+        );
+
+        const unknownResult = ingredients.filter(
+          (item: string) =>
+            !(
+              isNotVegan.includes(item.toLowerCase().replace(/\s+/g, "")) ||
+              isMaybeNotVegan.includes(
                 item.toLowerCase().replace(/\s+/g, "")
-              ) &&
-              !isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
-          );
+              ) ||
+              isVegan.includes(item.toLowerCase().replace(/\s+/g, ""))
+            )
+        );
 
-          setTimeout(() => {
-            callback({
-              notVeganResult,
-              maybeNotVeganResult,
-              veganResult,
-              unknownResult,
-            });
-          }, 0);
-        }
-      }),
-      postMessage: jest.fn(),
-    };
-  }),
+        setTimeout(() => {
+          callback({
+            notVeganResult,
+            maybeNotVeganResult,
+            veganResult,
+            unknownResult,
+          });
+        }, 0);
+      }
+    }),
+    postMessage: mock(),
+  })),
 }));
 
 describe("IngredientsV1Controller", () => {
   let controller: IngredientsV1Controller;
-  let translationService: jest.Mocked<TranslationService>;
+  let translationService: Mocked<TranslationService>;
 
   const mockResponse = () => {
     const res: Partial<Response> = {};
-    res.status = jest.fn().mockReturnValue(res);
-    res.send = jest.fn().mockReturnValue(res);
-    res.setHeader = jest.fn().mockReturnValue(res);
+    res.status = mock().mockReturnValue(res);
+    res.send = mock().mockReturnValue(res);
+    res.setHeader = mock().mockReturnValue(res);
     return res as Response;
   };
 
@@ -72,7 +83,7 @@ describe("IngredientsV1Controller", () => {
         {
           provide: TranslationService,
           useValue: {
-            translateText: jest.fn(),
+            translateText: mock(),
           },
         },
       ],
@@ -81,20 +92,22 @@ describe("IngredientsV1Controller", () => {
     controller = module.get<IngredientsV1Controller>(IngredientsV1Controller);
     translationService = module.get(
       TranslationService
-    ) as jest.Mocked<TranslationService>;
+    ) as Mocked<TranslationService>;
 
-    jest
-      .spyOn(jsonFileReader, "readJsonFile")
-      .mockImplementation((filename: string) => {
+    spyOn(jsonFileReader, "readJsonFile").mockImplementation(
+      (filename: string): Promise<any> => {
         if (filename === "./isnotvegan.json") {
           return Promise.resolve(["milk", "egg"]);
-        } else if (filename === "./isvegan.json") {
+        }
+        if (filename === "./isvegan.json") {
           return Promise.resolve(["tofu", "soy"]);
-        } else if (filename === "./ismaybenotvegan.json") {
+        }
+        if (filename === "./ismaybenotvegan.json") {
           return Promise.resolve(["sugar", "wine"]);
         }
         return Promise.resolve([]);
-      });
+      }
+    );
 
     await controller.onModuleInit();
   });

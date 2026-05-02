@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" data-color-mode="dark" data-dark-theme="dark">
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta charset="utf-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
     <title>Veganify API Overview</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
-    />
+    >
     <style>
-      body {
-        width: 50%;
-      }
+    body {
+      width: 50%;
+    }
 
-      @media only screen and (max-width: 750px) {
-        body {
-          width: 95%;
-        }
-        img {
-          display: none;
-        }
+    @media only screen and (max-width: 750px) {
+      body {
+        width: 95%;
       }
+      img {
+        display: none;
+      }
+    }
     </style>
     <script src="https://unpkg.com/alpinejs" defer></script>
   </head>
@@ -47,7 +47,7 @@
         src="https://raw.githubusercontent.com/JokeNetwork/veganify.app/main/public/img/hero_icon.png"
         align="right"
         alt="Veganify Logo"
-      />
+      >
       <h1>Veganify API Overview</h1>
       <p>
         <span class="Label mr-1 Label--success">Stable</span
@@ -64,32 +64,29 @@
       <h2>Requirements</h2>
       <ul>
         <li>
-          <a href="https://nodejs.org/en/download/">Node.js</a> (Recommended
-          version: v18.17.0 or higher)
+          <a href="https://nodejs.org/en/download/">Node.js</a>
+          (Recommended version: v18.17.0 or higher)
         </li>
         <li>
           <a href="https://docs.npmjs.com/cli/v8/commands/npm-install">npm</a>
         </li>
       </ul>
       <h2>Develop locally</h2>
-      <p>
-        Start the NestJS server locally with the following command:
-      </p>
+      <p>Start the NestJS server locally with the following command:</p>
       <p><strong>Start the service</strong></p>
       <pre><code class="lang-bash">npm install
 npm run start:dev </code></pre>
-<p><strong>Debug the service</strong></p>
-<pre><code class="lang-bash">npm install
+      <p><strong>Debug the service</strong></p>
+      <pre><code class="lang-bash">npm install
 npm run start:debug</code></pre>
-<p><strong>Run PETA Cronjob manually</strong></p>
-<pre><code class="lang-bash">npm run get:peta</code></pre>
+      <p><strong>Run PETA Cronjob manually</strong></p>
+      <pre><code class="lang-bash">npm run get:peta</code></pre>
       <h2>Build and deploy</h2>
       <p><strong>Build the service</strong></p>
-<pre><code class="lang-bash">npm install
+      <pre><code class="lang-bash">npm install
 npm run build
 npm run start</code></pre>
-
-Ideally deploy the API with the Dockerfile included in the project.
+      Ideally deploy the API with the Dockerfile included in the project.
 
       <h2>OpenAPI specification</h2>
       <div x-data="{ open: false }">
@@ -288,19 +285,18 @@ Ideally deploy the API with the Dockerfile included in the project.
       <p>The following endpoints are available within the veganify.app API:</p>
       <ul>
         <li>
-          <code>https://api.veganify.app/v0/grades/backend</code><br /><strong
-            >Warning:</strong
-          >
+          <code>https://api.veganify.app/v0/grades/backend</code><br>
+          <strong>Warning:</strong>
           This endpoint is not publicly available in the repo and will not be
           published.
         </li>
         <li>
           <code
-            >https://api.veganify.app/v0/ingredients/{ingredientslist}</code
+            >https://api.veganify.app/v0/ingredients/ { ingredientslist}</code
           >
         </li>
         <li><code>https://api.veganify.app/v0/peta/crueltyfree</code></li>
-        <li><code>https://api.veganify.app/v0/product/{barcode}</code></li>
+        <li><code>https://api.veganify.app/v0/product/ { barcode}</code></li>
       </ul>
       <h3>Unavailable endpoints</h3>
       <p>
@@ -338,7 +334,8 @@ Ideally deploy the API with the Dockerfile included in the project.
       <footer class="border-top">
         <p class="color-fg-muted mt-2">
           &copy; <span id="date"></span>
-          <a href="//veganify.app">veganify.app</a> - Licensed under
+          <a href="//veganify.app">veganify.app</a>
+          - Licensed under
           <a
             href="https://github.com/frontendnetwork/veganify.app/blob/main/LICENSE"
             >MIT</a
@@ -347,7 +344,8 @@ Ideally deploy the API with the Dockerfile included in the project.
       </footer>
     </div>
     <script>
-      document.getElementById("date").innerHTML = new Date().getFullYear();
+    "use strict";
+    document.getElementById("date").innerHTML = new Date().getFullYear();
     </script>
   </body>
 </html>

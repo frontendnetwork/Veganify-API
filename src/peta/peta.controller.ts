@@ -1,20 +1,19 @@
-import * as path from "path";
-
-import { Controller, Get, Param, Res, HttpStatus } from "@nestjs/common";
+import * as path from "node:path";
+import { Controller, Get, HttpStatus, Param, Res } from "@nestjs/common";
 import {
+  ApiExcludeEndpoint,
+  ApiProperty,
   ApiResponse,
   ApiTags,
-  ApiProperty,
-  ApiExcludeEndpoint,
 } from "@nestjs/swagger";
-import { Response } from "express";
+import type { Response } from "express";
 
 export class petaType {
   @ApiProperty({
     description: "The type of PETA list",
     example: "crueltyfree",
   })
-  type: string = "crueltyfree";
+  type = "crueltyfree";
 }
 
 @Controller("v0/peta")

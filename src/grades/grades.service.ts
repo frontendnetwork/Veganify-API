@@ -1,7 +1,7 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable, Logger } from "@nestjs/common";
-import { AxiosResponse } from "axios";
-import { lastValueFrom, Observable } from "rxjs";
+import type { AxiosResponse } from "axios";
+import { lastValueFrom, type Observable } from "rxjs";
 
 @Injectable()
 export class GradesService {
@@ -23,7 +23,7 @@ export class GradesService {
     const postData = {
       token: this.pushoverToken,
       user: this.pushoverUser,
-      message: message,
+      message,
       priority: 0,
     };
 

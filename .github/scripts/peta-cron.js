@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const qs = require("qs");
-const fs = require("fs");
+const fs = require("node:fs");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
@@ -43,7 +43,7 @@ async function fetchAndSavePETAData() {
     }
 
     const output = {
-      LAST_UPDATE: new Date().toLocaleString() + " CET",
+      LAST_UPDATE: `${new Date().toLocaleString()} CET`,
       ENTRIES: `${liElements.length}`,
       PETA_DOES_NOT_TEST: [],
     };
@@ -62,7 +62,7 @@ async function fetchAndSavePETAData() {
 
     fs.writeFileSync(
       "./peta_cruelty_free.json",
-      JSON.stringify(output, null, 2) + "\n"
+      `${JSON.stringify(output, null, 2)}\n`
     );
     console.log("Data fetched and saved successfully!");
   } catch (err) {
