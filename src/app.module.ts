@@ -1,5 +1,9 @@
 import { HttpModule } from "@nestjs/axios";
-import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
+import {
+  type MiddlewareConsumer,
+  Module,
+  type NestModule,
+} from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
 import { LoggerModule } from "nestjs-pino";
@@ -45,7 +49,7 @@ import { RedisRateLimiterMiddleware } from "./rate-limiter-redis.middleware";
   providers: [GradesService, ProductService, TranslationService, ConfigService],
 })
 export class AppModule implements NestModule {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(readonly _configService: ConfigService) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RedisRateLimiterMiddleware).exclude("health").forRoutes("*");

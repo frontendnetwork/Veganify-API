@@ -1,13 +1,13 @@
 import {
   Controller,
+  Logger,
+  NotFoundException,
   Param,
   Post,
   Res,
-  Logger,
-  NotFoundException,
 } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import type { Response } from "express";
 
 import { ProductService } from "./product.service";
 
@@ -35,7 +35,7 @@ export class ProductController {
     description: "Internal Server Error.",
   })
   async getProductDetails(
-    @Param("barcode") barcode: string = "",
+    @Param("barcode") barcode: string,
     @Res() res: Response
   ) {
     if (!/^\d{4,25}$/.test(barcode)) {

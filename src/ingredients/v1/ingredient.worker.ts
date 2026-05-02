@@ -1,13 +1,16 @@
-import { parentPort, workerData } from "worker_threads";
+import { parentPort, workerData } from "node:worker_threads";
 
 function sophisticatedMatch(ingredient: string, list: string[]): boolean {
   const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
 
-  if (list.includes(normalizedIngredient)) return true;
+  if (list.includes(normalizedIngredient)) {
+    return true;
+  }
 
   const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
-  if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, ""))))
+  if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
     return true;
+  }
 
   return false;
 }
@@ -31,9 +34,11 @@ if (parentPort) {
 
   const unknownResult = ingredients.filter(
     (item: string) =>
-      !sophisticatedMatch(item, isNotVegan) &&
-      !sophisticatedMatch(item, isMaybeNotVegan) &&
-      !sophisticatedMatch(item, isVegan)
+      !(
+        sophisticatedMatch(item, isNotVegan) ||
+        sophisticatedMatch(item, isMaybeNotVegan) ||
+        sophisticatedMatch(item, isVegan)
+      )
   );
 
   parentPort.postMessage({

@@ -1,0 +1,4 @@
+[test]
+preload = ["./src/tests/setup.ts"]
+include = ["**/*.spec.ts"]
+exclude = ["node_modules", "dist"]

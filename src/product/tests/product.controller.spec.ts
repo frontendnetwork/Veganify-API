@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
+import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
@@ -6,7 +7,6 @@ import { ProductController } from "../product.controller";
 import { ProductService } from "../product.service";
 
 interface MockResult {
-  status: number;
   product: {
     productname: string;
     genericname: string;
@@ -17,11 +17,13 @@ interface MockResult {
     nutriscore: "A" | "B" | "C" | "D" | "E" | "F" | "n/a";
     grade: string;
   };
-  sources: any;
-}
-
-interface CustomError extends Error {
-  status?: number;
+  sources: {
+    processed: boolean;
+    api: string;
+    baseuri: string;
+    edituri: string;
+  };
+  status: number;
 }
 
 describe("ProductController", () => {
@@ -35,7 +37,7 @@ describe("ProductController", () => {
         {
           provide: ProductService,
           useValue: {
-            fetchProductDetails: jest.fn(),
+            fetchProductDetails: mock(),
           },
         },
       ],
@@ -60,13 +62,18 @@ describe("ProductController", () => {
           nutriscore: "B",
           grade: "Grade A",
         },
-        sources: {},
+        sources: {
+          processed: false,
+          api: "Test API",
+          baseuri: "https://test.com",
+          edituri: "https://test.com/edit",
+        },
       };
-      jest.spyOn(service, "fetchProductDetails").mockResolvedValue(mockResult);
+      spyOn(service, "fetchProductDetails").mockResolvedValue(mockResult);
 
       const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
+        status: mock().mockReturnThis(),
+        json: mock(),
       } as unknown as Response;
 
       await controller.getProductDetails(barcode, mockRes);
@@ -78,14 +85,13 @@ describe("ProductController", () => {
 
     it("should return 404 when product is not found", async () => {
       const barcode = "987654321098";
-      const error: CustomError = new Error("Error message");
-      error.status = 404;
-      jest.spyOn(service, "fetchProductDetails").mockRejectedValue(error);
+      const error = new NotFoundException("Product not found");
+      spyOn(service, "fetchProductDetails").mockRejectedValue(error);
 
-      const res: Response<any, Record<string, any>> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response<any, Record<string, any>>;
+      const res = {
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
 
       await controller.getProductDetails(barcode, res);
 
@@ -100,11 +106,11 @@ describe("ProductController", () => {
     it("should return 500 for other errors", async () => {
       const barcode = "987654321098";
       const error = new Error("Internal Server Error");
-      jest.spyOn(service, "fetchProductDetails").mockRejectedValue(error);
+      spyOn(service, "fetchProductDetails").mockRejectedValue(error);
 
       const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
+        status: mock().mockReturnThis(),
+        json: mock(),
       } as unknown as Response;
 
       await controller.getProductDetails(barcode, res);

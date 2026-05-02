@@ -1,24 +1,20 @@
 import {
-  Controller,
-  Post,
   Body,
-  Res,
+  Controller,
   HttpException,
   HttpStatus,
-  Logger,
+  Post,
+  Res,
 } from "@nestjs/common";
-import { ApiResponse, ApiTags, ApiBody } from "@nestjs/swagger";
-import { Response } from "express";
+import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
+import type { Response } from "express";
 import { lastValueFrom } from "rxjs";
-
-import { backendResponseDto } from "./dtos/backendResponseDto";
 import { BarcodeDto } from "./dtos/BarcodeDto";
+import { backendResponseDto } from "./dtos/backendResponseDto";
 import { GradesService } from "./grades.service";
-
 
 @Controller("v0/grades")
 export class GradesController {
-  private readonly logger = new Logger(GradesController.name);
   constructor(private gradesService: GradesService) {}
 
   @Post("backend")
@@ -44,7 +40,7 @@ export class GradesController {
   async checkBarcode(@Body("barcode") barcode: string, @Res() res: Response) {
     if (
       !barcode ||
-      isNaN(Number(barcode)) ||
+      Number.isNaN(Number(barcode)) ||
       barcode.length < 8 ||
       barcode.length > 16 ||
       !/^\d+$/.test(barcode)
@@ -62,8 +58,11 @@ export class GradesController {
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.send(response?.data);
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((error as any).response?.status === 404) {
+      const is404 =
+        error instanceof Error &&
+        "response" in error &&
+        (error as { response?: { status?: number } }).response?.status === 404;
+      if (is404) {
         res.send("Sent");
         await this.gradesService.notifyMissingBarcode(barcode);
       } else {

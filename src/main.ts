@@ -1,7 +1,6 @@
-import { writeFileSync } from "fs";
-
+import { writeFileSync } from "node:fs";
 import { NestFactory } from "@nestjs/core";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as yaml from "js-yaml";
 import { Logger } from "nestjs-pino";
 

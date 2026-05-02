@@ -1,26 +1,25 @@
-import * as path from "path";
-import { Worker } from "worker_threads";
-
+import * as path from "node:path";
+import { Worker } from "node:worker_threads";
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  type OnModuleInit,
   Param,
   Query,
   Res,
-  HttpStatus,
-  HttpException,
-  Logger,
-  OnModuleInit,
 } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { DeeplLanguages } from "deepl";
-import { Response } from "express";
+import type { DeeplLanguages } from "deepl";
+import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
 
-import { V1ResponseData } from "./dto/response.dto";
+import type { V1ResponseData } from "./dto/response.dto";
 
 @Controller("v1/ingredients")
 export class IngredientsV1Controller implements OnModuleInit {

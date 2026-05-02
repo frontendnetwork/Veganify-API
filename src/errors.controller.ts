@@ -1,19 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import fs from "fs";
-
+import fs from "node:fs";
 import {
+  All,
   Controller,
   Get,
-  Post,
-  Options,
-  All,
-  Res,
-  Req,
   HttpException,
   HttpStatus,
   Logger,
+  Options,
+  Post,
+  Req,
+  Res,
 } from "@nestjs/common";
 import { ApiExcludeController } from "@nestjs/swagger";
+import type { Request, Response } from "express";
 
 @Controller()
 @ApiExcludeController()
@@ -32,7 +31,7 @@ export class ErrorsController {
     "/v0/spec",
     "/v0/specification",
   ])
-  getOpenApi(@Res() res: any): void {
+  getOpenApi(@Res() res: Response): void {
     fs.readFile(
       "./OpenAPI.yaml",
       "utf8",
@@ -58,7 +57,7 @@ export class ErrorsController {
   }
 
   @Get("/.well-known/security.txt")
-  getSecurityTxt(@Res() res: any): void {
+  getSecurityTxt(@Res() res: Response): void {
     fs.readFile(
       "./.well-known/security.txt",
       "utf8",
@@ -73,7 +72,7 @@ export class ErrorsController {
   }
 
   @Post("*")
-  handlePostWildcard(@Req() req: any, @Res() res: any): void {
+  handlePostWildcard(@Req() req: Request, @Res() res: Response): void {
     this.logger.log(`Posted to non existing endpoint: ${req.originalUrl}`);
     this.handleWildcard(
       req,
@@ -85,7 +84,7 @@ export class ErrorsController {
   }
 
   @Get("*")
-  handleGetWildcard(@Req() req: any, @Res() res: any): void {
+  handleGetWildcard(@Req() req: Request, @Res() res: Response): void {
     this.logger.log(`Get to non existing endpoint: ${req.originalUrl}`);
     this.handleWildcard(
       req,
@@ -97,12 +96,12 @@ export class ErrorsController {
   }
 
   @All(["PUT", "DELETE", "PATCH", "PROPFIND"])
-  handleMethodNotAllowed(@Req() req: any, @Res() res: any): void {
+  handleMethodNotAllowed(@Req() req: Request, @Res() res: Response): void {
     this.handleWildcard(req, res, 405, "Method not allowed", "");
   }
 
   @Options("*")
-  handleOptions(@Res() res: any): void {
+  handleOptions(@Res() res: Response): void {
     const result = {
       GET: {
         paths: ["/v0/ingredients/:ingredientslist", "v0/peta/crueltyfree"],
@@ -113,17 +112,17 @@ export class ErrorsController {
   }
 
   private handleWildcard(
-    req: any,
-    res: any,
+    req: Request,
+    res: Response,
     status: number,
     code: string,
     message: string
   ): void {
     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
     const result = {
-      status: status,
-      code: code,
-      message: message,
+      status,
+      code,
+      message,
       debug: {
         method: req.method,
         uri: fullUrl,

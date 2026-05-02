@@ -1,5 +1,5 @@
-import * as path from "path";
-
+import { beforeEach, describe, expect, it, mock } from "bun:test";
+import * as path from "node:path";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
@@ -16,9 +16,9 @@ describe("PetaController", () => {
 
     controller = module.get<PetaController>(PetaController);
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-      sendFile: jest.fn(),
+      status: mock().mockReturnThis(),
+      json: mock(),
+      sendFile: mock(),
     } as unknown as Response;
   });
 

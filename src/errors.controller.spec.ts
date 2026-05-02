@@ -1,12 +1,13 @@
-import * as fs from "fs";
-
+import { beforeEach, describe, expect, it, mock } from "bun:test";
+import * as fs from "node:fs";
 import { HttpException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import type { Request, Response } from "express";
 
 import { ErrorsController } from "./errors.controller";
 
-jest.mock("fs", () => ({
-  readFile: jest.fn(),
+mock.module("node:fs", () => ({
+  readFile: mock(),
 }));
 
 describe("ErrorsController", () => {
@@ -23,16 +24,16 @@ describe("ErrorsController", () => {
   describe.skip("getOpenApi", () => {
     it("should return OpenAPI specification", () => {
       const mockRes = {
-        setHeader: jest.fn(),
-        send: jest.fn(),
-      };
+        setHeader: mock(),
+        send: mock(),
+      } as unknown as Response;
 
       const mockContents = "OpenAPI specification content";
-      (fs.readFile as unknown as jest.Mock).mockImplementationOnce(
-        (_, __, callback) => {
-          callback(null, mockContents);
-        }
-      );
+      (
+        fs.readFile as unknown as ReturnType<typeof mock>
+      ).mockImplementationOnce((_, __, callback) => {
+        callback(null, mockContents);
+      });
 
       controller.getOpenApi(mockRes);
 
@@ -45,16 +46,16 @@ describe("ErrorsController", () => {
 
     it.skip("should throw HttpException if error reading file", () => {
       const mockRes = {
-        setHeader: jest.fn(),
-        send: jest.fn(),
-      };
+        setHeader: mock(),
+        send: mock(),
+      } as unknown as Response;
 
       const mockError = new Error("Error reading file");
-      (fs.readFile as unknown as jest.Mock).mockImplementationOnce(
-        (_, __, callback) => {
-          callback(mockError, null);
-        }
-      );
+      (
+        fs.readFile as unknown as ReturnType<typeof mock>
+      ).mockImplementationOnce((_, __, callback) => {
+        callback(mockError, null);
+      });
 
       expect(() => controller.getOpenApi(mockRes)).toThrow(HttpException);
     });
@@ -63,16 +64,16 @@ describe("ErrorsController", () => {
   describe("getSecurityTxt", () => {
     it.skip("should return security.txt file", () => {
       const mockRes = {
-        setHeader: jest.fn(),
-        send: jest.fn(),
-      };
+        setHeader: mock(),
+        send: mock(),
+      } as unknown as Response;
 
       const mockContents = "security.txt content";
-      (fs.readFile as unknown as jest.Mock).mockImplementationOnce(
-        (_, __, callback) => {
-          callback(null, mockContents);
-        }
-      );
+      (
+        fs.readFile as unknown as ReturnType<typeof mock>
+      ).mockImplementationOnce((_, __, callback) => {
+        callback(null, mockContents);
+      });
 
       controller.getSecurityTxt(mockRes);
 
@@ -91,11 +92,11 @@ describe("ErrorsController", () => {
         method: "POST",
         protocol: "http",
         get: () => "example.com",
-      };
+      } as unknown as Request;
       const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
 
       controller.handlePostWildcard(mockReq, mockRes);
 
@@ -119,11 +120,11 @@ describe("ErrorsController", () => {
         method: "GET",
         protocol: "http",
         get: () => "example.com",
-      };
+      } as unknown as Request;
       const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
 
       controller.handleGetWildcard(mockReq, mockRes);
 
@@ -147,11 +148,11 @@ describe("ErrorsController", () => {
         method: "PUT",
         protocol: "http",
         get: () => "example.com",
-      };
+      } as unknown as Request;
       const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
 
       controller.handleMethodNotAllowed(mockReq, mockRes);
 
@@ -171,9 +172,9 @@ describe("ErrorsController", () => {
   describe("handleOptions", () => {
     it("should return allowed HTTP methods and paths", () => {
       const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
 
       controller.handleOptions(mockRes);
 

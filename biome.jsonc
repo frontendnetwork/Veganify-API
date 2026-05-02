@@ -1,0 +1,62 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/biome/core"],
+  "javascript": {
+    "parser": {
+      // NestJS uses TypeScript legacy parameter decorators (@Req, @Res, @Body, etc.)
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "files": {
+    "includes": ["!docs", "!dist", "!.github/scripts", "!scripts"]
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        // Controllers use explicit any in some places
+        "noExplicitAny": "warn",
+        // NestJS controller methods use async for decorator compatibility even without await
+        "useAwait": "off"
+      },
+      "style": {
+        // NestJS constructor DI uses parameter properties extensively
+        "noParameterProperties": "off",
+        // NestJS uses various file naming conventions (not strict kebab-case)
+        "useFilenamingConvention": "off",
+        // NestJS applies readonly where needed; strict enforcement causes false positives
+        "useReadonlyClassProperties": "off",
+        // NestJS DI requires actual class imports (not type-only) for metadata reflection
+        "useImportType": "off"
+      },
+      "performance": {
+        // import * as X patterns are used across controllers and services
+        "noNamespaceImport": "off",
+        // Inline regex is acceptable in this codebase
+        "useTopLevelRegex": "off"
+      },
+      "correctness": {
+        // NestJS lifecycle methods and some params are intentionally unused
+        "noUnusedFunctionParameters": "off",
+        // CommonJS module — __dirname is valid; import.meta.dirname is NOT valid with module: CommonJS
+        "noGlobalDirnameFilename": "off"
+      },
+      "complexity": {
+        // NestJS service methods can exceed default complexity thresholds
+        "noExcessiveCognitiveComplexity": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.spec.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            // bun:test globals (describe, it, expect) are ambient
+            "noUndeclaredVariables": "off"
+          }
+        }
+      }
+    }
+  ]
+}
