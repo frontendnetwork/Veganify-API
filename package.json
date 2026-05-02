@@ -10,9 +10,9 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "bun dist/main.js",
     "build": "nest build",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "check:code": "ultracite check",
+    "lint": "bunx biome check .",
+    "lint:fix": "bunx biome check --write .",
+    "check:code": "bunx ultracite check",
     "get:peta": "node .github/scripts/peta-cron.js",
     "test": "bun test --concurrent --timeout=10000 --reporter=dots",
     "test:cov": "bun test --coverage",
@@ -87,7 +87,7 @@
   },
   "lint-staged": {
     "*.{js,ts,json}": [
-      "biome check --write --no-errors-on-unmatched"
+      "bunx biome check --write --no-errors-on-unmatched"
     ]
   }
 }
