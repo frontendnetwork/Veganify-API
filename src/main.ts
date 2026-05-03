@@ -12,7 +12,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle("Veganify API")
     .setDescription("API for checking if products and ingredients are vegan")
-    .setVersion("0.3.1")
+    .setVersion("0.5.1")
     .setContact("FrontendNetwork", "https://veganify.app", "info@philip.media")
     .setExternalDoc(
       "Veganify API Documentation",

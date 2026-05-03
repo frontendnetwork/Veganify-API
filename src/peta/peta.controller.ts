@@ -31,7 +31,7 @@ export class PetaController {
   })
   @ApiResponse({
     status: 404,
-    description: "Specified tyoe is not available.",
+    description: "Specified type is not available.",
   })
   @ApiResponse({
     status: 400,
