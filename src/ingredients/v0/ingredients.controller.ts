@@ -37,6 +37,10 @@ export class IngredientsController implements OnModuleInit {
     return list.map((item) => item.toLowerCase());
   }
 
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   private sophisticatedMatch(ingredient: string, list: string[]): boolean {
     const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
 
@@ -44,7 +48,8 @@ export class IngredientsController implements OnModuleInit {
       return true;
     }
 
-    const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
+    const escaped = this.escapeRegex(normalizedIngredient);
+    const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`);
     if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
       return true;
     }
@@ -87,6 +92,18 @@ export class IngredientsController implements OnModuleInit {
     }
 
     const ingredients = this.parseIngredients(ingredientsParam);
+
+    if (ingredients.length === 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          code: "Bad request",
+          message: "No valid ingredients found in the provided list",
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     let targetLanguage: DeeplLanguages = "EN";
 
     const shouldTranslate = translateFlag === true;
@@ -205,7 +222,13 @@ export class IngredientsController implements OnModuleInit {
 
   private parseIngredients(ingredientsString: string): string[] {
     // Decode URI component to handle %20 and other encoded characters
-    const decoded = decodeURIComponent(ingredientsString);
+    // Fall back to the raw string if the input is malformed percent-encoding
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(ingredientsString);
+    } catch {
+      decoded = ingredientsString;
+    }
 
     // Split by comma, trim whitespace, and filter out empty strings
     return decoded

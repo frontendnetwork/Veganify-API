@@ -1,5 +1,9 @@
 import { parentPort, workerData } from "node:worker_threads";
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function sophisticatedMatch(ingredient: string, list: string[]): boolean {
   const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
 
@@ -7,7 +11,8 @@ function sophisticatedMatch(ingredient: string, list: string[]): boolean {
     return true;
   }
 
-  const wordBoundaryRegex = new RegExp(`\\b${normalizedIngredient}\\b`);
+  const escaped = escapeRegex(normalizedIngredient);
+  const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`);
   if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
     return true;
   }

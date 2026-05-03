@@ -103,6 +103,18 @@ export class IngredientsV1Controller implements OnModuleInit {
     }
 
     const ingredients = this.parseIngredients(ingredientsParam);
+
+    if (ingredients.length === 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          code: "Bad request",
+          message: "No valid ingredients found in the provided list",
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     let targetLanguage: DeeplLanguages = "EN";
 
     const shouldTranslate = translateFlag === true;
@@ -223,7 +235,12 @@ export class IngredientsV1Controller implements OnModuleInit {
   }
 
   private parseIngredients(ingredientsString: string): string[] {
-    const decoded = decodeURIComponent(ingredientsString);
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(ingredientsString);
+    } catch {
+      decoded = ingredientsString;
+    }
     return decoded
       .split(",")
       .map((item) => item.trim().toLowerCase())
