@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import { HttpModule } from "@nestjs/axios";
 import { Test, TestingModule } from "@nestjs/testing";
 
 // bun:test does not export Mocked<T> yet; define a local utility
@@ -28,7 +27,6 @@ describe("ProductService", () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
       providers: [
         ProductService,
         {

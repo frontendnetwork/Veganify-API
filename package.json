@@ -36,7 +36,6 @@
     "picomatch": "^4.0.4"
   },
   "dependencies": {
-    "@nestjs/axios": "^4.0.1",
     "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^10.4.16",
     "@nestjs/config": "^4.0.4",
@@ -46,7 +45,6 @@
     "@nestjs/terminus": "^11.1.1",
     "@types/body-parser": "^1.19.6",
     "@types/ini": "^4.1.1",
-    "axios": "^1.13.6",
     "body-parser": "^2.2.2",
     "cache-manager-redis-store": "^3.0.1",
     "cheerio": "^1.2.0",

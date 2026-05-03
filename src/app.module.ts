@@ -1,4 +1,3 @@
-import { HttpModule } from "@nestjs/axios";
 import {
   type MiddlewareConsumer,
   Module,
@@ -26,7 +25,6 @@ import { RedisRateLimiterMiddleware } from "./rate-limiter-redis.middleware";
 @Module({
   imports: [
     HealthModule,
-    HttpModule,
     ConfigModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
