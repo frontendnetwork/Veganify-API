@@ -131,12 +131,18 @@ describe("IngredientsController", () => {
       });
     });
 
-    it("should handle missing ingredients parameter", async () => {
+    it("should throw 400 when ingredients param is empty string", async () => {
       const res = mockResponse();
-
       await expect(controller.getIngredients("", res, false)).rejects.toThrow(
         HttpException
       );
+    });
+
+    it("should throw 400 when ingredient list is all commas (parses to empty)", async () => {
+      const res = mockResponse();
+      await expect(
+        controller.getIngredients(",,,", res, false)
+      ).rejects.toThrow(HttpException);
     });
 
     it("should handle compound ingredients", async () => {
@@ -155,6 +161,30 @@ describe("IngredientsController", () => {
           maybe_vegan: ["soy milk", "egg white"],
         },
       });
+    });
+
+    it("should handle malformed percent-encoding without throwing", async () => {
+      // %GG is invalid percent-encoding — decodeURIComponent would throw URIError
+      // The hardened parseIngredients falls back to the raw string instead
+      const res = mockResponse();
+      await controller.getIngredients("tofu,%GGmilk", res, false);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      // The raw string is used as-is; tofu is still recognised
+      const call = (res.send as ReturnType<typeof mock>).mock.calls[0][0] as {
+        data: { surely_vegan: string[] };
+      };
+      expect(call.data.surely_vegan).toContain("tofu");
+    });
+
+    it("should match ingredients containing regex special characters", async () => {
+      // Before the fix, "(milk)" would throw a RegExp SyntaxError
+      const res = mockResponse();
+      await expect(
+        controller.getIngredients("(milk),tofu", res, false)
+      ).resolves.toBeUndefined();
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     });
   });
 });
