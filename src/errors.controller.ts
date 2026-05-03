@@ -1,13 +1,14 @@
-import fs from "node:fs";
+import { readFile } from "node:fs/promises";
 import {
-  All,
   Controller,
+  Delete,
   Get,
-  HttpException,
   HttpStatus,
   Logger,
   Options,
+  Patch,
   Post,
+  Put,
   Req,
   Res,
 } from "@nestjs/common";
@@ -31,44 +32,29 @@ export class ErrorsController {
     "/v0/spec",
     "/v0/specification",
   ])
-  getOpenApi(@Res() res: Response): void {
-    fs.readFile(
-      "./OpenAPI.yaml",
-      "utf8",
-      (err: NodeJS.ErrnoException | null, contents: string) => {
-        if (err != null) {
-          this.logger.error("Error reading file:", err);
-          throw new HttpException(
-            "Error reading OpenAPI specification",
-            HttpStatus.INTERNAL_SERVER_ERROR
-          );
-        }
-        if (err) {
-          this.logger.error("Error reading file:", err);
-          throw new HttpException(
-            "Error reading OpenAPI specification",
-            HttpStatus.INTERNAL_SERVER_ERROR
-          );
-        }
-        res.setHeader("Content-Type", "text/yaml");
-        res.send(contents);
-      }
-    );
+  async getOpenApi(@Res() res: Response): Promise<void> {
+    try {
+      const contents = await readFile("./OpenAPI.yaml", "utf8");
+      res.setHeader("Content-Type", "text/yaml");
+      res.send(contents);
+    } catch (err) {
+      this.logger.error("Error reading OpenAPI specification:", err);
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ status: 500, error: "Error reading OpenAPI specification" });
+    }
   }
 
   @Get("/.well-known/security.txt")
-  getSecurityTxt(@Res() res: Response): void {
-    fs.readFile(
-      "./.well-known/security.txt",
-      "utf8",
-      (err: NodeJS.ErrnoException | null, contents: string) => {
-        if (err != null) {
-          this.logger.warn(err);
-        }
-        res.setHeader("Content-Type", "text/plain");
-        res.send(contents);
-      }
-    );
+  async getSecurityTxt(@Res() res: Response): Promise<void> {
+    try {
+      const contents = await readFile("./.well-known/security.txt", "utf8");
+      res.setHeader("Content-Type", "text/plain");
+      res.send(contents);
+    } catch (err) {
+      this.logger.warn("security.txt not found or unreadable:", err);
+      res.status(HttpStatus.NOT_FOUND).send("");
+    }
   }
 
   @Post("*")
@@ -95,7 +81,9 @@ export class ErrorsController {
     );
   }
 
-  @All(["PUT", "DELETE", "PATCH", "PROPFIND"])
+  @Put("*")
+  @Delete("*")
+  @Patch("*")
   handleMethodNotAllowed(@Req() req: Request, @Res() res: Response): void {
     this.handleWildcard(req, res, 405, "Method not allowed", "");
   }

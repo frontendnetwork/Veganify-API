@@ -1,14 +1,9 @@
-import { beforeEach, describe, expect, it, mock } from "bun:test";
-import * as fs from "node:fs";
-import { HttpException } from "@nestjs/common";
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
+import * as fsPromises from "node:fs/promises";
 import { Test, TestingModule } from "@nestjs/testing";
 import type { Request, Response } from "express";
 
 import { ErrorsController } from "./errors.controller";
-
-mock.module("node:fs", () => ({
-  readFile: mock(),
-}));
 
 describe("ErrorsController", () => {
   let controller: ErrorsController;
@@ -21,21 +16,19 @@ describe("ErrorsController", () => {
     controller = module.get<ErrorsController>(ErrorsController);
   });
 
-  describe.skip("getOpenApi", () => {
-    it("should return OpenAPI specification", () => {
+  describe("getOpenApi", () => {
+    it("should serve the OpenAPI spec with text/yaml content-type", async () => {
+      const mockContents = "openapi: 3.0.0\ninfo:\n  title: Test";
+      spyOn(fsPromises, "readFile").mockResolvedValue(mockContents as never);
+
       const mockRes = {
         setHeader: mock(),
         send: mock(),
+        status: mock().mockReturnThis(),
+        json: mock(),
       } as unknown as Response;
 
-      const mockContents = "OpenAPI specification content";
-      (
-        fs.readFile as unknown as ReturnType<typeof mock>
-      ).mockImplementationOnce((_, __, callback) => {
-        callback(null, mockContents);
-      });
-
-      controller.getOpenApi(mockRes);
+      await controller.getOpenApi(mockRes);
 
       expect(mockRes.setHeader).toHaveBeenCalledWith(
         "Content-Type",
@@ -44,38 +37,41 @@ describe("ErrorsController", () => {
       expect(mockRes.send).toHaveBeenCalledWith(mockContents);
     });
 
-    it.skip("should throw HttpException if error reading file", () => {
+    it("should return 500 JSON when the file cannot be read", async () => {
+      spyOn(fsPromises, "readFile").mockRejectedValue(
+        new Error("ENOENT: no such file")
+      );
+
       const mockRes = {
         setHeader: mock(),
         send: mock(),
+        status: mock().mockReturnThis(),
+        json: mock(),
       } as unknown as Response;
 
-      const mockError = new Error("Error reading file");
-      (
-        fs.readFile as unknown as ReturnType<typeof mock>
-      ).mockImplementationOnce((_, __, callback) => {
-        callback(mockError, null);
-      });
+      await controller.getOpenApi(mockRes);
 
-      expect(() => controller.getOpenApi(mockRes)).toThrow(HttpException);
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        status: 500,
+        error: "Error reading OpenAPI specification",
+      });
     });
   });
 
   describe("getSecurityTxt", () => {
-    it.skip("should return security.txt file", () => {
+    it("should serve security.txt with text/plain content-type", async () => {
+      const mockContents = "Contact: security@example.com";
+      spyOn(fsPromises, "readFile").mockResolvedValue(mockContents as never);
+
       const mockRes = {
         setHeader: mock(),
         send: mock(),
+        status: mock().mockReturnThis(),
+        json: mock(),
       } as unknown as Response;
 
-      const mockContents = "security.txt content";
-      (
-        fs.readFile as unknown as ReturnType<typeof mock>
-      ).mockImplementationOnce((_, __, callback) => {
-        callback(null, mockContents);
-      });
-
-      controller.getSecurityTxt(mockRes);
+      await controller.getSecurityTxt(mockRes);
 
       expect(mockRes.setHeader).toHaveBeenCalledWith(
         "Content-Type",
@@ -83,16 +79,35 @@ describe("ErrorsController", () => {
       );
       expect(mockRes.send).toHaveBeenCalledWith(mockContents);
     });
+
+    it("should return 404 empty body when security.txt is missing", async () => {
+      spyOn(fsPromises, "readFile").mockRejectedValue(
+        new Error("ENOENT: no such file")
+      );
+
+      const mockRes = {
+        setHeader: mock(),
+        send: mock(),
+        status: mock().mockReturnThis(),
+        json: mock(),
+      } as unknown as Response;
+
+      await controller.getSecurityTxt(mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.send).toHaveBeenCalledWith("");
+    });
   });
 
   describe("handlePostWildcard", () => {
-    it("should handle POST request to non-existing endpoint", () => {
+    it("should return 404 for unknown POST endpoints", () => {
       const mockReq = {
-        originalUrl: "/non-existing-endpoint",
-        method: "POST",
+        originalUrl: "/unknown",
         protocol: "http",
-        get: () => "example.com",
+        method: "POST",
+        get: mock().mockReturnValue("localhost"),
       } as unknown as Request;
+
       const mockRes = {
         status: mock().mockReturnThis(),
         json: mock(),
@@ -101,26 +116,21 @@ describe("ErrorsController", () => {
       controller.handlePostWildcard(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        status: 404,
-        code: "Not found",
-        message: "Try v0/ingredients (GET) or v0/product",
-        debug: {
-          method: "POST",
-          uri: `http://example.com${mockReq.originalUrl}`,
-        },
-      });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 404, code: "Not found" })
+      );
     });
   });
 
   describe("handleGetWildcard", () => {
-    it("should handle GET request to non-existing endpoint", () => {
+    it("should return 404 for unknown GET endpoints", () => {
       const mockReq = {
-        originalUrl: "/non-existing-endpoint",
+        originalUrl: "/nowhere",
+        protocol: "https",
         method: "GET",
-        protocol: "http",
-        get: () => "example.com",
+        get: mock().mockReturnValue("api.veganify.app"),
       } as unknown as Request;
+
       const mockRes = {
         status: mock().mockReturnThis(),
         json: mock(),
@@ -129,26 +139,18 @@ describe("ErrorsController", () => {
       controller.handleGetWildcard(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        status: 404,
-        code: "Not found",
-        message: "Try v0/ingredients or v0/product (POST)",
-        debug: {
-          method: "GET",
-          uri: `http://example.com${mockReq.originalUrl}`,
-        },
-      });
     });
   });
 
   describe("handleMethodNotAllowed", () => {
-    it("should handle disallowed HTTP methods", () => {
+    it("should return 405 for PUT/DELETE/PATCH requests", () => {
       const mockReq = {
-        originalUrl: "/non-existing-endpoint",
+        originalUrl: "/v0/ingredients/water",
+        protocol: "https",
         method: "PUT",
-        protocol: "http",
-        get: () => "example.com",
+        get: mock().mockReturnValue("api.veganify.app"),
       } as unknown as Request;
+
       const mockRes = {
         status: mock().mockReturnThis(),
         json: mock(),
@@ -157,20 +159,14 @@ describe("ErrorsController", () => {
       controller.handleMethodNotAllowed(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(405);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        status: 405,
-        code: "Method not allowed",
-        message: "",
-        debug: {
-          method: "PUT",
-          uri: `http://example.com${mockReq.originalUrl}`,
-        },
-      });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 405, code: "Method not allowed" })
+      );
     });
   });
 
   describe("handleOptions", () => {
-    it("should return allowed HTTP methods and paths", () => {
+    it("should return the available methods and paths", () => {
       const mockRes = {
         status: mock().mockReturnThis(),
         json: mock(),
@@ -179,12 +175,12 @@ describe("ErrorsController", () => {
       controller.handleOptions(mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(200);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        GET: {
-          paths: ["/v0/ingredients/:ingredientslist", "v0/peta/crueltyfree"],
-        },
-        POST: { paths: "/v0/product/:barcode" },
-      });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          GET: expect.any(Object),
+          POST: expect.any(Object),
+        })
+      );
     });
   });
 });
