@@ -3,12 +3,12 @@ import {
   Controller,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
   Res,
 } from "@nestjs/common";
 import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
-import { lastValueFrom } from "rxjs";
 import { BarcodeDto } from "./dtos/BarcodeDto";
 import { backendResponseDto } from "./dtos/backendResponseDto";
 import { GradesService } from "./grades.service";
@@ -16,6 +16,7 @@ import { GradesService } from "./grades.service";
 @Controller("v0/grades")
 export class GradesController {
   constructor(private gradesService: GradesService) {}
+  private readonly logger = new Logger(GradesController.name);
 
   @Post("backend")
   @ApiResponse({
@@ -52,19 +53,26 @@ export class GradesController {
     }
 
     try {
-      const response = await lastValueFrom(
-        this.gradesService.checkBarcode(barcode)
-      );
+      const data = await this.gradesService.checkBarcode(barcode);
       res.setHeader("Content-Type", "application/json; charset=utf-8");
-      res.send(response?.data);
+      res.send(data);
     } catch (error) {
       const is404 =
         error instanceof Error &&
         "response" in error &&
         (error as { response?: { status?: number } }).response?.status === 404;
       if (is404) {
-        res.send("Sent");
-        await this.gradesService.notifyMissingBarcode(barcode);
+        // Fire-and-forget the notification; don't block the response
+        this.gradesService
+          .notifyMissingBarcode(barcode)
+          .catch((err: unknown) => {
+            this.logger.warn("Failed to notify about missing barcode:", err);
+          });
+        res.status(202).json({
+          status: 202,
+          code: "Accepted",
+          message: "Product not found. It has been queued for review.",
+        });
       } else {
         throw new HttpException(
           "An error happened on the server.",
