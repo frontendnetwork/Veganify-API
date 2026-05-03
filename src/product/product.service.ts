@@ -1,20 +1,41 @@
-import { HttpService } from "@nestjs/axios";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import axios from "axios";
 import * as iconv from "iconv-lite";
 import * as ini from "ini";
-import { firstValueFrom } from "rxjs";
 
 import { CacheService } from "../config/cache.service";
 
+type Nutriscore = "n/a" | "A" | "B" | "C" | "D" | "E" | "F";
+type VeganStatus = boolean | "n/a";
+
+export interface ProductDetails {
+  product: {
+    productname: string;
+    genericname: string;
+    vegan: VeganStatus;
+    vegetarian: VeganStatus;
+    animaltestfree: VeganStatus;
+    palmoil: VeganStatus;
+    nutriscore: Nutriscore;
+    grade: string;
+  };
+  sources: {
+    processed: boolean;
+    api: string;
+    baseuri: string;
+    edituri: string;
+  };
+  status: number;
+}
+
+const FETCH_TIMEOUT_MS = 8000;
+
 @Injectable()
 export class ProductService {
-  constructor(
-    private httpService: HttpService,
-    private cacheService: CacheService
-  ) {}
+  constructor(private cacheService: CacheService) {}
 
-  async fetchProductDetails(barcode: string) {
+  async fetchProductDetails(barcode: string): Promise<ProductDetails> {
     const cacheKey = this.cacheService.generateProductKey(barcode);
 
     return this.cacheService.getOrSet(
@@ -24,7 +45,9 @@ export class ProductService {
     );
   }
 
-  private async fetchProductDetailsFromAPIs(barcode: string) {
+  private async fetchProductDetailsFromAPIs(
+    barcode: string
+  ): Promise<ProductDetails> {
     let productname = "n/a";
     let genericname = "n/a";
     let vegan: boolean | "n/a" = "n/a";
@@ -46,64 +69,76 @@ export class ProductService {
     ]);
 
     // Process grade data
-    if (gradeData !== "404" && gradeData && gradeData.grade) {
-      grade = gradeData.grade;
-      productname = gradeData.name;
+    if (
+      gradeData !== "404" &&
+      gradeData &&
+      (gradeData as { grade?: string }).grade
+    ) {
+      grade = (gradeData as { grade: string }).grade;
+      productname = (gradeData as { name: string }).name;
     }
 
     // Process OpenFoodFacts data
-    if (openFoodFactsResponse.status === 1) {
-      const product = openFoodFactsResponse.product;
+    const offData = openFoodFactsResponse as {
+      status: number;
+      product: Record<string, unknown> | null;
+    };
+    if (offData.status === 1) {
+      const product = offData.product as Record<string, unknown>;
       apiname = "OpenFoodFacts";
       baseuri = "https://world.openfoodfacts.org";
-      edituri = product.url;
-      productname = product?.product_name;
-      genericname = product?.generic_name;
+      edituri = product.url as string;
+      productname = product?.product_name as string;
+      genericname = product?.generic_name as string;
 
       if (product.nutriscore_grade) {
-        nutriscore = product?.nutriscore_grade?.toUpperCase();
+        nutriscore = (
+          product?.nutriscore_grade as string
+        )?.toUpperCase() as typeof nutriscore;
       }
 
-      if (product.labels_tags) {
+      const labelsTags = product.labels_tags as string[] | undefined;
+      if (labelsTags) {
         if (
-          product.labels_tags.includes("en:vegan") ||
-          product.labels_tags.includes("de:vegan")
+          labelsTags.includes("en:vegan") ||
+          labelsTags.includes("de:vegan")
         ) {
           vegan = true;
         } else if (
-          product.labels_tags.includes("en:non-vegan") ||
-          product.labels_tags.includes("de:non-vegan")
+          labelsTags.includes("en:non-vegan") ||
+          labelsTags.includes("de:non-vegan")
         ) {
           vegan = false;
         }
 
         if (
-          product.labels_tags.includes("en:vegetarian") ||
-          product.labels_tags.includes("de:vegetarian")
+          labelsTags.includes("en:vegetarian") ||
+          labelsTags.includes("de:vegetarian")
         ) {
           vegetarian = true;
-        } else if (product.labels_tags.includes("en:non-vegetarian")) {
+        } else if (labelsTags.includes("en:non-vegetarian")) {
           vegetarian = false;
         }
 
         if (
-          product.labels_tags.includes("en:palm-oil-free") ||
-          product.labels_tags.includes("de:palmölfrei")
+          labelsTags.includes("en:palm-oil-free") ||
+          labelsTags.includes("de:palmölfrei")
         ) {
           palmoil = false;
         } else if (
-          product.labels_tags.includes("en:palm-oil") ||
-          product.labels_tags.includes("de:palm-oil")
+          labelsTags.includes("en:palm-oil") ||
+          labelsTags.includes("de:palm-oil")
         ) {
           palmoil = true;
         }
       }
 
-      if (product?.product?.brands) {
-        const dnt = petaResponse.PETA_DOES_NOT_TEST;
-        const tester = dnt.toString().toLowerCase();
+      if (product?.brands) {
+        const dnt = (petaResponse as { PETA_DOES_NOT_TEST: string[] })
+          .PETA_DOES_NOT_TEST;
+        const brandLower = (product.brands as string).toLowerCase();
 
-        if (tester.includes(product.product.brands.toLowerCase())) {
+        if (dnt.some((entry: string) => entry.toLowerCase() === brandLower)) {
           animaltestfree = true;
           apiname = "OpenBeautyFacts, PETA Beauty without Bunnies";
         }
@@ -111,7 +146,7 @@ export class ProductService {
     } else {
       // Try OpenEANDB as fallback
       const openEanDbResponse = await this.fetchOpenEanDb(barcode);
-      const array = ini.parse(openEanDbResponse);
+      const array = ini.parse(openEanDbResponse as string);
 
       if (array.error === "0") {
         apiname = "Open EAN Database";
@@ -170,28 +205,22 @@ export class ProductService {
     return this.cacheService.getOrSet(key, fetchFn, ttlSeconds);
   }
 
-  // Extract each API call into its own method
   private async fetchGrade(barcode: string) {
     const key = this.cacheService.generateGradeKey(barcode);
     return this.fetchWithCache(
       key,
       async () => {
-        try {
-          const gradeResponse = await firstValueFrom(
-            this.httpService.get(
-              `https://grades.veganify.app/api/${barcode}.json`
-            )
-          );
-          return gradeResponse?.data;
-        } catch (error) {
-          // If it's a 404, return "404" string as expected by the processing logic
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            return "404";
-          }
-          // Re-throw other errors
-          throw error;
+        const response = await fetch(
+          `https://grades.veganify.app/api/${barcode}.json`,
+          { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
+        );
+        if (response.status === 404) {
+          return "404";
         }
+        if (!response.ok) {
+          throw new Error(`Grades API error: ${response.status}`);
+        }
+        return response.json();
       },
       60 * 60 // Cache grades for 1 hour
     );
@@ -202,20 +231,17 @@ export class ProductService {
     return this.fetchWithCache(
       key,
       async () => {
-        try {
-          const response = await axios.get(
-            `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-          );
-          return response.data; // Extract only the data, not the entire response
-        } catch (error) {
-          // If it's a 404, return a proper response structure
-          const axiosError = error as { response?: { status?: number } };
-          if (axiosError.response?.status === 404) {
-            return { status: 0, product: null };
-          }
-          // Re-throw other errors
-          throw error;
+        const response = await fetch(
+          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
+          { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
+        );
+        if (response.status === 404) {
+          return { status: 0, product: null };
         }
+        if (!response.ok) {
+          throw new Error(`OpenFoodFacts error: ${response.status}`);
+        }
+        return response.json();
       },
       24 * 60 * 60 // Cache for 24 hours
     );
@@ -226,10 +252,9 @@ export class ProductService {
     return this.fetchWithCache(
       key,
       async () => {
-        const response = await axios.get(
-          "https://api.veganify.app/v0/peta/crueltyfree"
-        );
-        return response.data; // Extract only the data, not the entire response
+        const filePath = path.resolve(process.cwd(), "peta_cruelty_free.json");
+        const raw = await readFile(filePath, "utf-8");
+        return JSON.parse(raw);
       },
       24 * 60 * 60 // Cache for 24 hours
     );
@@ -240,12 +265,16 @@ export class ProductService {
     return this.fetchWithCache(
       key,
       async () => {
-        const response = await axios.get(
-          `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`
+        const response = await fetch(
+          `https://opengtindb.org/?ean=${barcode}&cmd=query&queryid=${process.env.USER_ID_OEANDB}`,
+          { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
         );
-        return response.data; // Extract only the data, not the entire response
+        if (!response.ok) {
+          throw new Error(`OpenEANDB error: ${response.status}`);
+        }
+        return response.text(); // Returns INI-formatted text
       },
-      7 * 24 * 60 * 60 // Cache for 7 days (less frequently updated)
+      7 * 24 * 60 * 60 // Cache for 7 days
     );
   }
 }

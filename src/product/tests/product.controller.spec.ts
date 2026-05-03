@@ -4,27 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
 import { ProductController } from "../product.controller";
-import { ProductService } from "../product.service";
-
-interface MockResult {
-  product: {
-    productname: string;
-    genericname: string;
-    vegan: boolean | "n/a";
-    vegetarian: boolean | "n/a";
-    animaltestfree: boolean | "n/a";
-    palmoil: boolean | "n/a";
-    nutriscore: "A" | "B" | "C" | "D" | "E" | "F" | "n/a";
-    grade: string;
-  };
-  sources: {
-    processed: boolean;
-    api: string;
-    baseuri: string;
-    edituri: string;
-  };
-  status: number;
-}
+import { type ProductDetails, ProductService } from "../product.service";
 
 describe("ProductController", () => {
   let controller: ProductController;
@@ -50,7 +30,7 @@ describe("ProductController", () => {
   describe("getProductDetails", () => {
     it("should return product details when barcode is provided", async () => {
       const barcode = "123456789012";
-      const mockResult: MockResult = {
+      const mockResult: ProductDetails = {
         status: 200,
         product: {
           productname: "Product Name",
