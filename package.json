@@ -52,7 +52,7 @@
     "dom-parser": "^1.1.5",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.3.2",
+    "express-rate-limit": "^8.5.2",
     "http": "^0.0.1-security",
     "iconv-lite": "^0.7.2",
     "ini": "^7.0.0",
