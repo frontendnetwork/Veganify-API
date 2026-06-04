@@ -11,20 +11,18 @@ jobs:
 
     steps:
     - name: Checkout repo on main branch
-      uses: actions/checkout@v6
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # actions/checkout@v6
       with:
         ref: main
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: '18.17'
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # oven-sh/setup-bun@v2
 
     - name: Install dependencies
-      run: npm install axios cheerio qs jsdom
+      run: bun install --frozen-lockfile
 
     - name: Fetch PETA Data and Save
-      run: node ${{ github.workspace }}/.github/scripts/peta-cron.js
+      run: bun ${{ github.workspace }}/.github/scripts/peta-cron.js
 
     - name: Commit and push if there are changes
       run: |
