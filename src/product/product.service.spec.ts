@@ -1,5 +1,12 @@
-import { HttpModule } from "@nestjs/axios";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { Test, TestingModule } from "@nestjs/testing";
+
+// bun:test does not export Mocked<T> yet; define a local utility
+type Mocked<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? ReturnType<typeof mock> & T[K]
+    : T[K];
+};
 
 import { CacheService } from "../config/cache.service";
 
@@ -7,20 +14,19 @@ import { ProductService } from "./product.service";
 
 describe("ProductService", () => {
   let service: ProductService;
-  let cacheService: jest.Mocked<CacheService>;
+  let cacheService: Mocked<CacheService>;
 
   beforeEach(async () => {
     const mockCacheService = {
-      getOrSet: jest.fn(),
-      generateProductKey: jest.fn(),
-      generateGradeKey: jest.fn(),
-      generatePetaKey: jest.fn(),
-      generateOpenFoodFactsKey: jest.fn(),
-      generateOpenEANDBKey: jest.fn(),
+      getOrSet: mock(),
+      generateProductKey: mock(),
+      generateGradeKey: mock(),
+      generatePetaKey: mock(),
+      generateOpenFoodFactsKey: mock(),
+      generateOpenEANDBKey: mock(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
       providers: [
         ProductService,
         {
@@ -67,5 +73,5 @@ describe("ProductService", () => {
     expect(result).toHaveProperty("product");
     expect(result).toHaveProperty("sources");
     expect(cacheService.getOrSet).toHaveBeenCalled();
-  }, 15000);
+  }, 15_000);
 });

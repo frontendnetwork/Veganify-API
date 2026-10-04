@@ -1,9 +1,17 @@
-import fs from "fs";
-import { promisify } from "util";
+import fs from "node:fs";
+import { promisify } from "node:util";
 
 const readFileAsync = promisify(fs.readFile);
 
 export async function readJsonFile<T>(filePath: string): Promise<T> {
   const data = await readFileAsync(filePath, "utf-8");
-  return JSON.parse(data) as T;
+  try {
+    return JSON.parse(data) as T;
+  } catch (err) {
+    throw new Error(
+      `Failed to parse JSON from ${filePath}: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+  }
 }

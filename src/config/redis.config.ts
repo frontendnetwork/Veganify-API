@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 export interface RedisConfig {
-  host: string;
-  port: number;
-  password?: string;
   db?: number;
-  retryDelayOnFailover?: number;
-  maxRetriesPerRequest?: number;
+  host: string;
   lazyConnect?: boolean;
+  maxRetriesPerRequest?: number;
+  password?: string;
+  port: number;
+  retryDelayOnFailover?: number;
 }
 
 @Injectable()

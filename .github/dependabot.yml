@@ -1,6 +1,13 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+
+  # Maintain dependencies for bun
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -8,6 +8,7 @@
     "target": "ES2017",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,10 +18,5 @@
     "noEmitOnError": true
   },
   "exclude": ["node_modules"],
-  "include": [
-    "./src/**/*.ts",
-    "jest.config.js",
-    "tests/**/*.js",
-    "tests/**/*.ts"
-  ]
+  "include": ["./src/**/*.ts"]
 }

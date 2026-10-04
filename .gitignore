@@ -9,3 +9,4 @@ affinity/
 dist/
 coverage/
 .pi-lens/
+docs/agents/*

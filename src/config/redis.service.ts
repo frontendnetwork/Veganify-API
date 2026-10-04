@@ -1,10 +1,10 @@
 import {
   Injectable,
   Logger,
-  OnModuleInit,
-  OnModuleDestroy,
+  type OnModuleDestroy,
+  type OnModuleInit,
 } from "@nestjs/common";
-import { createClient, RedisClientType } from "redis";
+import { createClient, type RedisClientType } from "redis";
 
 import { RedisConfigService } from "./redis.config";
 
@@ -61,7 +61,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    if (this.client && this.client.isOpen) {
+    if (this.client?.isOpen) {
       await this.client.quit();
       this.logger.log("Redis connection closed");
     }

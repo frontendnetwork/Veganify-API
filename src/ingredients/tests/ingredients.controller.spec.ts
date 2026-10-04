@@ -1,22 +1,32 @@
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
+
+// bun:test does not export Mocked<T> yet; define a local utility
+type Mocked<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? ReturnType<typeof mock> & T[K]
+    : T[K];
+};
 
 import { TranslationService } from "../shared/services/translation.service";
 import * as jsonFileReader from "../shared/utils/jsonFileReader";
 import { IngredientsController } from "../v0/ingredients.controller";
 
-jest.mock("../shared/utils/jsonFileReader");
+mock.module("../shared/utils/jsonFileReader", () => ({
+  readJsonFile: mock(),
+}));
 
 describe("IngredientsController", () => {
   let controller: IngredientsController;
-  let translationService: jest.Mocked<TranslationService>;
+  let translationService: Mocked<TranslationService>;
 
   const mockResponse = () => {
     const res: Partial<Response> = {};
-    res.status = jest.fn().mockReturnValue(res);
-    res.send = jest.fn().mockReturnValue(res);
-    res.setHeader = jest.fn().mockReturnValue(res);
+    res.status = mock().mockReturnValue(res);
+    res.send = mock().mockReturnValue(res);
+    res.setHeader = mock().mockReturnValue(res);
     return res as Response;
   };
 
@@ -27,7 +37,7 @@ describe("IngredientsController", () => {
         {
           provide: TranslationService,
           useValue: {
-            translateText: jest.fn(),
+            translateText: mock(),
           },
         },
       ],
@@ -36,18 +46,19 @@ describe("IngredientsController", () => {
     controller = module.get<IngredientsController>(IngredientsController);
     translationService = module.get(
       TranslationService
-    ) as jest.Mocked<TranslationService>;
+    ) as Mocked<TranslationService>;
 
-    jest
-      .spyOn(jsonFileReader, "readJsonFile")
-      .mockImplementation((filename: string) => {
+    spyOn(jsonFileReader, "readJsonFile").mockImplementation(
+      (filename: string): Promise<any> => {
         if (filename === "./isnotvegan.json") {
           return Promise.resolve(["milk", "egg"]);
-        } else if (filename === "./isvegan.json") {
+        }
+        if (filename === "./isvegan.json") {
           return Promise.resolve(["tofu", "soy"]);
         }
         return Promise.resolve([]);
-      });
+      }
+    );
 
     await controller.onModuleInit();
   });
@@ -120,12 +131,18 @@ describe("IngredientsController", () => {
       });
     });
 
-    it("should handle missing ingredients parameter", async () => {
+    it("should throw 400 when ingredients param is empty string", async () => {
       const res = mockResponse();
-
       await expect(controller.getIngredients("", res, false)).rejects.toThrow(
         HttpException
       );
+    });
+
+    it("should throw 400 when ingredient list is all commas (parses to empty)", async () => {
+      const res = mockResponse();
+      await expect(
+        controller.getIngredients(",,,", res, false)
+      ).rejects.toThrow(HttpException);
     });
 
     it("should handle compound ingredients", async () => {
@@ -144,6 +161,30 @@ describe("IngredientsController", () => {
           maybe_vegan: ["soy milk", "egg white"],
         },
       });
+    });
+
+    it("should handle malformed percent-encoding without throwing", async () => {
+      // %GG is invalid percent-encoding — decodeURIComponent would throw URIError
+      // The hardened parseIngredients falls back to the raw string instead
+      const res = mockResponse();
+      await controller.getIngredients("tofu,%GGmilk", res, false);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      // The raw string is used as-is; tofu is still recognised
+      const call = (res.send as ReturnType<typeof mock>).mock.calls[0][0] as {
+        data: { surely_vegan: string[] };
+      };
+      expect(call.data.surely_vegan).toContain("tofu");
+    });
+
+    it("should match ingredients containing regex special characters", async () => {
+      // Before the fix, "(milk)" would throw a RegExp SyntaxError
+      const res = mockResponse();
+      await expect(
+        controller.getIngredients("(milk),tofu", res, false)
+      ).resolves.toBeUndefined();
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     });
   });
 });

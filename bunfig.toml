@@ -1,0 +1,8 @@
+[install]
+# Only install package versions published at least 2 days ago.
+minimumReleaseAge = 172800
+
+[test]
+preload = ["./src/tests/setup.ts"]
+include = ["**/*.spec.ts"]
+exclude = ["node_modules", "dist"]

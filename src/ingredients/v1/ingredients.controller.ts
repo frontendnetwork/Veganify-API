@@ -1,26 +1,25 @@
-import * as path from "path";
-import { Worker } from "worker_threads";
-
+import * as path from "node:path";
+import { Worker } from "node:worker_threads";
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  type OnModuleInit,
   Param,
   Query,
   Res,
-  HttpStatus,
-  HttpException,
-  Logger,
-  OnModuleInit,
 } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { DeeplLanguages } from "deepl";
-import { Response } from "express";
+import type { DeeplLanguages } from "deepl";
+import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
 
-import { V1ResponseData } from "./dto/response.dto";
+import type { V1ResponseData } from "./dto/response.dto";
 
 @Controller("v1/ingredients")
 export class IngredientsV1Controller implements OnModuleInit {
@@ -104,6 +103,18 @@ export class IngredientsV1Controller implements OnModuleInit {
     }
 
     const ingredients = this.parseIngredients(ingredientsParam);
+
+    if (ingredients.length === 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          code: "Bad request",
+          message: "No valid ingredients found in the provided list",
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     let targetLanguage: DeeplLanguages = "EN";
 
     const shouldTranslate = translateFlag === true;
@@ -224,7 +235,12 @@ export class IngredientsV1Controller implements OnModuleInit {
   }
 
   private parseIngredients(ingredientsString: string): string[] {
-    const decoded = decodeURIComponent(ingredientsString);
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(ingredientsString);
+    } catch {
+      decoded = ingredientsString;
+    }
     return decoded
       .split(",")
       .map((item) => item.trim().toLowerCase())
