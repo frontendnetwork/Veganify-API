@@ -14,5 +14,6 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production --ignore-scripts
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/isvegan.json /app/isnotvegan.json /app/ismaybenotvegan.json /app/peta_cruelty_free.json ./
 EXPOSE 8080
 CMD ["bun", "dist/main.js"]

@@ -34,6 +34,14 @@ The following endpoints are available within the Veganify API:
 
 ## Development
 
+Use Bun for installation and scripts. Node-based tooling requires Node 22.22.3+, 24.15+, or 26+; these are the versions supported by the Nest 12 schematics.
+
+TypeScript intentionally stays on 6.x. TypeScript 7.0 ships only the native `tsc` executable, without the compiler API required by Nest CLI 12. Upgrading to 7.0 breaks `nest build`; Swagger 12 also declares TypeScript 5.5/6 peer support.
+
+Ultracite is pinned to 7.8.3. Version 7.12.2 introduces `braces` 3.0.3 through `fast-glob`, which is affected by [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (`braces <=3.0.3`). Revisit this tooling update when it no longer introduces that advisory.
+
+Dependency updates preserve the 48-hour minimum release age configured in `bunfig.toml`. A newer release shown by `bun outdated` may therefore be intentionally held back.
+
 To run the API locally, you first need to set up the environment variables. You can do this by creating a `.env` file based on the `.env.example` file.
 Here, you need to set `DEEPL_AUTH` to a valid DeepL API key (you can get one [here](https://www.deepl.com/docs-api/) for free), `PUSHOVER_TOKEN` and `PUSHOVER_USER` can be left blank, and `USER_ID_OEANDB` to your OpenEANDB user key.
 For Development purposes, you can just provide a dummy value for the `USER_ID_OEANDB` key.
@@ -41,11 +49,11 @@ For Development purposes, you can just provide a dummy value for the `USER_ID_OE
 After setting up the `.env` file, you can run the following commands to get everything up and running:
 
 ```bash
-npm install
-npm run start:dev
+bun install --frozen-lockfile
+bun run start:dev
 ```
 
-Before committing any changes, you need to make sure that your code passes the linter and the tests. Run `npm run lint` and `npm run test` to check if everything is ok.
+Before committing changes, run `bun run check` (lint, typecheck, and tests) and `bun run build`.
 
 ### Updating the Vegan and Non-Vegan ingredient lists
 
