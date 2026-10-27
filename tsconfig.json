@@ -6,6 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES2017",
+    "lib": ["ES2017", "ES2022.Error"],
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",

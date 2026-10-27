@@ -31,29 +31,29 @@ describe("ProductController", () => {
     it("should return product details when barcode is provided", async () => {
       const barcode = "123456789012";
       const mockResult: ProductDetails = {
-        status: 200,
         product: {
-          productname: "Product Name",
+          animaltestfree: false,
           genericname: "Generic Name",
+          grade: "Grade A",
+          nutriscore: "B",
+          palmoil: "n/a",
+          productname: "Product Name",
           vegan: true,
           vegetarian: "n/a",
-          animaltestfree: false,
-          palmoil: "n/a",
-          nutriscore: "B",
-          grade: "Grade A",
         },
         sources: {
-          processed: false,
           api: "Test API",
           baseuri: "https://test.com",
           edituri: "https://test.com/edit",
+          processed: false,
         },
+        status: 200,
       };
       spyOn(service, "fetchProductDetails").mockResolvedValue(mockResult);
 
       const mockRes = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getProductDetails(barcode, mockRes);
@@ -69,8 +69,8 @@ describe("ProductController", () => {
       spyOn(service, "fetchProductDetails").mockRejectedValue(error);
 
       const res = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getProductDetails(barcode, res);
@@ -78,8 +78,8 @@ describe("ProductController", () => {
       expect(service.fetchProductDetails).toHaveBeenCalledWith(barcode);
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
-        status: 404,
         error: "Product not found",
+        status: 404,
       });
     });
 
@@ -89,8 +89,8 @@ describe("ProductController", () => {
       spyOn(service, "fetchProductDetails").mockRejectedValue(error);
 
       const res = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getProductDetails(barcode, res);
@@ -98,8 +98,8 @@ describe("ProductController", () => {
       expect(service.fetchProductDetails).toHaveBeenCalledWith(barcode);
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        status: 500,
         error: "Internal server error",
+        status: 500,
       });
     });
   });

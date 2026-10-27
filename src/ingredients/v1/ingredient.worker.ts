@@ -47,9 +47,9 @@ if (parentPort) {
   );
 
   parentPort.postMessage({
-    notVeganResult,
     maybeNotVeganResult,
-    veganResult,
+    notVeganResult,
     unknownResult,
+    veganResult,
   });
 }

@@ -55,8 +55,8 @@ export class IngredientsV1Controller implements OnModuleInit {
         {
           workerData: {
             ingredients,
-            isNotVegan: this.isNotVegan,
             isMaybeNotVegan: this.isMaybeNotVegan,
+            isNotVegan: this.isNotVegan,
             isVegan: this.isVegan,
           },
         }
@@ -75,13 +75,13 @@ export class IngredientsV1Controller implements OnModuleInit {
   @Get(":ingredients")
   @ApiTags("Ingredients")
   @ApiResponse({
-    status: 200,
     description:
       "Request returned a positive result. If translation fails, results will be based on untranslated ingredients.",
+    status: 200,
   })
   @ApiResponse({
-    status: 500,
     description: "Internal Server Error.",
+    status: 500,
   })
   async getIngredients(
     @Param("ingredients") ingredientsParam: string,
@@ -94,9 +94,9 @@ export class IngredientsV1Controller implements OnModuleInit {
     if (!ingredientsParam) {
       throw new HttpException(
         {
-          status: HttpStatus.BAD_REQUEST,
           code: "Bad request",
           message: "Missing argument v1/ingredients/:ingredients",
+          status: HttpStatus.BAD_REQUEST,
         },
         HttpStatus.BAD_REQUEST
       );
@@ -107,9 +107,9 @@ export class IngredientsV1Controller implements OnModuleInit {
     if (ingredients.length === 0) {
       throw new HttpException(
         {
-          status: HttpStatus.BAD_REQUEST,
           code: "Bad request",
           message: "No valid ingredients found in the provided list",
+          status: HttpStatus.BAD_REQUEST,
         },
         HttpStatus.BAD_REQUEST
       );
@@ -228,8 +228,8 @@ export class IngredientsV1Controller implements OnModuleInit {
       this.logger.error(`Error processing request: ${error}`);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         code: "Internal Server Error",
-        status: "500",
         message: "An error occurred while processing the request",
+        status: "500",
       });
     }
   }
@@ -255,21 +255,21 @@ export class IngredientsV1Controller implements OnModuleInit {
     unknownItems: string[]
   ) {
     const responseData: V1ResponseData = {
+      maybe_not_vegan: maybeNotVeganItems,
+      not_vegan: notVeganItems,
+      surely_vegan: veganItems,
+      unknown: unknownItems,
       vegan:
         notVeganItems.length === 0 &&
         maybeNotVeganItems.length === 0 &&
         unknownItems.length === 0,
-      surely_vegan: veganItems,
-      not_vegan: notVeganItems,
-      maybe_not_vegan: maybeNotVeganItems,
-      unknown: unknownItems,
     };
 
     res.status(HttpStatus.OK).send({
       code: "OK",
-      status: "200",
-      message: "Success",
       data: responseData,
+      message: "Success",
+      status: "200",
     });
   }
 }

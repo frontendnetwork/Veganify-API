@@ -22,10 +22,10 @@ describe("ErrorsController", () => {
       spyOn(fsPromises, "readFile").mockResolvedValue(mockContents as never);
 
       const mockRes = {
-        setHeader: mock(),
-        send: mock(),
-        status: mock().mockReturnThis(),
         json: mock(),
+        send: mock(),
+        setHeader: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getOpenApi(mockRes);
@@ -43,18 +43,18 @@ describe("ErrorsController", () => {
       );
 
       const mockRes = {
-        setHeader: mock(),
-        send: mock(),
-        status: mock().mockReturnThis(),
         json: mock(),
+        send: mock(),
+        setHeader: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getOpenApi(mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
-        status: 500,
         error: "Error reading OpenAPI specification",
+        status: 500,
       });
     });
   });
@@ -65,10 +65,10 @@ describe("ErrorsController", () => {
       spyOn(fsPromises, "readFile").mockResolvedValue(mockContents as never);
 
       const mockRes = {
-        setHeader: mock(),
-        send: mock(),
-        status: mock().mockReturnThis(),
         json: mock(),
+        send: mock(),
+        setHeader: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getSecurityTxt(mockRes);
@@ -86,10 +86,10 @@ describe("ErrorsController", () => {
       );
 
       const mockRes = {
-        setHeader: mock(),
-        send: mock(),
-        status: mock().mockReturnThis(),
         json: mock(),
+        send: mock(),
+        setHeader: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       await controller.getSecurityTxt(mockRes);
@@ -102,22 +102,22 @@ describe("ErrorsController", () => {
   describe("handlePostWildcard", () => {
     it("should return 404 for unknown POST endpoints", () => {
       const mockReq = {
+        get: mock().mockReturnValue("localhost"),
+        method: "POST",
         originalUrl: "/unknown",
         protocol: "http",
-        method: "POST",
-        get: mock().mockReturnValue("localhost"),
       } as unknown as Request;
 
       const mockRes = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       controller.handlePostWildcard(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 404, code: "Not found" })
+        expect.objectContaining({ code: "Not found", status: 404 })
       );
     });
   });
@@ -125,15 +125,15 @@ describe("ErrorsController", () => {
   describe("handleGetWildcard", () => {
     it("should return 404 for unknown GET endpoints", () => {
       const mockReq = {
+        get: mock().mockReturnValue("api.veganify.app"),
+        method: "GET",
         originalUrl: "/nowhere",
         protocol: "https",
-        method: "GET",
-        get: mock().mockReturnValue("api.veganify.app"),
       } as unknown as Request;
 
       const mockRes = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       controller.handleGetWildcard(mockReq, mockRes);
@@ -145,22 +145,22 @@ describe("ErrorsController", () => {
   describe("handleMethodNotAllowed", () => {
     it("should return 405 for PUT/DELETE/PATCH requests", () => {
       const mockReq = {
+        get: mock().mockReturnValue("api.veganify.app"),
+        method: "PUT",
         originalUrl: "/v0/ingredients/water",
         protocol: "https",
-        method: "PUT",
-        get: mock().mockReturnValue("api.veganify.app"),
       } as unknown as Request;
 
       const mockRes = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       controller.handleMethodNotAllowed(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(405);
       expect(mockRes.json).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 405, code: "Method not allowed" })
+        expect.objectContaining({ code: "Method not allowed", status: 405 })
       );
     });
   });
@@ -168,8 +168,8 @@ describe("ErrorsController", () => {
   describe("handleOptions", () => {
     it("should return the available methods and paths", () => {
       const mockRes = {
-        status: mock().mockReturnThis(),
         json: mock(),
+        status: mock().mockReturnThis(),
       } as unknown as Response;
 
       controller.handleOptions(mockRes);

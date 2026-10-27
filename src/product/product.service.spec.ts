@@ -18,12 +18,12 @@ describe("ProductService", () => {
 
   beforeEach(async () => {
     const mockCacheService = {
-      getOrSet: mock(),
-      generateProductKey: mock(),
       generateGradeKey: mock(),
-      generatePetaKey: mock(),
-      generateOpenFoodFactsKey: mock(),
       generateOpenEANDBKey: mock(),
+      generateOpenFoodFactsKey: mock(),
+      generatePetaKey: mock(),
+      generateProductKey: mock(),
+      getOrSet: mock(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -45,23 +45,23 @@ describe("ProductService", () => {
 
     // Mock the cache service to return a sample product
     const mockProduct = {
-      status: 200,
       product: {
-        productname: "Test Product",
+        animaltestfree: false,
         genericname: "Test Generic",
+        grade: "A+",
+        nutriscore: "A",
+        palmoil: false,
+        productname: "Test Product",
         vegan: true,
         vegetarian: true,
-        animaltestfree: false,
-        palmoil: false,
-        nutriscore: "A",
-        grade: "A+",
       },
       sources: {
-        processed: false,
         api: "Test API",
         baseuri: "https://test.com",
         edituri: "https://test.com/edit",
+        processed: false,
       },
+      status: 200,
     };
 
     cacheService.generateProductKey.mockReturnValue(`product:${barcode}`);

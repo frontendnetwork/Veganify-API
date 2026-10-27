@@ -17,13 +17,13 @@ export class RedisConfigService {
 
   getRedisConfig(): RedisConfig {
     return {
-      host: this.configService.get<string>("REDIS_HOST", "localhost"),
-      port: this.configService.get<number>("REDIS_PORT", 6379),
-      password: this.configService.get<string>("REDIS_PASSWORD"),
       db: 0,
-      retryDelayOnFailover: 100,
-      maxRetriesPerRequest: 3,
+      host: this.configService.get<string>("REDIS_HOST", "localhost"),
       lazyConnect: true,
+      maxRetriesPerRequest: 3,
+      password: this.configService.get<string>("REDIS_PASSWORD"),
+      port: this.configService.get<number>("REDIS_PORT", 6379),
+      retryDelayOnFailover: 100,
     };
   }
 

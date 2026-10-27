@@ -74,8 +74,10 @@ export class ProductService {
       gradeData &&
       (gradeData as { grade?: string }).grade
     ) {
-      grade = (gradeData as { grade: string }).grade;
-      productname = (gradeData as { name: string }).name;
+      ({ grade, name: productname } = gradeData as {
+        grade: string;
+        name: string;
+      });
     }
 
     // Process OpenFoodFacts data
@@ -88,13 +90,13 @@ export class ProductService {
       apiname = "OpenFoodFacts";
       baseuri = "https://world.openfoodfacts.org";
       edituri = product.url as string;
-      productname = product?.product_name as string;
-      genericname = product?.generic_name as string;
+      productname = product.product_name as string;
+      genericname = product.generic_name as string;
 
       if (product.nutriscore_grade) {
         nutriscore = (
-          product?.nutriscore_grade as string
-        )?.toUpperCase() as typeof nutriscore;
+          product.nutriscore_grade as string
+        ).toUpperCase() as typeof nutriscore;
       }
 
       const labelsTags = product.labels_tags as string[] | undefined;
@@ -133,7 +135,7 @@ export class ProductService {
         }
       }
 
-      if (product?.brands) {
+      if (product.brands) {
         const dnt = (petaResponse as { PETA_DOES_NOT_TEST: string[] })
           .PETA_DOES_NOT_TEST;
         const brandLower = (product.brands as string).toLowerCase();
@@ -159,12 +161,20 @@ export class ProductService {
           )
           .toString();
 
-        const contents = array.contents;
-        if (contents != null && contents >= "128" && contents < "256") {
+        const { contents } = array;
+        if (
+          contents !== null &&
+          contents !== undefined &&
+          contents >= "128" &&
+          contents < "256"
+        ) {
           vegan = false;
           vegetarian = true;
         } else if (
-          (contents != null && contents >= "256" && contents < "384") ||
+          (contents !== null &&
+            contents !== undefined &&
+            contents >= "256" &&
+            contents < "384") ||
           (contents >= "384" && contents < "512")
         ) {
           vegan = true;
@@ -176,23 +186,23 @@ export class ProductService {
     }
 
     return {
-      status: 200,
       product: {
-        productname,
+        animaltestfree,
         genericname,
+        grade,
+        nutriscore,
+        palmoil,
+        productname,
         vegan,
         vegetarian,
-        animaltestfree,
-        palmoil,
-        nutriscore,
-        grade,
       },
       sources: {
-        processed,
         api: apiname,
         baseuri,
         edituri,
+        processed,
       },
+      status: 200,
     };
   }
 
@@ -236,7 +246,7 @@ export class ProductService {
           { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
         );
         if (response.status === 404) {
-          return { status: 0, product: null };
+          return { product: null, status: 0 };
         }
         if (!response.ok) {
           throw new Error(`OpenFoodFacts error: ${response.status}`);

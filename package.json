@@ -2,37 +2,41 @@
   "name": "veganify-api",
   "version": "0.5.1",
   "description": "Veganify API",
+  "license": "MIT",
+  "author": "JokeNetwork, Veganify Contributors",
   "main": "dist/app.js",
-  "packageManager": "bun",
   "scripts": {
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "bun dist/main.js",
     "build": "nest build",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
+    "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"bun run lint\" \"tsc --noEmit -p tsconfig.build.json\" \"bun test --concurrent --timeout=10000 --reporter=dots --bail\"",
     "check:code": "bunx ultracite check",
     "get:peta": "node .github/scripts/peta-cron.js",
-    "test": "bun test --concurrent --timeout=10000 --reporter=dots",
-    "test:cov": "bun test --coverage",
-    "process:ingredients": "bun scripts/processIngredients.js",
-    "process:vegan": "bun run process:ingredients ../isvegan.json",
-    "process:notvegan": "bun run process:ingredients ../isnotvegan.json",
-    "process:maybenotvegan": "bun run process:ingredients ../ismaybenotvegan.json",
+    "lint": "bunx biome check .",
+    "lint:fix": "bunx biome check --write .",
+    "prepare": "husky",
     "process:all": "concurrently --names \"vegan,not vegan,maybe vegan\" --prefix-colors \"green,red,yellow\" \"bun run process:vegan\" \"bun run process:notvegan\" \"bun run process:maybenotvegan\"",
-    "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"bun run lint\" \"tsc --noEmit -p tsconfig.build.json\" \"bun test --concurrent --timeout=10000 --reporter=dots --bail\"",
-    "prepare": "husky"
+    "process:ingredients": "bun scripts/processIngredients.js",
+    "process:maybenotvegan": "bun run process:ingredients ../ismaybenotvegan.json",
+    "process:notvegan": "bun run process:ingredients ../isnotvegan.json",
+    "process:vegan": "bun run process:ingredients ../isvegan.json",
+    "start": "nest start",
+    "start:debug": "nest start --debug --watch",
+    "start:dev": "nest start --watch",
+    "start:prod": "bun dist/main.js",
+    "test": "bun test --concurrent --timeout=10000 --reporter=dots",
+    "test:cov": "bun test --coverage"
   },
-  "author": "JokeNetwork, Veganify Contributors",
-  "license": "MIT",
+  "lint-staged": {
+    "*.{js,ts,json}": [
+      "bunx biome check --write --no-errors-on-unmatched"
+    ]
+  },
   "overrides": {
+    "axios": "^1.20.0",
+    "flatted": "^3.4.2",
     "handlebars": "^4.7.9",
     "lodash": "^4.18.1",
-    "axios": "^1.20.0",
-    "undici": "^7.24.0",
-    "flatted": "^3.4.2",
-    "picomatch": "^4.0.7"
+    "picomatch": "^4.0.7",
+    "undici": "^7.24.0"
   },
   "dependencies": {
     "@nestjs/axios": "^12.0.1",
@@ -86,9 +90,5 @@
     "typescript": "^6.0.3",
     "ultracite": "7.8.3"
   },
-  "lint-staged": {
-    "*.{js,ts,json}": [
-      "bunx biome check --write --no-errors-on-unmatched"
-    ]
-  }
+  "packageManager": "bun"
 }
