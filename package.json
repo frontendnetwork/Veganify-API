@@ -6,7 +6,7 @@
   "author": "JokeNetwork, Veganify Contributors",
   "main": "dist/app.js",
   "scripts": {
-    "build": "nest build",
+    "build": "tsc -p tsconfig.build.json",
     "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"bun run lint\" \"tsc --noEmit -p tsconfig.build.json\" \"bun test --concurrent --timeout=10000 --reporter=dots --bail\"",
     "check:code": "bunx ultracite check",
     "get:peta": "node .github/scripts/peta-cron.js",
@@ -87,7 +87,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "qs": "^6.16.0",
-    "typescript": "^6.0.3",
+    "typescript": "7.0.2",
     "ultracite": "7.8.3"
   },
   "packageManager": "bun"
