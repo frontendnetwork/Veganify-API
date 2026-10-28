@@ -6,8 +6,8 @@ import { RedisConfigService } from "./redis.config";
 import { RedisService } from "./redis.service";
 
 @Module({
+  exports: [RedisService, CacheService],
   imports: [ConfigModule],
   providers: [RedisConfigService, RedisService, CacheService],
-  exports: [RedisService, CacheService],
 })
 export class RedisModule {}

@@ -25,14 +25,14 @@ export class GradesService {
 
     try {
       const response = await fetch(pushoverUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: this.pushoverToken,
-          user: this.pushoverUser,
           message,
           priority: 0,
+          token: this.pushoverToken,
+          user: this.pushoverUser,
         }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
         signal: AbortSignal.timeout(5000),
       });
 

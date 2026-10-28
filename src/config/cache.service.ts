@@ -64,6 +64,7 @@ export class CacheService {
 
     while (!haveLock && retries < maxRetries) {
       // Try to set the lock (NX = only if not exists)
+      // biome-ignore lint/performance/noAwaitInLoops: deliberate sequential lock-retry loop
       const lock = await this.redisService.setNxPx(lockKey, "1", lockTtl);
       if (lock) {
         haveLock = true;
@@ -77,7 +78,7 @@ export class CacheService {
         this.logger.debug(`Cache filled by another request for key: ${key}`);
         return value;
       }
-      retries++;
+      retries += 1;
     }
 
     if (haveLock) {

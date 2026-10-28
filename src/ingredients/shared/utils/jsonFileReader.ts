@@ -8,10 +8,6 @@ export async function readJsonFile<T>(filePath: string): Promise<T> {
   try {
     return JSON.parse(data) as T;
   } catch (err) {
-    throw new Error(
-      `Failed to parse JSON from ${filePath}: ${
-        err instanceof Error ? err.message : String(err)
-      }`
-    );
+    throw new Error(`Failed to parse JSON from ${filePath}`, { cause: err });
   }
 }

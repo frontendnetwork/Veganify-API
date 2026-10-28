@@ -41,7 +41,7 @@ export class ErrorsController {
       this.logger.error("Error reading OpenAPI specification:", err);
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ status: 500, error: "Error reading OpenAPI specification" });
+        .json({ error: "Error reading OpenAPI specification", status: 500 });
     }
   }
 
@@ -108,13 +108,13 @@ export class ErrorsController {
   ): void {
     const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
     const result = {
-      status,
       code,
-      message,
       debug: {
         method: req.method,
         uri: fullUrl,
       },
+      message,
+      status,
     };
     res.status(status).json(result);
   }

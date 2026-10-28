@@ -52,10 +52,10 @@ mock.module("worker_threads", () => ({
 
         setTimeout(() => {
           callback({
-            notVeganResult,
             maybeNotVeganResult,
-            veganResult,
+            notVeganResult,
             unknownResult,
+            veganResult,
           });
         }, 0);
       }
@@ -124,15 +124,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
           unknown: ["unknown"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -144,15 +144,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["soy"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["soy"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -173,8 +173,8 @@ describe("IngredientsV1Controller", () => {
         data: {
           translations: [
             {
-              text: "tofu,milk,sugar,unknown",
               detected_source_language: "",
+              text: "tofu,milk,sugar,unknown",
             },
           ],
         },
@@ -186,15 +186,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
           unknown: ["unknown"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -209,15 +209,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -236,15 +236,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: [],
-          not_vegan: [],
           maybe_not_vegan: ["wine"],
+          not_vegan: [],
+          surely_vegan: [],
           unknown: ["soy milk", "egg white"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -255,15 +255,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: [],
           maybe_not_vegan: ["sugar"],
+          not_vegan: [],
+          surely_vegan: ["tofu"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
   });

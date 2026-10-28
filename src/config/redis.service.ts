@@ -26,22 +26,22 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         : `redis://${config.host}:${config.port}/${config.db || 0}`;
 
       this.client = createClient({
-        url,
         // Removed legacyMode for compatibility
         socket: {
           reconnectStrategy: (retries) => Math.min(retries * 50, 1000),
         },
+        url,
       });
 
       this.client.on("connect", () => {
         this.logger.log("Redis connected successfully");
       });
 
-      this.client.on("error", (error: Error) => {
-        const config = this.redisConfigService.getRedisConfig();
+      this.client.on("error", (err: Error) => {
+        const redisConfig = this.redisConfigService.getRedisConfig();
         this.logger.error(
-          `Redis connection error for ${config.host}:${config.port}:`,
-          error
+          `Redis connection error for ${redisConfig.host}:${redisConfig.port}:`,
+          err
         );
       });
 

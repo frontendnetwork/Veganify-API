@@ -19,20 +19,20 @@ export class ProductController {
   @Post(":barcode")
   @ApiTags("Product")
   @ApiResponse({
-    status: 200,
     description: "Request returned a positive result.",
+    status: 200,
   })
   @ApiResponse({
-    status: 404,
     description: "Specified product is not in the database.",
+    status: 404,
   })
   @ApiResponse({
-    status: 400,
     description: "Input Error / Bad Request.",
+    status: 400,
   })
   @ApiResponse({
-    status: 500,
     description: "Internal Server Error.",
+    status: 500,
   })
   async getProductDetails(
     @Param("barcode") barcode: string,
@@ -41,7 +41,7 @@ export class ProductController {
     if (!/^\d{4,25}$/.test(barcode)) {
       return res
         .status(400)
-        .json({ status: 400, error: "Invalid barcode format" });
+        .json({ error: "Invalid barcode format", status: 400 });
     }
     try {
       const result = await this.productService.fetchProductDetails(barcode);
@@ -53,13 +53,13 @@ export class ProductController {
       if (error instanceof NotFoundException) {
         return res
           .status(404)
-          .json({ status: 404, error: "Product not found" });
+          .json({ error: "Product not found", status: 404 });
       }
 
       // Handle other errors
       return res
         .status(500)
-        .json({ status: 500, error: "Internal server error" });
+        .json({ error: "Internal server error", status: 500 });
     }
   }
 }
