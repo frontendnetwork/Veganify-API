@@ -7,11 +7,13 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"bun run lint\" \"tsc --noEmit -p tsconfig.build.json\" \"bun test --concurrent --timeout=10000 --reporter=dots --bail\"",
-    "check:code": "bunx ultracite check",
+    "check": "concurrently --names \"lint,typecheck,test\" --prefix-colors \"yellow,blue,green\" \"bun run check:code\" \"tsc --noEmit -p tsconfig.build.json\" \"bun test --concurrent --timeout=10000 --reporter=dots --bail\"",
+    "check:code": "bun run lint && bun run format:check",
     "get:peta": "node .github/scripts/peta-cron.js",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
+    "format": "bun fmt",
+    "format:check": "bun fmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix && bun fmt",
     "prepare": "husky",
     "process:all": "concurrently --names \"vegan,not vegan,maybe vegan\" --prefix-colors \"green,red,yellow\" \"bun run process:vegan\" \"bun run process:notvegan\" \"bun run process:maybenotvegan\"",
     "process:ingredients": "bun scripts/processIngredients.js",
@@ -24,19 +26,6 @@
     "start:prod": "bun dist/main.js",
     "test": "bun test --concurrent --timeout=10000 --reporter=dots",
     "test:cov": "bun test --coverage"
-  },
-  "lint-staged": {
-    "*.{js,ts,json}": [
-      "bunx biome check --write --no-errors-on-unmatched"
-    ]
-  },
-  "overrides": {
-    "axios": "^1.20.0",
-    "flatted": "^3.4.2",
-    "handlebars": "^4.7.9",
-    "lodash": "^4.18.1",
-    "picomatch": "^4.0.7",
-    "undici": "^7.24.0"
   },
   "dependencies": {
     "@nestjs/axios": "^12.0.1",
@@ -72,7 +61,6 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
     "@nestjs/cli": "^12.0.8",
     "@nestjs/schematics": "^12.0.6",
     "@nestjs/testing": "^12.3.2",
@@ -86,9 +74,27 @@
     "concurrently": "^10.0.6",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
+    "oxlint": "^1.90.0",
     "qs": "^6.17.1",
     "typescript": "7.0.2",
     "ultracite": "8.1.1"
   },
-  "packageManager": "bun"
+  "overrides": {
+    "axios": "^1.20.0",
+    "flatted": "^3.4.2",
+    "handlebars": "^4.7.9",
+    "lodash": "^4.18.1",
+    "picomatch": "^4.0.7",
+    "undici": "^7.24.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,mjs,cjs,mts,cts}": [
+      "oxlint --fix",
+      "bun fmt"
+    ],
+    "*.{json,jsonc}": [
+      "bun fmt"
+    ]
+  },
+  "packageManager": "bun@1.4.4"
 }

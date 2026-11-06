@@ -9,8 +9,9 @@ import {
 } from "@nestjs/common";
 import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
-import { BarcodeDto } from "./dtos/BarcodeDto";
+
 import { backendResponseDto } from "./dtos/backendResponseDto";
+import { BarcodeDto } from "./dtos/BarcodeDto";
 import { GradesService } from "./grades.service";
 
 @Controller("v0/grades")
@@ -74,7 +75,6 @@ export class GradesController {
           status: 202,
         });
       } else {
-        // biome-ignore lint/style/useErrorCause: Nest's HttpException carries the cause in its options argument below
         throw new HttpException(
           "An error happened on the server.",
           HttpStatus.INTERNAL_SERVER_ERROR,
