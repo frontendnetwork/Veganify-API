@@ -10,24 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo on main branch
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v6
-      with:
-        ref: main
+      - name: Checkout repo on main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v6
+        with:
+          ref: main
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # oven-sh/setup-bun@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # oven-sh/setup-bun@v2
 
-    - name: Install dependencies
-      run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-    - name: Fetch PETA Data and Save
-      run: bun ${{ github.workspace }}/.github/scripts/peta-cron.js
+      - name: Fetch PETA Data and Save
+        run: bun ${{ github.workspace }}/.github/scripts/peta-cron.js
 
-    - name: Commit and push if there are changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add peta_cruelty_free.json
-        git commit -m "Update peta_cruelty_free.json" || echo "No changes to commit"
-        git push origin main --force
+      - name: Commit and push if there are changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add peta_cruelty_free.json
+          git commit -m "Update peta_cruelty_free.json" || echo "No changes to commit"
+          git push origin main --force

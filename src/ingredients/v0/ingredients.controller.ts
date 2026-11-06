@@ -16,7 +16,6 @@ import type { Response } from "express";
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
-
 import type { V0ResponseData } from "./dto/response.dto";
 
 @Controller("v0/ingredients")

@@ -10,17 +10,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BarcodeDto'
+              $ref: "#/components/schemas/BarcodeDto"
       responses:
-        '201':
+        "201":
           description: Request returned a positive result.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/backendResponseDto'
-        '400':
+                $ref: "#/components/schemas/backendResponseDto"
+        "400":
           description: Input Error / Bad Request.
-        '500':
+        "500":
           description: Internal Server Error.
       tags:
         - Grades
@@ -35,13 +35,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Request returned a positive result.
-        '400':
+        "400":
           description: Input Error / Bad Request.
-        '404':
+        "404":
           description: Specified product is not in the database.
-        '500':
+        "500":
           description: Internal Server Error.
       tags:
         - Product
@@ -56,11 +56,11 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Request returned a positive result.
-        '500':
+        "500":
           description: Internal Server Error.
-        '503':
+        "503":
           description: >-
             Service Unavailable. Translation service is unavailable. Try again
             with disabled translation (Results might vary). Add flag
@@ -78,11 +78,11 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: >-
             Request returned a positive result. If translation fails, results
             will be based on untranslated ingredients.
-        '500':
+        "500":
           description: Internal Server Error.
       tags:
         - IngredientsV1
@@ -97,13 +97,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Request returned a positive result.
-        '400':
+        "400":
           description: Input Error / Bad Request.
-        '404':
+        "404":
           description: Specified tyoe is not available.
-        '500':
+        "500":
           description: Internal Server Error.
       tags:
         - Peta
@@ -113,7 +113,7 @@ paths:
       operationId: HealthController_check
       parameters: []
       responses:
-        '200':
+        "200":
           description: The Health Check is successful
           content:
             application/json:
@@ -160,7 +160,7 @@ paths:
                         status:
                           type: string
                       additionalProperties: true
-        '503':
+        "503":
           description: The Health Check is not successful
           content:
             application/json:
@@ -239,7 +239,7 @@ components:
         barcode:
           type: string
           description: The barcode to be checked
-          example: '4066600204404'
+          example: "4066600204404"
       required:
         - barcode
     backendResponseDto:
@@ -248,7 +248,7 @@ components:
         barcode:
           type: string
           description: The barcode requested
-          example: '12345678'
+          example: "12345678"
         name:
           type: string
           description: The name of the product

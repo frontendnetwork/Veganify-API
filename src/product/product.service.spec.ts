@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
+
 import { Test, TestingModule } from "@nestjs/testing";
 
 // bun:test does not export Mocked<T> yet; define a local utility
@@ -9,7 +10,6 @@ type Mocked<T> = {
 };
 
 import { CacheService } from "../config/cache.service";
-
 import { ProductService } from "./product.service";
 
 describe("ProductService", () => {

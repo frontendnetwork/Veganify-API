@@ -34,11 +34,11 @@ The following endpoints are available within the Veganify API:
 
 ## Development
 
-Use Bun for installation and scripts. Node-based tooling requires Node 22.22.3+, 24.15+, or 26+; these are the versions supported by the Nest 12 schematics.
+Use Bun 1.4.4 or newer for installation and scripts. Node-based tooling requires Node 22.22.3+, 24.15+, or 26+; these are the versions supported by the Nest 12 schematics.
 
 TypeScript intentionally stays on 6.x. TypeScript 7.0 ships only the native `tsc` executable, without the compiler API required by Nest CLI 12. Upgrading to 7.0 breaks `nest build`; Swagger 12 also declares TypeScript 5.5/6 peer support.
 
-Ultracite is pinned to 7.8.3. Version 7.12.2 introduces `braces` 3.0.3 through `fast-glob`, which is affected by [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (`braces <=3.0.3`). Revisit this tooling update when it no longer introduces that advisory.
+Ultracite provides the Oxlint ruleset. Bun's built-in formatter is configured to match Ultracite's formatting defaults.
 
 Dependency updates preserve the 48-hour minimum release age configured in `bunfig.toml`. A newer release shown by `bun outdated` may therefore be intentionally held back.
 

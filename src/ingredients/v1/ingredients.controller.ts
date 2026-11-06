@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import { Worker } from "node:worker_threads";
+
 import {
   Controller,
   Get,
@@ -18,7 +19,6 @@ import type { Response } from "express";
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
-
 import type { V1ResponseData } from "./dto/response.dto";
 
 @Controller("v1/ingredients")
