@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import * as path from "node:path";
 
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
@@ -25,6 +26,29 @@ describe("PetaController", () => {
 
   it("should be defined", () => {
     expect(controller).toBeDefined();
+  });
+
+  it("preserves the generated Swagger type route schema", async () => {
+    const testingModule = await Test.createTestingModule({
+      controllers: [PetaController],
+    }).compile();
+    const app = testingModule.createNestApplication();
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder().setTitle("test").setVersion("1").build()
+    );
+
+    expect(document.paths["/v0/peta/{type}"]?.get?.parameters).toEqual([
+      {
+        in: "path",
+        name: "type",
+        required: true,
+        schema: { type: "string" },
+      },
+    ]);
+    expect(document.components?.schemas).toEqual({});
+
+    await app.close();
   });
 
   describe("getPetaByType", () => {

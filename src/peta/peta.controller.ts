@@ -9,7 +9,7 @@ import {
 } from "@nestjs/swagger";
 import type { Response } from "express";
 
-export class petaType {
+class petaType {
   @ApiProperty({
     description: "The type of PETA list",
     example: "crueltyfree",

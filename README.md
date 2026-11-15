@@ -34,9 +34,9 @@ The following endpoints are available within the Veganify API:
 
 ## Development
 
-Use Bun 1.4.4 or newer for installation and scripts. Node-based tooling requires Node 22.22.3+, 24.15+, or 26+; these are the versions supported by the Nest 12 schematics.
+Use Bun 1.4.4 (the version pinned in `package.json`) for installation and scripts. Node-based tooling requires Node 22.22.3+, 24.15+, or 26+; these are the versions supported by the Nest 12 schematics.
 
-TypeScript intentionally stays on 6.x. TypeScript 7.0 ships only the native `tsc` executable, without the compiler API required by Nest CLI 12. Upgrading to 7.0 breaks `nest build`; Swagger 12 also declares TypeScript 5.5/6 peer support.
+TypeScript is pinned to 7.0.2. `bun run build` uses the TypeScript compiler to emit the production CommonJS output.
 
 Ultracite provides the Oxlint ruleset. Bun's built-in formatter is configured to match Ultracite's formatting defaults.
 
@@ -60,6 +60,6 @@ Before committing changes, run `bun run check` (lint, typecheck, and tests) and 
 Before committing changes to the `isnotvegan.json` and `isvegan.json` lists, format and process them by running the following command:
 
 ```bash
-npm run process:vegan
-npm run process:notvegan
+bun run process:vegan
+bun run process:notvegan
 ```

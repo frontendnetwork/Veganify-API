@@ -18,6 +18,10 @@ import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
+import {
+  normalizeIngredientList,
+  parseIngredients as parseIngredientString,
+} from "../shared/utils/ingredient-processing";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
 import type { V1ResponseData } from "./dto/response.dto";
 
@@ -40,7 +44,7 @@ export class IngredientsV1Controller implements OnModuleInit {
 
   private async loadAndPreprocessList(filename: string): Promise<string[]> {
     const list = (await readJsonFile(filename)) as string[];
-    return list.map((item) => item.toLowerCase());
+    return normalizeIngredientList(list);
   }
 
   private runWorker(ingredients: string[]): Promise<{
@@ -235,16 +239,7 @@ export class IngredientsV1Controller implements OnModuleInit {
   }
 
   private parseIngredients(ingredientsString: string): string[] {
-    let decoded: string;
-    try {
-      decoded = decodeURIComponent(ingredientsString);
-    } catch {
-      decoded = ingredientsString;
-    }
-    return decoded
-      .split(",")
-      .map((item) => item.trim().toLowerCase())
-      .filter((item) => item !== "");
+    return parseIngredientString(ingredientsString);
   }
 
   private sendResponse(

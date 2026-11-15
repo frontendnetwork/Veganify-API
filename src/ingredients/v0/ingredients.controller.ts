@@ -15,6 +15,11 @@ import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
+import {
+  normalizeIngredientList,
+  parseIngredients as parseIngredientString,
+  sophisticatedMatch as ingredientMatchesList,
+} from "../shared/utils/ingredient-processing";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
 import type { V0ResponseData } from "./dto/response.dto";
 
@@ -33,27 +38,11 @@ export class IngredientsController implements OnModuleInit {
 
   private async loadAndPreprocessList(filename: string): Promise<string[]> {
     const list = (await readJsonFile(filename)) as string[];
-    return list.map((item) => item.toLowerCase());
-  }
-
-  private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return normalizeIngredientList(list);
   }
 
   private sophisticatedMatch(ingredient: string, list: string[]): boolean {
-    const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
-
-    if (list.includes(normalizedIngredient)) {
-      return true;
-    }
-
-    const escaped = this.escapeRegex(normalizedIngredient);
-    const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`);
-    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
-      return true;
-    }
-
-    return false;
+    return ingredientMatchesList(ingredient, list);
   }
 
   @Get(":ingredients")
@@ -219,20 +208,7 @@ export class IngredientsController implements OnModuleInit {
   }
 
   private parseIngredients(ingredientsString: string): string[] {
-    // Decode URI component to handle %20 and other encoded characters
-    // Fall back to the raw string if the input is malformed percent-encoding
-    let decoded: string;
-    try {
-      decoded = decodeURIComponent(ingredientsString);
-    } catch {
-      decoded = ingredientsString;
-    }
-
-    // Split by comma, trim whitespace, and filter out empty strings
-    return decoded
-      .split(",")
-      .map((item) => item.trim().toLowerCase())
-      .filter((item) => item !== "");
+    return parseIngredientString(ingredientsString);
   }
 
   private sendResponse(
