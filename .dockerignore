@@ -2,5 +2,6 @@ node_modules/
 README.md 
 SECURITY.md
 docs/
-scripts/
+scripts/*
+!scripts/smokeIngredientWorker.js
 .env.example
