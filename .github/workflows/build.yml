@@ -18,6 +18,9 @@ jobs:
   build-and-push-prod:
     if: github.ref != 'refs/heads/staging'
     runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.build-prod.outputs.digest }}
+      image-tag: ${{ steps.meta-sha.outputs.version }}
     permissions:
       contents: read
       packages: write
@@ -43,19 +46,30 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Extract immutable commit tag
+        id: meta-sha
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=sha,format=long
+
       - name: Build and push Docker image
         id: build-prod
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # docker/build-push-action@v7
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.meta-sha.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-prod:
     needs: build-and-push-prod
     if: success() && github.ref != 'refs/heads/staging'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -71,9 +85,49 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
 
-      - name: Restart Kubernetes Pod
+      - name: Deploy exact image built by this run
+        env:
+          IMAGE_DIGEST: ${{ needs.build-and-push-prod.outputs.image-digest }}
+          IMAGE_TAG: ${{ needs.build-and-push-prod.outputs.image-tag }}
         run: |
-          kubectl rollout restart deployment/veganify-backend-deployment -n veganify
+          if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Build did not provide a valid image digest: $IMAGE_DIGEST" >&2
+            exit 1
+          fi
+          if [[ ! "$IMAGE_TAG" =~ ^sha-[a-f0-9]{40}$ ]]; then
+            echo "Build did not provide a valid commit tag: $IMAGE_TAG" >&2
+            exit 1
+          fi
+
+          IMAGE_NAME_LOWER="$(printf '%s' "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')"
+          IMAGE_REPOSITORY="${REGISTRY}/${IMAGE_NAME_LOWER}"
+          IMAGE_REF="${IMAGE_REPOSITORY}:${IMAGE_TAG}@${IMAGE_DIGEST}"
+          DEPLOYMENT=veganify-backend-deployment
+
+          CONTAINER_NAME="$(kubectl get deployment "$DEPLOYMENT" -n veganify -o json | jq -r --arg image "$IMAGE_REPOSITORY" '
+            [.spec.template.spec.containers[]?
+              | select((.image | sub("@.*$"; "") | sub(":[^/:]+$"; "")) == $image)
+              | .name]
+            | if length == 1 then .[0] else empty end
+          ')"
+
+          if [[ -z "$CONTAINER_NAME" ]]; then
+            echo "Expected exactly one container in $DEPLOYMENT using $IMAGE_REPOSITORY" >&2
+            exit 1
+          fi
+
+          CURRENT_SHA="$(git ls-remote origin "$GITHUB_REF" | awk 'NR == 1 { print $1 }')"
+          if [[ -z "$CURRENT_SHA" ]]; then
+            echo "Could not resolve the current head for $GITHUB_REF" >&2
+            exit 1
+          fi
+          if [[ "$CURRENT_SHA" != "$GITHUB_SHA" ]]; then
+            echo "Skipping stale deployment for $GITHUB_SHA; $GITHUB_REF is now at $CURRENT_SHA"
+            exit 0
+          fi
+
+          kubectl set image "deployment/$DEPLOYMENT" "$CONTAINER_NAME=$IMAGE_REF" -n veganify
+          kubectl rollout status "deployment/$DEPLOYMENT" -n veganify --timeout=5m
 
   build-and-push-staging:
     if: github.ref == 'refs/heads/staging'
