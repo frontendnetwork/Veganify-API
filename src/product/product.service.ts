@@ -1,13 +1,19 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
-import * as iconv from "iconv-lite";
 import * as ini from "ini";
 
 import { CacheService } from "../config/cache.service";
+import {
+  createDefaultProductResponseMapping,
+  mapGradeResponse,
+  mapOpenEanDbResponse,
+  mapOpenFoodFactsResponse,
+  type VeganStatus,
+} from "./product.response-mappers";
 
 type Nutriscore = "n/a" | "A" | "B" | "C" | "D" | "E" | "F";
-type VeganStatus = boolean | "n/a";
 
 export interface ProductDetails {
   product: {
@@ -48,18 +54,8 @@ export class ProductService {
   private async fetchProductDetailsFromAPIs(
     barcode: string
   ): Promise<ProductDetails> {
-    let productname = "n/a";
-    let genericname = "n/a";
-    let vegan: boolean | "n/a" = "n/a";
-    let vegetarian: boolean | "n/a" = "n/a";
-    let animaltestfree: boolean | "n/a" = "n/a";
-    let palmoil: boolean | "n/a" = "n/a";
-    let nutriscore: "n/a" | "A" | "B" | "C" | "D" | "E" | "F" = "n/a";
-    let grade = "n/a";
-    let apiname = "n/a";
-    const processed: boolean = false;
-    let baseuri = "n/a";
-    let edituri = "n/a";
+    let mapping = createDefaultProductResponseMapping();
+    const processed = false;
 
     // Fetch all data in parallel
     const [gradeData, openFoodFactsResponse, petaResponse] = await Promise.all([
@@ -68,15 +64,7 @@ export class ProductService {
       this.fetchPeta(),
     ]);
 
-    // Process grade data
-    if (
-      gradeData !== "404" &&
-      gradeData &&
-      (gradeData as { grade?: string }).grade
-    ) {
-      grade = (gradeData as { grade: string }).grade;
-      productname = (gradeData as { name: string }).name;
-    }
+    mapping = mapGradeResponse(mapping, gradeData);
 
     // Process OpenFoodFacts data
     const offData = openFoodFactsResponse as {
@@ -85,114 +73,37 @@ export class ProductService {
     };
     if (offData.status === 1) {
       const product = offData.product as Record<string, unknown>;
-      apiname = "OpenFoodFacts";
-      baseuri = "https://world.openfoodfacts.org";
-      edituri = product.url as string;
-      productname = product?.product_name as string;
-      genericname = product?.generic_name as string;
-
-      if (product.nutriscore_grade) {
-        nutriscore = (
-          product?.nutriscore_grade as string
-        )?.toUpperCase() as typeof nutriscore;
-      }
-
-      const labelsTags = product.labels_tags as string[] | undefined;
-      if (labelsTags) {
-        if (
-          labelsTags.includes("en:vegan") ||
-          labelsTags.includes("de:vegan")
-        ) {
-          vegan = true;
-        } else if (
-          labelsTags.includes("en:non-vegan") ||
-          labelsTags.includes("de:non-vegan")
-        ) {
-          vegan = false;
-        }
-
-        if (
-          labelsTags.includes("en:vegetarian") ||
-          labelsTags.includes("de:vegetarian")
-        ) {
-          vegetarian = true;
-        } else if (labelsTags.includes("en:non-vegetarian")) {
-          vegetarian = false;
-        }
-
-        if (
-          labelsTags.includes("en:palm-oil-free") ||
-          labelsTags.includes("de:palmölfrei")
-        ) {
-          palmoil = false;
-        } else if (
-          labelsTags.includes("en:palm-oil") ||
-          labelsTags.includes("de:palm-oil")
-        ) {
-          palmoil = true;
-        }
-      }
-
-      if (product?.brands) {
-        const dnt = (petaResponse as { PETA_DOES_NOT_TEST: string[] })
-          .PETA_DOES_NOT_TEST;
-        const brandLower = (product.brands as string).toLowerCase();
-
-        if (dnt.some((entry: string) => entry.toLowerCase() === brandLower)) {
-          animaltestfree = true;
-          apiname = "OpenBeautyFacts, PETA Beauty without Bunnies";
-        }
-      }
+      mapping = mapOpenFoodFactsResponse(mapping, product, petaResponse);
     } else {
       // Try OpenEANDB as fallback
       const openEanDbResponse = await this.fetchOpenEanDb(barcode);
       const array = ini.parse(openEanDbResponse as string);
 
       if (array.error === "0") {
-        apiname = "Open EAN Database";
-        baseuri = "https://opengtindb.org";
-        edituri = `https://opengtindb.org/index.php?cmd=ean1&ean=${barcode}`;
-        productname = iconv
-          .decode(
-            Buffer.from(`${array.name} ${array.detailname}`),
-            "ISO-8859-1"
-          )
-          .toString();
-
-        const contents = array.contents;
-        if (contents != null && contents >= "128" && contents < "256") {
-          vegan = false;
-          vegetarian = true;
-        } else if (
-          (contents != null && contents >= "256" && contents < "384") ||
-          (contents >= "384" && contents < "512")
-        ) {
-          vegan = true;
-          vegetarian = true;
-        }
+        mapping = mapOpenEanDbResponse(mapping, barcode, array);
       } else {
         throw new NotFoundException("Product not found");
       }
     }
 
     return {
-      status: 200,
       product: {
-        productname,
-        genericname,
-        vegan,
-        vegetarian,
-        animaltestfree,
-        palmoil,
-        nutriscore,
-        grade,
+        animaltestfree: mapping.animaltestfree,
+        genericname: mapping.genericname,
+        grade: mapping.grade,
+        nutriscore: mapping.nutriscore,
+        palmoil: mapping.palmoil,
+        productname: mapping.productname,
+        vegan: mapping.vegan,
+        vegetarian: mapping.vegetarian,
       },
       sources: {
+        api: mapping.api,
+        baseuri: mapping.baseuri,
+        edituri: mapping.edituri,
         processed,
-        api: apiname,
-        baseuri,
-        edituri,
       },
+      status: 200,
     };
   }
 
@@ -236,7 +147,7 @@ export class ProductService {
           { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
         );
         if (response.status === 404) {
-          return { status: 0, product: null };
+          return { product: null, status: 0 };
         }
         if (!response.ok) {
           throw new Error(`OpenFoodFacts error: ${response.status}`);

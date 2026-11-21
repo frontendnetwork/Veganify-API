@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import * as path from "node:path";
+
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
@@ -16,9 +18,9 @@ describe("PetaController", () => {
 
     controller = module.get<PetaController>(PetaController);
     res = {
-      status: mock().mockReturnThis(),
       json: mock(),
       sendFile: mock(),
+      status: mock().mockReturnThis(),
     } as unknown as Response;
   });
 
@@ -26,14 +28,37 @@ describe("PetaController", () => {
     expect(controller).toBeDefined();
   });
 
+  it("preserves the generated Swagger type route schema", async () => {
+    const testingModule = await Test.createTestingModule({
+      controllers: [PetaController],
+    }).compile();
+    const app = testingModule.createNestApplication();
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder().setTitle("test").setVersion("1").build()
+    );
+
+    expect(document.paths["/v0/peta/{type}"]?.get?.parameters).toEqual([
+      {
+        in: "path",
+        name: "type",
+        required: true,
+        schema: { type: "string" },
+      },
+    ]);
+    expect(document.components?.schemas).toEqual({});
+
+    await app.close();
+  });
+
   describe("getPetaByType", () => {
     it("should return a bad request response when type is missing", () => {
       controller.getPetaByType("", res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        status: "400",
         code: "Bad request",
         message: "Missing argument type",
+        status: "400",
       });
     });
 
@@ -54,9 +79,9 @@ describe("PetaController", () => {
       controller.getPetaByType("veganapproved", res);
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
-        status: "501",
         code: "Not implemented",
         message: "veganapproved was removed from the API",
+        status: "501",
       });
     });
 
@@ -64,10 +89,10 @@ describe("PetaController", () => {
       controller.getPetaByType("unknown", res);
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
-        status: "404",
         code: "Type not found",
         message:
           "The given type was not found in the API. Please check the documentation for available types. Also check for typos.",
+        status: "404",
       });
     });
   });
@@ -77,9 +102,9 @@ describe("PetaController", () => {
       controller.getPetaWithoutType(res);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        status: "400",
         code: "Bad request",
         message: "Missing argument type: /v0/peta/:type",
+        status: "400",
       });
     });
   });

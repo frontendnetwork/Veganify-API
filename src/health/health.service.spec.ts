@@ -1,4 +1,5 @@
 import { describe, expect, it, mock } from "bun:test";
+
 import { ServiceUnavailableException } from "@nestjs/common";
 import { HttpHealthIndicator } from "@nestjs/terminus";
 import { Test } from "@nestjs/testing";
@@ -21,7 +22,7 @@ async function createHealthModule(redisHealthy: boolean) {
     .useValue(http)
     .compile();
 
-  return { testingModule, redis, http };
+  return { http, redis, testingModule };
 }
 
 describe("HealthModule", () => {
@@ -67,9 +68,9 @@ describe("HealthModule", () => {
     try {
       const result = await testingModule.get(HealthService).check();
       expect(result).toMatchObject({
-        status: "ok",
-        info: { Ping: { status: "up" }, redis: { status: "up" } },
         error: {},
+        info: { Ping: { status: "up" }, redis: { status: "up" } },
+        status: "ok",
       });
       expect(http.pingCheck).toHaveBeenCalledWith("Ping", "https://8.8.8.8");
     } finally {
@@ -90,8 +91,8 @@ describe("HealthModule", () => {
       }
       expect(result.getStatus()).toBe(503);
       expect(result.getResponse()).toMatchObject({
-        status: "error",
         error: { redis: { status: "down" } },
+        status: "error",
       });
     } finally {
       await testingModule.close();

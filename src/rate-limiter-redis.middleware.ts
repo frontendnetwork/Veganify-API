@@ -1,4 +1,5 @@
 import * as crypto from "node:crypto";
+
 import {
   HttpException,
   HttpStatus,
@@ -90,9 +91,9 @@ export class RedisRateLimiterMiddleware
 
         throw new HttpException(
           {
-            status: HttpStatus.TOO_MANY_REQUESTS,
             error: "Too Many Requests",
             message: `Rate limit exceeded. Try again in ${retryAfter} seconds.`,
+            status: HttpStatus.TOO_MANY_REQUESTS,
           },
           HttpStatus.TOO_MANY_REQUESTS
         );
@@ -183,7 +184,7 @@ export class RedisRateLimiterMiddleware
     }
 
     // Increment counter
-    counter.count++;
+    counter.count += 1;
 
     // Check if limit exceeded (using stricter fallback limit)
     if (counter.count > this.fallbackLimit) {
@@ -191,17 +192,17 @@ export class RedisRateLimiterMiddleware
 
       res.set({
         "Retry-After": String(retryAfter),
+        "X-RateLimit-Fallback": "true",
         "X-RateLimit-Limit": String(this.fallbackLimit),
         "X-RateLimit-Remaining": "0",
         "X-RateLimit-Reset": String(counter.resetTime),
-        "X-RateLimit-Fallback": "true",
       });
 
       throw new HttpException(
         {
-          status: HttpStatus.TOO_MANY_REQUESTS,
           error: "Too Many Requests",
           message: `Rate limit exceeded (fallback mode). Try again in ${retryAfter} seconds.`,
+          status: HttpStatus.TOO_MANY_REQUESTS,
         },
         HttpStatus.TOO_MANY_REQUESTS
       );
@@ -209,10 +210,10 @@ export class RedisRateLimiterMiddleware
 
     // Add rate limit headers
     res.set({
+      "X-RateLimit-Fallback": "true",
       "X-RateLimit-Limit": String(this.fallbackLimit),
       "X-RateLimit-Remaining": String(this.fallbackLimit - counter.count),
       "X-RateLimit-Reset": String(counter.resetTime),
-      "X-RateLimit-Fallback": "true",
     });
 
     next();

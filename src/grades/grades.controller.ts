@@ -9,8 +9,9 @@ import {
 } from "@nestjs/common";
 import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
-import { BarcodeDto } from "./dtos/BarcodeDto";
+
 import { backendResponseDto } from "./dtos/backendResponseDto";
+import { BarcodeDto } from "./dtos/BarcodeDto";
 import { GradesService } from "./grades.service";
 
 @Controller("v0/grades")
@@ -20,22 +21,22 @@ export class GradesController {
 
   @Post("backend")
   @ApiResponse({
-    status: 201,
     description: "Request returned a positive result.",
+    status: 201,
     type: backendResponseDto,
   })
   @ApiResponse({
-    status: 400,
     description: "Input Error / Bad Request.",
+    status: 400,
   })
   @ApiResponse({
-    status: 500,
     description: "Internal Server Error.",
+    status: 500,
   })
   @ApiBody({
-    type: BarcodeDto,
     description: "The barcode to be checked",
     required: true,
+    type: BarcodeDto,
   })
   @ApiTags("Grades")
   async checkBarcode(@Body("barcode") barcode: string, @Res() res: Response) {
@@ -69,14 +70,15 @@ export class GradesController {
             this.logger.warn("Failed to notify about missing barcode:", err);
           });
         res.status(202).json({
-          status: 202,
           code: "Accepted",
           message: "Product not found. It has been queued for review.",
+          status: 202,
         });
       } else {
         throw new HttpException(
           "An error happened on the server.",
-          HttpStatus.INTERNAL_SERVER_ERROR
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          { cause: error }
         );
       }
     }

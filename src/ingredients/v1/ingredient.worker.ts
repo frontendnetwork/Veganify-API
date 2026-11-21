@@ -1,24 +1,6 @@
 import { parentPort, workerData } from "node:worker_threads";
 
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function sophisticatedMatch(ingredient: string, list: string[]): boolean {
-  const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
-
-  if (list.includes(normalizedIngredient)) {
-    return true;
-  }
-
-  const escaped = escapeRegex(normalizedIngredient);
-  const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`);
-  if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
-    return true;
-  }
-
-  return false;
-}
+import { sophisticatedMatch } from "../shared/utils/ingredient-processing";
 
 if (parentPort) {
   const { ingredients, isNotVegan, isMaybeNotVegan, isVegan } = workerData;
@@ -47,9 +29,9 @@ if (parentPort) {
   );
 
   parentPort.postMessage({
-    notVeganResult,
     maybeNotVeganResult,
-    veganResult,
+    notVeganResult,
     unknownResult,
+    veganResult,
   });
 }

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { GradesService } from "./grades.service";
@@ -80,16 +81,15 @@ describe("GradesService", () => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "https://api.pushover.net/1/messages.json",
         expect.objectContaining({
-          method: "POST",
           headers: { "Content-Type": "application/json" },
+          method: "POST",
         })
       );
 
-      const calls = (globalThis.fetch as unknown as ReturnType<typeof mock>)
-        .mock.calls;
-      const body = JSON.parse(
-        (calls[0] as [string, RequestInit])[1].body as string
-      );
+      const { calls } = (globalThis.fetch as unknown as ReturnType<typeof mock>)
+        .mock;
+      const [, requestInit] = calls[0] as [string, RequestInit];
+      const body = JSON.parse(requestInit.body as string);
       expect(body).toMatchObject({
         message: expect.stringContaining("99887766"),
         priority: 0,

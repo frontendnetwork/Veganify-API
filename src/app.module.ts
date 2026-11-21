@@ -23,6 +23,15 @@ import { ProductService } from "./product/product.service";
 import { RedisRateLimiterMiddleware } from "./rate-limiter-redis.middleware";
 
 @Module({
+  controllers: [
+    GradesController,
+    ProductController,
+    IngredientsController,
+    IngredientsV1Controller,
+    PetaController,
+    HealthController,
+    ErrorsController,
+  ],
   imports: [
     HealthModule,
     ConfigModule.forRoot(),
@@ -34,15 +43,6 @@ import { RedisRateLimiterMiddleware } from "./rate-limiter-redis.middleware";
     TerminusModule,
     IngredientsModule,
     RedisModule,
-  ],
-  controllers: [
-    GradesController,
-    ProductController,
-    IngredientsController,
-    IngredientsV1Controller,
-    PetaController,
-    HealthController,
-    ErrorsController,
   ],
   providers: [GradesService, ProductService, TranslationService, ConfigService],
 })

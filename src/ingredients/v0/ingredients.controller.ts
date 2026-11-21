@@ -15,8 +15,12 @@ import type { Response } from "express";
 
 import { ParseBooleanPipe } from "../shared/pipes/parse-boolean.pipe";
 import { TranslationService } from "../shared/services/translation.service";
+import {
+  normalizeIngredientList,
+  parseIngredients as parseIngredientString,
+  sophisticatedMatch as ingredientMatchesList,
+} from "../shared/utils/ingredient-processing";
 import { readJsonFile } from "../shared/utils/jsonFileReader";
-
 import type { V0ResponseData } from "./dto/response.dto";
 
 @Controller("v0/ingredients")
@@ -34,43 +38,27 @@ export class IngredientsController implements OnModuleInit {
 
   private async loadAndPreprocessList(filename: string): Promise<string[]> {
     const list = (await readJsonFile(filename)) as string[];
-    return list.map((item) => item.toLowerCase());
-  }
-
-  private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return normalizeIngredientList(list);
   }
 
   private sophisticatedMatch(ingredient: string, list: string[]): boolean {
-    const normalizedIngredient = ingredient.toLowerCase().replace(/\s+/g, "");
-
-    if (list.includes(normalizedIngredient)) {
-      return true;
-    }
-
-    const escaped = this.escapeRegex(normalizedIngredient);
-    const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`);
-    if (list.some((item) => wordBoundaryRegex.test(item.replace(/\s+/g, "")))) {
-      return true;
-    }
-
-    return false;
+    return ingredientMatchesList(ingredient, list);
   }
 
   @Get(":ingredients")
   @ApiTags("Ingredients")
   @ApiResponse({
-    status: 200,
     description: "Request returned a positive result.",
+    status: 200,
   })
   @ApiResponse({
-    status: 500,
     description: "Internal Server Error.",
+    status: 500,
   })
   @ApiResponse({
-    status: 503,
     description:
       "Service Unavailable. Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
+    status: 503,
   })
   async getIngredients(
     @Param("ingredients") ingredientsParam: string,
@@ -83,9 +71,9 @@ export class IngredientsController implements OnModuleInit {
     if (!ingredientsParam) {
       throw new HttpException(
         {
-          status: HttpStatus.BAD_REQUEST,
           code: "Bad request",
           message: "Missing argument v0/ingredients/:ingredients",
+          status: HttpStatus.BAD_REQUEST,
         },
         HttpStatus.BAD_REQUEST
       );
@@ -96,9 +84,9 @@ export class IngredientsController implements OnModuleInit {
     if (ingredients.length === 0) {
       throw new HttpException(
         {
-          status: HttpStatus.BAD_REQUEST,
           code: "Bad request",
           message: "No valid ingredients found in the provided list",
+          status: HttpStatus.BAD_REQUEST,
         },
         HttpStatus.BAD_REQUEST
       );
@@ -129,25 +117,25 @@ export class IngredientsController implements OnModuleInit {
               this.logger.error(`Translation service is unavailable: ${error}`);
               res.status(HttpStatus.SERVICE_UNAVAILABLE).send({
                 code: "Service Unavailable",
-                status: "503",
                 message:
                   "Translation service is unavailable. Try again with disabled translation (Results might vary). Add flag ?translate=false to the request.",
+                status: "503",
               });
               return;
             }
             this.logger.error(`Error during translation: ${error}`);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
               code: "Internal Server Error",
-              status: "500",
               message: "An error occurred during the translation process",
+              status: "500",
             });
             return;
           }
           this.logger.error(`Unknown error: ${error}`);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
             code: "Internal Server Error",
-            status: "500",
             message: "An unknown error occurred while processing the request",
+            status: "500",
           });
           return;
         }
@@ -202,10 +190,9 @@ export class IngredientsController implements OnModuleInit {
           this.logger.error(`Error during back translation: ${error}`);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
             code: "Internal Server Error",
-            status: "500",
             message: "An error occurred during the back translation process",
+            status: "500",
           });
-          return;
         }
       } else {
         this.sendResponse(res, notVeganResult, veganResult, unknownResult);
@@ -214,27 +201,14 @@ export class IngredientsController implements OnModuleInit {
       this.logger.error(`Error processing request: ${error}`);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         code: "Internal Server Error",
-        status: "500",
         message: "An error occurred while processing the request",
+        status: "500",
       });
     }
   }
 
   private parseIngredients(ingredientsString: string): string[] {
-    // Decode URI component to handle %20 and other encoded characters
-    // Fall back to the raw string if the input is malformed percent-encoding
-    let decoded: string;
-    try {
-      decoded = decodeURIComponent(ingredientsString);
-    } catch {
-      decoded = ingredientsString;
-    }
-
-    // Split by comma, trim whitespace, and filter out empty strings
-    return decoded
-      .split(",")
-      .map((item) => item.trim().toLowerCase())
-      .filter((item) => item !== "");
+    return parseIngredientString(ingredientsString);
   }
 
   private sendResponse(
@@ -244,17 +218,17 @@ export class IngredientsController implements OnModuleInit {
     unknownItems: string[]
   ) {
     const responseData: V0ResponseData = {
-      vegan: notVeganItems.length === 0 && unknownItems.length === 0,
-      surely_vegan: veganItems,
-      not_vegan: notVeganItems,
       maybe_vegan: unknownItems,
+      not_vegan: notVeganItems,
+      surely_vegan: veganItems,
+      vegan: notVeganItems.length === 0 && unknownItems.length === 0,
     };
 
     res.status(HttpStatus.OK).send({
       code: "OK",
-      status: "200",
-      message: "Success",
       data: responseData,
+      message: "Success",
+      status: "200",
     });
   }
 }

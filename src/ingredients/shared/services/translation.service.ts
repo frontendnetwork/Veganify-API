@@ -55,10 +55,10 @@ export class TranslationService {
     );
 
     const translatePromise = translate({
-      free_api: true,
-      text,
-      target_lang: targetLang,
       auth_key: `${process.env.DEEPL_AUTH as string}`,
+      free_api: true,
+      target_lang: targetLang,
+      text,
     }) as Promise<DeepLTranslationResult>;
 
     return Promise.race([

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
+
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
@@ -52,10 +53,10 @@ mock.module("worker_threads", () => ({
 
         setTimeout(() => {
           callback({
-            notVeganResult,
             maybeNotVeganResult,
-            veganResult,
+            notVeganResult,
             unknownResult,
+            veganResult,
           });
         }, 0);
       }
@@ -67,6 +68,9 @@ mock.module("worker_threads", () => ({
 describe("IngredientsV1Controller", () => {
   let controller: IngredientsV1Controller;
   let translationService: Mocked<TranslationService>;
+  let isNotVeganIngredients: string[];
+  let isMaybeNotVeganIngredients: string[];
+  let isVeganIngredients: string[];
 
   const mockResponse = () => {
     const res: Partial<Response> = {};
@@ -94,16 +98,20 @@ describe("IngredientsV1Controller", () => {
       TranslationService
     ) as Mocked<TranslationService>;
 
+    isNotVeganIngredients = ["milk", "egg"];
+    isMaybeNotVeganIngredients = ["sugar", "wine"];
+    isVeganIngredients = ["tofu", "soy"];
+
     spyOn(jsonFileReader, "readJsonFile").mockImplementation(
       (filename: string): Promise<any> => {
         if (filename === "./isnotvegan.json") {
-          return Promise.resolve(["milk", "egg"]);
+          return Promise.resolve(isNotVeganIngredients);
         }
         if (filename === "./isvegan.json") {
-          return Promise.resolve(["tofu", "soy"]);
+          return Promise.resolve(isVeganIngredients);
         }
         if (filename === "./ismaybenotvegan.json") {
-          return Promise.resolve(["sugar", "wine"]);
+          return Promise.resolve(isMaybeNotVeganIngredients);
         }
         return Promise.resolve([]);
       }
@@ -124,15 +132,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
           unknown: ["unknown"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -144,26 +152,26 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["soy"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["soy"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
-    it.skip("should handle translation when flag is true", async () => {
+    it("should handle translation when flag is true", async () => {
       const res = mockResponse();
       translationService.translateText.mockResolvedValueOnce({
         data: {
           translations: [
             {
               detected_source_language: "DE",
-              text: "tofu,milch,zucker,unbekannt",
+              text: "tofu,milk,sugar,unknown",
             },
           ],
         },
@@ -173,8 +181,8 @@ describe("IngredientsV1Controller", () => {
         data: {
           translations: [
             {
-              text: "tofu,milk,sugar,unknown",
               detected_source_language: "",
+              text: "milch,zucker,tofu,unbekannt",
             },
           ],
         },
@@ -186,15 +194,143 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
+          maybe_not_vegan: ["zucker"],
+          not_vegan: ["milch"],
           surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
-          maybe_not_vegan: ["sugar"],
-          unknown: ["unknown"],
+          unknown: ["unbekannt"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("preserves duplicate categories during back translation", async () => {
+      isNotVeganIngredients = ["overlap"];
+      isMaybeNotVeganIngredients = ["overlap"];
+      isVeganIngredients = ["overlap"];
+      await controller.onModuleInit();
+
+      const res = mockResponse();
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [{ detected_source_language: "DE", text: "overlap" }],
+        },
+      });
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [
+            { detected_source_language: "", text: "doppelt,doppelt" },
+          ],
+        },
+      });
+
+      await controller.getIngredients("overlap", res, true);
+
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: [],
+          not_vegan: ["doppelt"],
+          surely_vegan: ["doppelt"],
+          unknown: [],
+          vegan: false,
+        },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("keeps the current category slicing when back translation is short", async () => {
+      isNotVeganIngredients = ["overlap"];
+      isMaybeNotVeganIngredients = ["overlap"];
+      isVeganIngredients = ["overlap"];
+      await controller.onModuleInit();
+
+      const res = mockResponse();
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [{ detected_source_language: "DE", text: "overlap" }],
+        },
+      });
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [{ detected_source_language: "", text: "only-one" }],
+        },
+      });
+
+      await controller.getIngredients("overlap", res, true);
+
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: [],
+          not_vegan: ["only-one"],
+          surely_vegan: [],
+          unknown: [],
+          vegan: false,
+        },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("keeps the current empty successful-translation response", async () => {
+      const res = mockResponse();
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [{ detected_source_language: "DE", text: "" }],
+        },
+      });
+
+      await controller.getIngredients("tofu", res, true);
+
+      expect(translationService.translateText).toHaveBeenCalledTimes(1);
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: [],
+          not_vegan: [],
+          surely_vegan: [],
+          unknown: [],
+          vegan: true,
+        },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("uses untranslated categorized results when back translation fails", async () => {
+      const res = mockResponse();
+      translationService.translateText.mockResolvedValueOnce({
+        data: {
+          translations: [
+            {
+              detected_source_language: "DE",
+              text: "tofu,milk,sugar,unknown",
+            },
+          ],
+        },
+      });
+      translationService.translateText.mockRejectedValueOnce(
+        new Error("Back translation failed")
+      );
+
+      await controller.getIngredients("tofu,milch,zucker,unbekannt", res, true);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
+          unknown: ["unknown"],
+          vegan: false,
+        },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -209,15 +345,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: ["milk"],
           maybe_not_vegan: ["sugar"],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -236,15 +372,56 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: [],
-          not_vegan: [],
           maybe_not_vegan: ["wine"],
+          not_vegan: [],
+          surely_vegan: [],
           unknown: ["soy milk", "egg white"],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("preserves category overlap across ingredient lists", async () => {
+      isNotVeganIngredients = ["overlap"];
+      isMaybeNotVeganIngredients = ["overlap"];
+      isVeganIngredients = ["overlap"];
+      await controller.onModuleInit();
+
+      const res = mockResponse();
+      await controller.getIngredients("overlap", res, false);
+
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: [],
+          not_vegan: ["overlap"],
+          surely_vegan: ["overlap"],
+          unknown: [],
+          vegan: false,
+        },
+        message: "Success",
+        status: "200",
+      });
+    });
+
+    it("decodes URI input and normalizes whitespace and case", async () => {
+      const res = mockResponse();
+      await controller.getIngredients("%20TOFU%20%2C%20%20MILK%20", res, false);
+
+      expect(res.send).toHaveBeenCalledWith({
+        code: "OK",
+        data: {
+          maybe_not_vegan: [],
+          not_vegan: ["milk"],
+          surely_vegan: ["tofu"],
+          unknown: [],
+          vegan: false,
+        },
+        message: "Success",
+        status: "200",
       });
     });
 
@@ -255,15 +432,15 @@ describe("IngredientsV1Controller", () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.send).toHaveBeenCalledWith({
         code: "OK",
-        status: "200",
-        message: "Success",
         data: {
-          vegan: false,
-          surely_vegan: ["tofu"],
-          not_vegan: [],
           maybe_not_vegan: ["sugar"],
+          not_vegan: [],
+          surely_vegan: ["tofu"],
           unknown: [],
+          vegan: false,
         },
+        message: "Success",
+        status: "200",
       });
     });
   });

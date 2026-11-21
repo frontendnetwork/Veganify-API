@@ -2,6 +2,15 @@
 # Only install package versions published at least 2 days ago.
 minimumReleaseAge = 172800
 
+[fmt]
+printWidth = 80
+sortImports = true
+sortPackageJson = true
+semi = true
+singleQuote = false
+trailingComma = "es5"
+ignorePatterns = ["docs/", "dist/", ".github/scripts/", "scripts/"]
+
 [test]
 preload = ["./src/tests/setup.ts"]
 include = ["**/*.spec.ts"]

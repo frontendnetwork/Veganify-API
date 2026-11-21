@@ -1,4 +1,5 @@
 import * as crypto from "node:crypto";
+
 import { Injectable, Logger } from "@nestjs/common";
 
 import { RedisService } from "./redis.service";
@@ -64,20 +65,23 @@ export class CacheService {
 
     while (!haveLock && retries < maxRetries) {
       // Try to set the lock (NX = only if not exists)
+      // oxlint-disable-next-line no-await-in-loop -- deliberate sequential lock-retry loop
       const lock = await this.redisService.setNxPx(lockKey, "1", lockTtl);
       if (lock) {
         haveLock = true;
         break;
       }
       // Wait and retry
+      // oxlint-disable-next-line no-await-in-loop -- deliberate sequential lock-retry loop
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       // Check if cache is now filled
+      // oxlint-disable-next-line no-await-in-loop -- deliberate sequential lock-retry loop
       const value = await this.get<T>(key);
       if (value !== null) {
         this.logger.debug(`Cache filled by another request for key: ${key}`);
         return value;
       }
-      retries++;
+      retries += 1;
     }
 
     if (haveLock) {

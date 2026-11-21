@@ -1,4 +1,5 @@
 import * as path from "node:path";
+
 import { Controller, Get, HttpStatus, Param, Res } from "@nestjs/common";
 import {
   ApiExcludeEndpoint,
@@ -8,7 +9,7 @@ import {
 } from "@nestjs/swagger";
 import type { Response } from "express";
 
-export class petaType {
+class petaType {
   @ApiProperty({
     description: "The type of PETA list",
     example: "crueltyfree",
@@ -26,27 +27,27 @@ export class PetaController {
     type: petaType,
   })
   @ApiResponse({
-    status: 200,
     description: "Request returned a positive result.",
+    status: 200,
   })
   @ApiResponse({
-    status: 404,
     description: "Specified type is not available.",
+    status: 404,
   })
   @ApiResponse({
-    status: 400,
     description: "Input Error / Bad Request.",
+    status: 400,
   })
   @ApiResponse({
-    status: 500,
     description: "Internal Server Error.",
+    status: 500,
   })
   getPetaByType(@Param("type") type: string, @Res() res: Response) {
     if (!type || type.length === 0) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        status: "400",
         code: "Bad request",
         message: "Missing argument type",
+        status: "400",
       });
     }
 
@@ -62,17 +63,17 @@ export class PetaController {
 
     if (type === "veganapproved") {
       return res.status(HttpStatus.NOT_IMPLEMENTED).json({
-        status: "501",
         code: "Not implemented",
         message: "veganapproved was removed from the API",
+        status: "501",
       });
     }
 
     return res.status(HttpStatus.NOT_FOUND).json({
-      status: "404",
       code: "Type not found",
       message:
         "The given type was not found in the API. Please check the documentation for available types. Also check for typos.",
+      status: "404",
     });
   }
 
@@ -80,9 +81,9 @@ export class PetaController {
   @ApiExcludeEndpoint()
   getPetaWithoutType(@Res() res: Response) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      status: "400",
       code: "Bad request",
       message: "Missing argument type: /v0/peta/:type",
+      status: "400",
     });
   }
 }
