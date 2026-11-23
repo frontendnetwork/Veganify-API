@@ -33,7 +33,7 @@
         "@types/express": "^5.0.6",
         "@types/ini": "^4.1.1",
         "@types/jsdom": "^30.0.0",
-        "axios": "^1.20.0",
+        "axios": "^1.21.1",
         "concurrently": "^10.0.6",
         "husky": "^9.1.7",
         "oxlint": "^1.93.0",
