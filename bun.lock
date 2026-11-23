@@ -27,7 +27,7 @@
         "rxjs": "^7.8.2",
       },
       "devDependencies": {
-        "@nestjs/cli": "^12.0.12",
+        "@nestjs/cli": "^12.0.13",
         "@nestjs/testing": "^12.3.2",
         "@types/bun": "^1.4.3",
         "@types/express": "^5.0.6",
@@ -136,7 +136,7 @@
 
     "@nestjs/axios": ["@nestjs/axios@12.0.1", "", { "peerDependencies": { "@nestjs/common": "^10.0.0 || ^11.0.0 || ^12.0.0", "axios": "^1.3.1", "rxjs": "^7.0.0" } }, "sha512-Sqp14ZDrsNT96S9obtmQVzN1PLZ+FL0hnUEUjpOOtjYcGW30Knr9vV4goky/bPYPUxSCCFoXp+biRUyafkLFLA=="],
 
-    "@nestjs/cli": ["@nestjs/cli@12.0.12", "", { "dependencies": { "@angular-devkit/core": "22.2.6", "@angular-devkit/schematics": "22.2.6", "@angular-devkit/schematics-cli": "22.2.6", "@inquirer/prompts": "8.7.5", "@nestjs/schematics": "^12.0.13", "ansis": "4.5.0", "chokidar": "5.0.0", "cli-table3": "0.6.5", "commander": "15.0.0", "jsonc-parser": "3.3.1", "minimatch": "11.0.5", "node-emoji": "2.2.0", "ora": "9.4.1", "tsconfig-paths": "4.2.0", "typescript": "~6.0.2" }, "peerDependencies": { "@rspack/core": "^1.7.7 || ^2.1.10", "@swc/cli": "^0.8.0", "@swc/core": "^1.15.18", "fork-ts-checker-webpack-plugin": "^9.1.0", "ts-loader": "^9.5.4", "tsconfig-paths-webpack-plugin": "^4.2.0", "webpack": "^5.105.4", "webpack-node-externals": "^3.0.0" }, "optionalPeers": ["@rspack/core", "@swc/cli", "@swc/core", "fork-ts-checker-webpack-plugin", "ts-loader", "tsconfig-paths-webpack-plugin", "webpack", "webpack-node-externals"], "bin": { "nest": "bin/nest.js" } }, "sha512-6Ab0zxLqYzZD8aEYWvleCIkvxJhcUtjR1VfQ/Hqg1/xhinKmSaFXEbFxc3QgqsJdoM//hRoMl0iQ4sudam1pjg=="],
+    "@nestjs/cli": ["@nestjs/cli@12.0.13", "", { "dependencies": { "@angular-devkit/core": "22.2.6", "@angular-devkit/schematics": "22.2.6", "@angular-devkit/schematics-cli": "22.2.6", "@inquirer/prompts": "8.7.5", "@nestjs/schematics": "^12.0.13", "ansis": "4.5.0", "chokidar": "5.0.0", "cli-table3": "0.6.5", "commander": "15.0.0", "jsonc-parser": "3.3.1", "minimatch": "11.0.5", "node-emoji": "2.2.0", "ora": "9.4.1", "tsconfig-paths": "4.2.0", "typescript": "~6.0.2" }, "peerDependencies": { "@rspack/core": "^1.7.7 || ^2.1.10", "@swc/cli": "^0.8.0", "@swc/core": "^1.15.18", "fork-ts-checker-webpack-plugin": "^9.1.0", "ts-loader": "^9.5.4", "tsconfig-paths-webpack-plugin": "^4.2.0", "webpack": "^5.105.4", "webpack-node-externals": "^3.0.0" }, "optionalPeers": ["@rspack/core", "@swc/cli", "@swc/core", "fork-ts-checker-webpack-plugin", "ts-loader", "tsconfig-paths-webpack-plugin", "webpack", "webpack-node-externals"], "bin": { "nest": "bin/nest.js" } }, "sha512-dfb9zbM4VRUQnkjt0IyhYWxiScDq/4j8m6Y5f6PKvg6LK47XbzBeWKCBdqVFQV85uAHdJiMa8nyemAu0xvujRQ=="],
 
     "@nestjs/common": ["@nestjs/common@12.3.3", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "file-type": "22.3.0", "iterare": "1.2.1", "load-esm": "1.0.3", "tslib": "2.9.1", "uid": "2.0.2" }, "peerDependencies": { "class-transformer": ">=0.4.1", "class-validator": ">=0.13.2", "reflect-metadata": "^0.1.12 || ^0.2.0", "rxjs": "^7.1.0" }, "optionalPeers": ["class-transformer", "class-validator"] }, "sha512-e5HbxvNqNnsQfzYEfnjTCx9AExxYUu7YQxIO6yp09WtQl9MwOiZWilccWxC18spcbujZ6xacaH7Vfk/flYG0Pw=="],
 

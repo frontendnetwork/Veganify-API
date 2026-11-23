@@ -52,7 +52,7 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@nestjs/cli": "^12.0.12",
+    "@nestjs/cli": "^12.0.13",
     "@nestjs/testing": "^12.3.2",
     "@types/bun": "^1.4.3",
     "@types/express": "^5.0.6",
